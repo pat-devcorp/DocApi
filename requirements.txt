@@ -1,0 +1,13 @@
+#Linters and formating
+autoflake
+black
+flake8
+isort
+pydocstyle
+#git
+pre-commit
+#services
+gunicorn
+flask
+#test
+pytest

@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+#folders
+/app/media
+/app/log
+/app/.pytest_cache
+*.log
