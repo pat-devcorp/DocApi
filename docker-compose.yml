@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   api:
-    build: ./services/src
+    build: ./services
     volumes:
       - ./services/src/:/usr/src/app/
     ports:
-      - 5000:5000
+      - 5000:${API_PORT}
     env_file:
       - ./.env

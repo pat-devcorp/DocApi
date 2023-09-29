@@ -1,5 +1,5 @@
 from ...application.ticket import Ticket as TicketUseCase
-from ...domain.ticket import Ticket as TicketDomain
+from ...struct.ticket import Ticket as TicketStruct
 from ...infraestructure.config import Config
 from ...infraestructure.repositories.mongo import Mongo as MongoRepository
 from .controllerError import controllerError
@@ -10,10 +10,11 @@ class Ticket:
 
     def __init__(self, ref_repository=None):
         self.my_repository = (
-            self.set_repository() if ref_repository is None else ref_repository
+            self.setRepository() if ref_repository is None else ref_repository
         )
 
-    def set_repository(self):
+    # TODO: remove?
+    def setRepository(self):
         my_config = Config()
         self.my_repository = MongoRepository(
             my_config.MONGO_HOST,
@@ -23,19 +24,19 @@ class Ticket:
             my_config.MONGO_DATABASE,
         )
 
-    def get_all(self):
+    def getAll(self):
         my_ticket = TicketUseCase(self.my_repository)
-        data = my_ticket.get_all()
+        data = my_ticket.getAll()
         return data
 
-    def get_by_id(self, id: str):
+    def getByID(self, id: str):
         my_ticket = TicketUseCase(self.my_repository)
-        datos = my_ticket.get_by_id(id)
+        datos = my_ticket.getByID(id)
         return datos
 
     def create(self, write_uid, description: str):
         my_dto = {"write_uid": write_uid, "description": description}
-        has_error = TicketDomain.ensure_description(description)
+        has_error = TicketStruct.ensure_description(description)
         if has_error:
             controllerError("VALIDATION", has_error)
 
@@ -45,9 +46,9 @@ class Ticket:
         return my_obj
 
     def update(self, write_uid, input_dict):
-        my_dto = {k: v for k, v in input_dict if k in TicketDomain.__fields__}
+        my_dto = {k: v for k, v in input_dict if k in TicketStruct.__fields__}
         my_dto.update({"write_uid": write_uid})
-        has_error = TicketDomain.validate_schema(my_dto)
+        has_error = TicketStruct.validate(my_dto)
         if has_error:
             controllerError("VALIDATION", has_error)
 

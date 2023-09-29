@@ -1,0 +1,17 @@
+@baseUrl = {{API_HOST}}:{{API_PORT}}/ticket
+@rdpVersion = v1
+@ticket_id = b4b69df7-f852-4318-bc3d-1437ee5dddee
+
+### Create Ticket
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "ticket_id":{{ticket_id}}, 
+    "description":"I HAVE PROBLEMS WITH"
+}
+### Tickets
+GET {{baseUrl}}
+
+### Ticket by id
+GET {{baseUrl}}/{{baseUrl}}

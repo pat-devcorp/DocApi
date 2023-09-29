@@ -1,39 +1,39 @@
 from flask import Blueprint, jsonify, request
-
-from ...domain.ticket import Ticket as TicketDomain
+from ...struct.ticket import Ticket as TicketStruct
 from ..controllers.ticket import Ticket as TicketController
 
 Ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
-allowed_keys = TicketDomain.__fields__ + ["write_uid"]
 
 
 @Ticket.get("/", defaults={"id": None})
 @Ticket.get("/<id>")
-def get_ticket(id: str = None):
-    my_controller = TicketController()
+def getTicket(id: str = None):
+    my_ticket_controller = TicketController()
 
-    data = my_controller.get_all() if id is None else my_controller.get_by_id(id)
+    data = my_ticket_controller.getAll() if id is None else my_ticket_controller.getByID(id)
 
     return jsonify(data, 200)
 
 
 @Ticket.post("/")
-def create_ticket():
+def createTicket():
     params = request.get_json()
+    allowed_keys = ["ticket_id", "description", "write_uid"]
     df = {k: v for k, v in params.items() if k in allowed_keys}
 
-    my_controller = TicketController()
-    data = my_controller.create(**df)
+    my_ticket_controller = TicketController()
+    data = my_ticket_controller.create(**df)
 
     return jsonify(data, 200)
 
 
 @Ticket.put("/<id>")
-def update_ticket(id):
+def updateTicket(id):
     params = request.get_json()
+    allowed_keys = TicketStruct.__fields__ + ["write_uid"]
     df = {k: v for k, v in params.items() if k in allowed_keys}
 
-    my_controller = TicketController()
-    data = my_controller(**df)
+    my_ticket_controller = TicketController()
+    data = my_ticket_controller(**df)
 
     return jsonify(data, 200)

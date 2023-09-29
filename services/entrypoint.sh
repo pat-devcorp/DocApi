@@ -7,7 +7,7 @@ cd /home/services/app
 
 # Execute Odoo server command in a subshell
 (
-    gunicorn --bind 0.0.0.0:5000 wsgi:app
+    gunicorn --bind 0.0.0.0:${API_PORT} wsgi:app
     # Exit with the appropriate code
     exit_code=$?
     echo "Server exited with code: $exit_code"

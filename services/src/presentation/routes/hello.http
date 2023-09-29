@@ -1,0 +1,5 @@
+@baseUrl = {{API_HOST}}:{{API_PORT}}
+@rdpVersion = v1
+
+### Hello
+GET {{baseUrl}}

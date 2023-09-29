@@ -7,7 +7,7 @@ class RepositoryMock:
     def get(self, tablename: str, attrs: List[str]):
         return [{"id": "1234567890"}]
 
-    def get_by_id(self, tablename: str, pk: str, id_val: str, attrs: List[str]):
+    def getByID(self, tablename: str, pk: str, id_val: str, attrs: List[str]):
         return {"id": "1234567890"}
 
     def update(self, tablename: str, pk: str, id_val: str, kwargs: dict):
@@ -27,7 +27,7 @@ class RepositoryMock:
 
 def test_get():
     ticket = TicketController(RepositoryMock())
-    datos = ticket.get_by_id("1234567890")
+    datos = ticket.getByID("1234567890")
 
     assert datos == {"id": "1234567890"}
 
