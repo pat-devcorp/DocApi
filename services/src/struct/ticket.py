@@ -31,7 +31,7 @@ class EventTicket(Enum):
     END = "E"
 
 
-TicketStruct = namedtuple('TicketStruct', [
+TicketStruct = namedtuple('ticket', [
         "ticket_id", 
         "type_ticket", 
         "description", 
@@ -75,6 +75,28 @@ class Ticket:
             return "\nIs not a valid identity"
         return ''
 
+    @staticmethod
+    def ensureState(state_ticket: str) ->str:
+        if state_ticket is None or len(state_ticket) == 0:
+            return "\nEmpty state"
+        
+        try:
+            StateTicket(state_ticket)
+        except ValueError:
+            return "\nInvalid state"
+        return ''
+    
+    @staticmethod
+    def ensureType(type_ticket: str) ->str:
+        if type_ticket is None or len(type_ticket) == 0:
+            return "\nEmpty state"
+        
+        try:
+            TypeTicket(type_ticket)
+        except ValueError:
+            return "\nInvalid type ticket"
+        return ''
+
 
     @classmethod
     def fromDict(cls, params):
@@ -85,10 +107,10 @@ class Ticket:
     @classmethod
     def create(
         self,
-        ticket_id,
-        description,
-        type_ticket=TypeTicket.UNDEFINED,
-        state=StateTicket.UNDIFINED,
+        ticket_id: str,
+        description: str,
+        type_ticket: TypeTicket =TypeTicket.UNDEFINED,
+        state: StateTicket =StateTicket.UNDIFINED,
         audit_id=None,
     ) -> TicketStruct:
         my_ticket = {

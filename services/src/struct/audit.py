@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 
 
-AuditStruct = namedtuple('AuditStruct', [
+AuditStruct = namedtuple('audit', [
         "audit_id",
         "write_uid",
         "write_at",

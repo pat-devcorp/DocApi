@@ -13,7 +13,6 @@ class Ticket:
             self.setRepository() if ref_repository is None else ref_repository
         )
 
-    # TODO: remove?
     def setRepository(self):
         my_config = Config()
         self.my_repository = MongoRepository(
@@ -27,16 +26,18 @@ class Ticket:
     def getAll(self):
         my_ticket = TicketUseCase(self.my_repository)
         data = my_ticket.getAll()
+
         return data
 
     def getByID(self, id: str):
         my_ticket = TicketUseCase(self.my_repository)
         datos = my_ticket.getByID(id)
+
         return datos
 
     def create(self, write_uid, description: str):
         my_dto = {"write_uid": write_uid, "description": description}
-        has_error = TicketStruct.ensure_description(description)
+        has_error = TicketStruct.ensureDescription(description)
         if has_error:
             controllerError("VALIDATION", has_error)
 
