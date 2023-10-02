@@ -1,13 +1,16 @@
-#Linters and formating
+################################Linters and formating
 autoflake
 black
 flake8
 isort
 pydocstyle
-#git
+################################git
 pre-commit
-#services
+################################services
 gunicorn
 flask
-#test
+################################test
 pytest
+################################Streaming
+flask_cors
+kafka-python

@@ -1,87 +1,57 @@
 from collections import namedtuple
-from datetime import datetime
-import re
 
+from .DomainError import DomainError
+from .utils.datetime import ensureDatetimeFormat, getDatetime
+from .utils.identity import Identity, IdentityAlgorithm
 
-AuditStruct = namedtuple('audit', [
-        "audit_id",
-        "write_uid",
-        "write_at",
-        "create_uid",
-        "create_at",
-        "is_active"
-    ])
+AuditStruct = namedtuple("audit", ["write_uid", "write_at", "create_uid", "create_at"])
+
 
 class Audit:
-    audit_id: str
-    is_active: bool
-    write_uid: str
-    create_uid: str
-    write_at: str
-    create_at: str
-
-
     @staticmethod
-    def validate(input_dict: dict):
+    def validate(my_audit: dict) -> AuditStruct:
         errors = list()
-        id_errors = Audit.ensureUuidV4(input_dict.get("audit_id"))
-        if len(id_errors) > 0:
-            errors.append(id_errors)
-        write_uid_errors = Audit.ensureUserID(input_dict.get("write_uid"))
-        if len(write_uid_errors) > 0:
-            errors.append(write_uid_errors)
-        return errors
 
-    @staticmethod
-    def ensureDateFormat(write_at):
-        try:
-            datetime.strftime(write_at, "%d/%m/%Y, %H:%M:%S")
-            return ''
-        except ValueError:
-            return "Date format is not supported"
+        my_write_at = my_audit.get("write_at")
+        if my_write_at is not None:
+            if not ensureDatetimeFormat(my_write_at):
+                errors.append("Date format is not supported for write datetime")
 
-    @staticmethod
-    def ensureUuidV4(identity: str):
-        if identity is None or len(identity) == 0:
-            return "\nEmpty description"
-        
-        uuid_v4_pattern = re.compile(
-            r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
-        )
-        if not bool(uuid_v4_pattern.match(identity)):
-            return "\nIs not a valid identity"
-        return ''
-    
-    @staticmethod
-    def ensureUserID(write_uid):
-        if write_uid is not None:
-            return "User identity is not defined"
-        return ''
+        my_create_at = my_audit.get("create_at")
+        if my_create_at is not None:
+            if not ensureDatetimeFormat(my_create_at):
+                errors.append("Date format is not supported for create datetime")
+
+        if len(errors) > 0:
+            raise DomainError(errors)
+
+        return AuditStruct(**my_audit)
 
     @classmethod
     def fromDict(cls, params: dict):
         my_audit = {k: v for k, v in params.items() if k in AuditStruct._fields}
-        
+
         cls.create(**my_audit)
 
     @classmethod
     def create(
         self,
-        audit_id,
-        write_uid,
-        create_uid=None,
-        is_active=True,
-        write_at=None,
-        create_at=None,
+        write_uid: Identity(IdentityAlgorithm(0)),
+        create_uid: Identity(IdentityAlgorithm(0)),
+        write_at: str = None,
+        create_at: str = None,
     ) -> AuditStruct:
-        now = datetime.strftime(datetime.now(), "%d/%m/%Y, %H:%M:%S")
+        now = getDatetime()
         my_audit = {
-            "audit_id": audit_id,
-            'write_uid': write_uid,
-            'create_uid': (create_uid or write_uid),
-            'is_active': is_active,
-            'write_at': (write_at or now),
-            'create_at': (create_at or now)
+            "write_uid": write_uid,
+            "create_uid": (create_uid or write_uid),
+            "write_at": (write_at or now),
+            "create_at": (create_at or now),
         }
-        self.validate(my_audit)
-        return AuditStruct(**my_audit)
+        return self.validate(my_audit)
+
+    @classmethod
+    def udpate(cls, write_uid, my_audit: AuditStruct):
+        my_audit.write_uid = write_uid
+        my_audit.write_at = getDatetime()
+        return cls.validate(my_audit)

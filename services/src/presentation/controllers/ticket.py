@@ -1,8 +1,10 @@
 from ...application.ticket import Ticket as TicketUseCase
-from ...struct.ticket import Ticket as TicketStruct
 from ...infraestructure.config import Config
 from ...infraestructure.repositories.mongo import Mongo as MongoRepository
-from .controllerError import controllerError
+from ...struct.ticket import EventTicket
+from ...struct.ticket import Ticket as TicketDomain
+from ...struct.ticket import TicketStruct
+from .ControllerError import controllerError
 
 
 class Ticket:
@@ -35,25 +37,43 @@ class Ticket:
 
         return datos
 
-    def create(self, write_uid, description: str):
-        my_dto = {"write_uid": write_uid, "description": description}
-        has_error = TicketStruct.ensureDescription(description)
-        if has_error:
-            controllerError("VALIDATION", has_error)
+    def create(self, write_uid, ticket_id, description: str):
+        errors = list()
 
-        my_ticket = TicketUseCase(self.my_repository)
-        my_obj = my_ticket.create(my_dto)
+        my_identity_error = TicketDomain.ensureTicketId(ticket_id)
+        if my_identity_error is not None:
+            errors.append("\nIdentity not valid for ticket")
 
-        return my_obj
+        description_error = TicketDomain.ensureDescription(description)
+        if len(description_error) > 0:
+            errors.append("\nDescription not valid for ticket")
+
+        if errors:
+            controllerError(errors)
+
+        my_dto = {
+            "write_uid": write_uid,
+            "ticket_id": ticket_id,
+            "description": description,
+        }
+        my_ticket_use_case = TicketUseCase(self.my_repository)
+        my_ticket = my_ticket_use_case.stateMachine(EventTicket.CREATED, my_dto)
+
+        return my_ticket
 
     def update(self, write_uid, input_dict):
-        my_dto = {k: v for k, v in input_dict if k in TicketStruct.__fields__}
+        my_dto = {k: v for k, v in input_dict if k in TicketStruct._fields}
         my_dto.update({"write_uid": write_uid})
-        has_error = TicketStruct.validate(my_dto)
-        if has_error:
-            controllerError("VALIDATION", has_error)
 
-        my_ticket = TicketUseCase(self.my_repository)
-        my_obj = my_ticket.update(my_dto)
+        my_ticket_use_case = TicketUseCase(self.my_repository)
+        my_ticket = my_ticket_use_case.stateMachine(EventTicket.UPDATED, my_dto)
 
-        return my_obj
+        return my_ticket
+
+    def delete(self, write_uid):
+        my_ticket_use_case = TicketUseCase(self.my_repository)
+        my_ticket = my_ticket_use_case.stateMachine(
+            EventTicket.DELETED, {"write_uid": write_uid}
+        )
+
+        return my_ticket

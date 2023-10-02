@@ -1,12 +1,12 @@
 import pytest
 from flask import Flask
 
-from src.infraestructure.server import create_server
+from src.infraestructure.server import createServer
 
 
 @pytest.fixture
 def client():
-    app = create_server()  # Create your Flask app
+    app = createServer()  # Create your Flask app
     app.config["TESTING"] = True
     with app.test_client() as client:
         yield client

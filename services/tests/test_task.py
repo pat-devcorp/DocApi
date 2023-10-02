@@ -25,14 +25,14 @@ class RepositoryMock:
         }
 
 
-def test_get():
+def test_presentation():
     ticket = TicketController(RepositoryMock())
     datos = ticket.getByID("1234567890")
 
     assert datos == {"id": "1234567890"}
 
 
-def test_create():
+def test_struct():
     ticket = TicketController(RepositoryMock())
     my_dto = {"write_uid": "1234567890", "description": "This is a ticket"}
     my_obj = ticket.create(**my_dto)
@@ -40,12 +40,5 @@ def test_create():
     assert my_obj == {"id": "1234567890"}
 
 
-# def test_update():
-#    ticket = TicketController(RepositoryMock())
-#    my_dto = {
-#        "write_uid": "1234567890",
-#        "description": "This is a ticket modified",
-#    }
-#    my_obj = ticket.update(**my_dto)
-#
-#    assert my_obj == {"id": "1234567890"}
+def test_application():
+    return True

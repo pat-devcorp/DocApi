@@ -1,10 +1,10 @@
 from collections import namedtuple
 from enum import Enum
-import re
 
 from validator_collection import checkers
 
-from .audit import AuditId
+from .DomainError import DomainError
+from .utils.identity import Identity, IdentityAlgorithm
 
 
 class TypeTicket(Enum):
@@ -24,101 +24,85 @@ class StateTicket(Enum):
     END = "E"
 
 
-class EventTicket(Enum):
-    CREATED = "C"
-    IN_PROCESS = "P"
-    OBSERVE = "O"
-    END = "E"
+TicketStruct = namedtuple(
+    "ticket", ["ticket_id", "type_ticket", "description", "state"]
+)
 
-
-TicketStruct = namedtuple('ticket', [
-        "ticket_id", 
-        "type_ticket", 
-        "description", 
-        "state", 
-        "audit_id"
-    ])
 
 class Ticket:
-    ticket_id: str
-    type_ticket: TypeTicket
-    description: str
-    state: StateTicket
-    audit_id: AuditId
+    @staticmethod
+    def validate(my_ticket: dict) -> TicketStruct:
+        errors = list()
+
+        my_ticket_id = my_ticket.get("ticket_id")
+        ticket_id_error = Ticket.ensureTicketId(my_ticket_id)
+        if len(ticket_id_error) > 0:
+            errors.append(ticket_id_error)
+
+        description_error = Ticket.ensureDescription(my_ticket.get("description"))
+        if len(description_error) > 0:
+            errors.append(description_error)
+
+        my_type_ticket = my_ticket.get("ticket_type")
+        type_ticket_error = Ticket.ensureType(my_type_ticket)
+        if len(type_ticket_error) > 0:
+            errors.append(type_ticket_error)
+
+        my_state = my_ticket.get("state")
+        state_error = Ticket.ensureState(my_state)
+        if len(state_error) > 0:
+            errors.append(state_error)
+
+        if len(errors) > 0:
+            raise DomainError(errors)
+
+        return TicketStruct(**my_ticket)
 
     @staticmethod
-    def validate(input_dict: dict) -> dict:
-        errors = dict()
-        error_description = Ticket.ensureDescription(input_dict.get("description"))
-        if len(error_description) > 0:
-            errors.update(error_description)
-        return errors
+    def ensureTicketId(ticket_id: str) -> str:
+        if not Identity.validate(ticket_id, IdentityAlgorithm(1)):
+            return "Identity not valid for ticket"
+        return ""
 
     @staticmethod
-    def ensureDescription(description: str) ->str:
+    def ensureDescription(description: str) -> str:
         if description is None or len(description) == 0:
-            return "\nEmpty description"
-        
+            return "Empty description"
+
         if checkers.is_string(description, maximum_lengt=200):
-            return "\nMax length exceeded, not allowed"
-        return ''
+            return "Max length exceeded, not allowed"
+        return ""
 
     @staticmethod
-    def ensureUuidV4(identity: str):
-        if identity is None or len(identity) == 0:
-            return "\nEmpty description"
-        
-        uuid_v4_pattern = re.compile(
-            r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
-        )
-        if not bool(uuid_v4_pattern.match(identity)):
-            return "\nIs not a valid identity"
-        return ''
+    def ensureState(state_ticket: str) -> str:
+        if state_ticket not in StateTicket:
+            return "Invalid state"
+        return ""
 
     @staticmethod
-    def ensureState(state_ticket: str) ->str:
-        if state_ticket is None or len(state_ticket) == 0:
-            return "\nEmpty state"
-        
-        try:
-            StateTicket(state_ticket)
-        except ValueError:
-            return "\nInvalid state"
-        return ''
-    
-    @staticmethod
-    def ensureType(type_ticket: str) ->str:
-        if type_ticket is None or len(type_ticket) == 0:
-            return "\nEmpty state"
-        
-        try:
-            TypeTicket(type_ticket)
-        except ValueError:
-            return "\nInvalid type ticket"
-        return ''
-
+    def ensureTicketId(ticket_id: str) -> str:
+        if not Identity.validate(ticket_id, IdentityAlgorithm(1)):
+            return "Identity not valid for ticket"
+        return ""
 
     @classmethod
     def fromDict(cls, params):
         my_ticket = {k: v for k, v in params.items() if k in TicketStruct._fields}
-        
+
         cls.create(**my_ticket)
 
     @classmethod
     def create(
         self,
-        ticket_id: str,
+        ticket_id: Identity(IdentityAlgorithm(1)),
         description: str,
-        type_ticket: TypeTicket =TypeTicket.UNDEFINED,
-        state: StateTicket =StateTicket.UNDIFINED,
-        audit_id=None,
+        type_ticket: TypeTicket = TypeTicket.UNDEFINED,
+        state: StateTicket = StateTicket.UNDIFINED,
     ) -> TicketStruct:
         my_ticket = {
-            'ticket_id': ticket_id,
-            'description': description,
-            'type_ticket': type_ticket,
-            'state': state,
-            'audit_id': audit_id
+            "ticket_id": ticket_id,
+            "description": description,
+            "type_ticket": type_ticket,
+            "state": state,
         }
-        self.validate(my_ticket)
-        return TicketStruct(**my_ticket)
+        return self.validate(my_ticket)

@@ -1,7 +1,15 @@
+from collections import namedtuple
+from enum import Enum
 from typing import Dict, List, Protocol
 
 
 class RepositoryProtocol(Protocol):
+    def stateMachine(self, state: Enum, event: Enum) -> dict:
+        pass
+
+    def ensureEntity(self, my_object: namedtuple) -> bool:
+        return True
+
     def get(self, tablename: str, attrs: List[str]) -> List[Dict]:
         pass
 

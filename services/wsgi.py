@@ -1,5 +1,5 @@
-from src.infraestructure.server import create_server
+from src.infraestructure.server import createServer
 
 if __name__ == "__main__":
-    app = create_server()
+    app = createServer()
     app.run()
