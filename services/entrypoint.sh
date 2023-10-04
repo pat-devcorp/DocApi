@@ -3,11 +3,11 @@
 set -e
 echo "STARTING..."
 
-cd /home/services/app
+pytest .
 
 # Execute Odoo server command in a subshell
 (
-    gunicorn --bind 0.0.0.0:${API_PORT} wsgi:app
+    gunicorn --bind 0.0.0.0:${API_PORT} wsgi:src
     # Exit with the appropriate code
     exit_code=$?
     echo "Server exited with code: $exit_code"

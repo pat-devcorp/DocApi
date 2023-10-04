@@ -3,4 +3,4 @@ class ControllerError(Exception):
         self.message = ".\n".join(messages)
 
     def __str__(self):
-        return "--- VALIDATION ---\n" + self.message + "-" * 12
+        return "--- CONTROLLER ---\n" + self.message + "-" * 12

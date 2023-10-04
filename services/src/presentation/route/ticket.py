@@ -1,13 +1,14 @@
 from flask import Blueprint, jsonify, request
 
-from ...struct.ticket import TicketStruct
-from ..controllers.ticket import Ticket as TicketController
+from ..controller.ticket import Ticket as TicketController
+from ..interface.ticket import TicketCreate as TicketCreateInterface
+from ..interface.ticket import TicketUpdate as TicketUpdateInterface
 
-Ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
+ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 
-@Ticket.get("/", defaults={"id": None})
-@Ticket.get("/<id>")
+@ticket.get("/", defaults={"id": None})
+@ticket.get("/<id>")
 def get(id: str = None):
     my_ticket_controller = TicketController()
 
@@ -20,31 +21,30 @@ def get(id: str = None):
     return jsonify(data, 200)
 
 
-@Ticket.post("/")
+@ticket.post("/")
 def create():
     params = request.get_json()
-    allowed_keys = ["ticket_id", "description", "write_uid"]
-    df = {k: v for k, v in params.items() if k in allowed_keys}
+    my_ticket_dto = TicketCreateInterface.fromDict(params)
 
     my_ticket_controller = TicketController()
-    data = my_ticket_controller.create(**df)
+    data = my_ticket_controller.create(**my_ticket_dto)
 
     return jsonify(data, 200)
 
 
-@Ticket.put("/<id>")
+@ticket.put("/<id>")
 def update(ticket_id):
     params = request.get_json()
-    allowed_keys = TicketStruct._fields + ["write_uid"]
-    df = {k: v for k, v in params.items() if k in allowed_keys}
+
+    my_ticket_dto = TicketUpdateInterface.fromDict(params)
 
     my_ticket_controller = TicketController()
-    data = my_ticket_controller.update(ticket_id, **df)
+    data = my_ticket_controller.update(ticket_id, **my_ticket_dto)
 
     return jsonify(data, 200)
 
 
-@Ticket.delete("/<id>")
+@ticket.delete("/<id>")
 def delete(ticket_id):
     my_ticket_controller = TicketController()
     my_ticket_controller.delete(ticket_id)

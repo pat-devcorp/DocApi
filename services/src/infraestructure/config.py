@@ -14,18 +14,21 @@ def singleton(class_):
 
 @singleton
 class Config:
-    ALLOWED_EXTENSIONS = ["pdf"]
-    MAX_FILE_WEIGTH = 16000
-    DATE_FORMAT = "%Y-%m-%d"
-    TIME_FORMAT = "%H:%M:%S"
-    DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-
     def __init__(self):
-        self.PROJECT_PATH = os.environ["PROJECT_PATH"]
-        self.SECRET_KEY = os.getenv("SECRET_KEY")
-        self.get_config_mongo_database()
+        current_directory = os.getcwd()
+        self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, "..", ".."))
+        self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
 
-    def get_config_mongo_database(self):
+        allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")
+        self.ALLOWED_EXTENSIONS = allowed_extensions.split(",")
+        self.MAX_FILE_WEIGTH = os.getenv("MAX_FILE_WEIGTH", 16000)
+        self.DATE_FORMAT = os.getenv("DATE_FORMAT", "%Y-%m-%d")
+        self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
+        self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
+
+        self.PRODUCER_HOST = os.getenv("PRODUCER_HOST", "172.25.0.2")
+        self.PRODUCER_PORT = os.getenv("PRODUCER_PORT", 9092)
+
         self.MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
         self.MONGO_PORT = os.getenv("MONGO_PORT", 27017)
         self.MONGO_USER = os.getenv("MONGO_USER", "mongo")

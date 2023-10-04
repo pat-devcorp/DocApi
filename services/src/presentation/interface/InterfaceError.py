@@ -3,4 +3,4 @@ class InterfaceError(Exception):
         self.message = ".\n".join(messages)
 
     def __str__(self):
-        return "--- ARGS REQUIRED ---\n" + self.message + "-" * 21
+        return "--- INTERFACE ---\n" + self.message + "-" * 12

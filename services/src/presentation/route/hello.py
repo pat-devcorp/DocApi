@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
 
-Hello = Blueprint("hello", __name__)
+hello = Blueprint("hello", __name__)
 
 
-@Hello.get("/")
+@hello.get("/")
 def say_hello():
     return jsonify("Welcome", 200)

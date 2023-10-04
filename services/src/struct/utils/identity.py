@@ -19,15 +19,17 @@ class Identity:
 
     @classmethod
     def validate(cls, identity, algorithm: IdentityAlgorithm) -> bool:
-        identity_functions = [cls.ensureUuidV4]
-        error_identity = identity_functions[algorithm](identity)
+        identity_functions = [cls.ensureDefault, cls.ensureUuidV4]
+        error_identity = identity_functions[algorithm.value](identity)
         if len(error_identity) > 0:
             raise ValueError(error_identity)
         return True
 
+    @staticmethod
     def ensureDefault(identity):
         return ""
 
+    @staticmethod
     def ensureUuidV4(identity: str):
         if identity is None or len(identity) == 0:
             return "\nEmpty identifier"
@@ -38,3 +40,6 @@ class Identity:
         if not bool(uuid_v4_pattern.match(identity)):
             return "\nIs not a valid identity"
         return ""
+
+    def __str__(self):
+        return str(self._id)

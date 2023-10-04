@@ -36,8 +36,8 @@ class Audit:
     @classmethod
     def create(
         self,
-        write_uid: Identity(IdentityAlgorithm(0)),
-        create_uid: Identity(IdentityAlgorithm(0)),
+        write_uid: Identity(IdentityAlgorithm.DEFAULT),
+        create_uid: Identity(IdentityAlgorithm.DEFAULT),
         write_at: str = None,
         create_at: str = None,
     ) -> AuditStruct:

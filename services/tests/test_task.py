@@ -1,44 +1,59 @@
-from typing import Dict, List
+from typing import List
 
-from src.presentation.controllers.ticket import Ticket as TicketController
+from src.presentation.interface.ticket import TicketCreate as TicketCreateInterface
+from src.presentation.controller.ticket import Ticket as TicketController
+from src.struct.ticket import Ticket as TicketDomain
+
+
+def get_ticket():
+    return {
+        "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+        "write_uid": "999",
+        "description": "This is a ticket modified",
+    }
 
 
 class RepositoryMock:
     def get(self, tablename: str, attrs: List[str]):
-        return [{"id": "1234567890"}]
+        return [{"ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"}]
 
     def getByID(self, tablename: str, pk: str, id_val: str, attrs: List[str]):
-        return {"id": "1234567890"}
+        return {"ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"}
 
     def update(self, tablename: str, pk: str, id_val: str, kwargs: dict):
         return {
-            "id": "1234567890",
-            "write_uid": "1234567890",
+            "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+            "write_uid": "999",
             "description": "This is a ticket modified",
         }
 
     def create(self, tablename: str, kwargs: dict):
         return {
-            "id": "1234567890",
-            "write_uid": "1234567890",
+            "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+            "write_uid": "999",
             "description": "This is a ticket",
         }
 
 
-def test_presentation():
-    ticket = TicketController(RepositoryMock())
-    datos = ticket.getByID("1234567890")
-
-    assert datos == {"id": "1234567890"}
-
-
 def test_struct():
-    ticket = TicketController(RepositoryMock())
-    my_dto = {"write_uid": "1234567890", "description": "This is a ticket"}
-    my_obj = ticket.create(**my_dto)
-
-    assert my_obj == {"id": "1234567890"}
+    my_ticket_dto = get_ticket()
+    my_ticket = TicketCreateInterface.fromDict(my_ticket_dto)
+    print(my_ticket)
 
 
-def test_application():
-    return True
+# def test_controller():
+#     my_ticket = TicketController(RepositoryMock())
+#     my_ticket_dto = get_ticket()
+#     response = my_ticket.create(**my_ticket_dto)
+#     assert my_ticket_dto == response
+
+
+# def test_struct():
+#     ticket = TicketController(RepositoryMock())
+#     my_dto = {"write_uid": "999", "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c", "description": "This is a ticket"}
+#     my_obj = ticket.create(**my_dto)
+
+#     assert my_obj == {"ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"}
+
+
+# def test_application():

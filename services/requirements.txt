@@ -9,6 +9,7 @@ pre-commit
 ################################services
 gunicorn
 flask
+validator-collection
 ################################test
 pytest
 ################################Streaming
