@@ -1,6 +1,5 @@
 import pytest
 from flask import Flask
-
 from src.infraestructure.server import createServer
 
 

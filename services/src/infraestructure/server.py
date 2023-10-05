@@ -1,7 +1,7 @@
 import importlib.util
-import os
-from flask import Flask
 from pathlib import Path
+
+from flask import Flask
 
 from .config import Config
 from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
@@ -18,7 +18,11 @@ def registerBlueprints(app, path_ref: Path, blueprints: list):
 def getBlueprints(path_ref: Path, predicate: str = "") -> list:
     blueprints = []
     for item_path in path_ref.iterdir():
-        if not (item_path.name.startswith("__") or item_path.suffix == ".http" or item_path.name == "InterfaceError.py"):
+        if not (
+            item_path.name.startswith("__")
+            or item_path.suffix == ".http"
+            or item_path.name == "InterfaceError.py"
+        ):
             if item_path.is_file() and item_path.suffix == ".py":
                 blueprints.append(predicate + item_path.stem)
             elif item_path.is_dir():

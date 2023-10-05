@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from ..controller.ticket import Ticket as TicketController
-from ..interface.ticket import TicketCreate as TicketCreateInterface
-from ..interface.ticket import TicketUpdate as TicketUpdateInterface
+from ..interface.ticket import newTicket, setTicket
 
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
@@ -24,7 +23,7 @@ def get(id: str = None):
 @ticket.post("/")
 def create():
     params = request.get_json()
-    my_ticket_dto = TicketCreateInterface.fromDict(params)
+    my_ticket_dto = newTicket(params)
 
     my_ticket_controller = TicketController()
     data = my_ticket_controller.create(**my_ticket_dto)
@@ -35,8 +34,7 @@ def create():
 @ticket.put("/<id>")
 def update(ticket_id):
     params = request.get_json()
-
-    my_ticket_dto = TicketUpdateInterface.fromDict(params)
+    my_ticket_dto = setTicket(params)
 
     my_ticket_controller = TicketController()
     data = my_ticket_controller.update(ticket_id, **my_ticket_dto)

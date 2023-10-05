@@ -3,9 +3,8 @@ from enum import Enum
 from ..infraestructure.producer import Producer
 from ..struct.audit import Audit as AuditDomain
 from ..struct.audit import AuditStruct
-from ..struct.ticket import TicketState
 from ..struct.ticket import Ticket as TicketDomain
-from ..struct.ticket import TicketStruct
+from ..struct.ticket import TicketState, TicketStruct
 from .ApplicationError import ApplicationError
 from .repositoryProtocol import RepositoryProtocol
 
@@ -25,10 +24,11 @@ class Ticket:
         self._producer = Producer()
 
     def stateMachine(self, write_uid, event: TicketEvent, dto_ref: dict) -> dict:
+        print("---DTO---")
         print(dto_ref)
-        current_ticket = TicketDomain.create(dto_ref)
+        current_ticket = TicketDomain.fromDict(dto_ref)
         kafka_topic = ""
-        message = ''
+        message = ""
         new_ticket = None
 
         if event.CREATED:
@@ -40,10 +40,12 @@ class Ticket:
             new_ticket = self.delete(write_uid, current_ticket.ticket_id)
         if event.UPDATED:
             kafka_topic = f"TICKET UPDATED: {current_ticket.ticket_id}"
-            new_ticket = self.update(write_uid, current_ticket.ticket_id, current_ticket)
+            new_ticket = self.update(
+                write_uid, current_ticket.ticket_id, current_ticket
+            )
 
         # self._producer.send_message(kafka_topic, message)
-        return new_ticket.asDict()
+        return new_ticket._asdict()
 
     def ensureTicketId(self, my_ticket: TicketStruct) -> None:
         my_ticket = self.getByID(my_ticket.ticket_id)
@@ -61,12 +63,10 @@ class Ticket:
 
     def create(self, write_uid, my_struct: TicketStruct) -> TicketStruct:
         my_audit = AuditDomain.create(write_uid)
-        my_dto = {k: v for k, v in my_struct.items()}
-        my_dto.update(my_audit.asDict())
+        my_ticket = {k: v for k, v in my_struct.__asdict().items()}
+        my_ticket.update(my_audit._asdict())
 
-        my_ticket = TicketDomain.create(**my_dto)
-
-        self.my_repository.create(TicketStruct.__name__, my_ticket.asDict())
+        self.my_repository.create(TicketStruct.__name__, my_ticket._asdict())
 
         return my_ticket
 
@@ -79,7 +79,7 @@ class Ticket:
         my_audit = AuditDomain.update(write_uid, **my_dto_audit)
 
         self.my_repository.update(
-            TicketStruct.__name__, "ticket_id", str(my_struct._id), my_audit.asDict()
+            TicketStruct.__name__, "ticket_id", str(my_struct._id), my_audit._asdict()
         )
 
         return my_audit

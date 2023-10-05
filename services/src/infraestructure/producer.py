@@ -1,14 +1,15 @@
 import json
+
 from kafka import KafkaProducer
 
 from .config import Config
 
 
 class Producer:
-    host:str
+    host: str
     port: int
 
-    def __init__(self, host: str=None, port: int=None):
+    def __init__(self, host: str = None, port: int = None):
         if host is None:
             self.setToDefaultServer()
         else:

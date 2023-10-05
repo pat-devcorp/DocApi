@@ -1,5 +1,5 @@
-from ...application.ticket import TicketEvent
 from ...application.ticket import Ticket as TicketUseCase
+from ...application.ticket import TicketEvent
 from ...infraestructure.config import Config
 from ...infraestructure.repositories.mongo import Mongo as MongoRepository
 from ...struct.ticket import Ticket as TicketDomain
@@ -31,17 +31,17 @@ class Ticket:
 
         return data
 
-    def getByID(self, id: str):
+    def getByID(self, id):
         my_ticket = TicketUseCase(self.my_repository)
         datos = my_ticket.getByID(id)
 
         return datos
 
-    def create(self, write_uid, ticket_id, description: str):
+    def create(self, write_uid, ticket_id, description):
         errors = list()
 
-        my_identity_error = TicketDomain.validateTicketId(ticket_id)
-        if my_identity_error is not None:
+        identity_error = TicketDomain.validateTicketId(ticket_id)
+        if identity_error is not None:
             errors.append("\nIdentity not valid for ticket")
 
         description_error = TicketDomain.validateDescription(description)
@@ -57,7 +57,9 @@ class Ticket:
             "description": description,
         }
         my_ticket_use_case = TicketUseCase(self.my_repository)
-        my_ticket = my_ticket_use_case.stateMachine(write_uid, TicketEvent.CREATED, my_dto)
+        my_ticket = my_ticket_use_case.stateMachine(
+            write_uid, TicketEvent.CREATED, my_dto
+        )
 
         return my_ticket
 
@@ -66,7 +68,9 @@ class Ticket:
         my_dto.update({"write_uid": write_uid})
 
         my_ticket_use_case = TicketUseCase(self.my_repository)
-        my_ticket = my_ticket_use_case.stateMachine(write_uid, TicketEvent.UPDATED, my_dto)
+        my_ticket = my_ticket_use_case.stateMachine(
+            write_uid, TicketEvent.UPDATED, my_dto
+        )
 
         return my_ticket
 

@@ -1,8 +1,9 @@
 from typing import List
 
-from src.presentation.interface.ticket import TicketCreate as TicketCreateInterface
 from src.presentation.controller.ticket import Ticket as TicketController
-from src.struct.ticket import Ticket as TicketDomain
+from src.presentation.interface.ticket import newTicket, setTicket
+
+# from src.struct.ticket import Ticket as TicketDomain
 
 
 def get_ticket():
@@ -36,9 +37,13 @@ class RepositoryMock:
 
 
 def test_struct():
-    my_ticket_dto = get_ticket()
-    my_ticket = TicketCreateInterface.fromDict(my_ticket_dto)
-    print(my_ticket)
+    my_repository = RepositoryMock()
+    test_ticket_dto = get_ticket()
+    my_ticket_dto = newTicket(test_ticket_dto)
+    my_ticket_controller = TicketController(my_repository)
+    my_ticket_controller.create(**my_ticket_dto)
+    print(my_ticket_controller)
+    assert my_ticket_controller
 
 
 # def test_controller():
