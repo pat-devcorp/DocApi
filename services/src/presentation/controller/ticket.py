@@ -2,8 +2,8 @@ from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
 from ...infraestructure.config import Config
 from ...infraestructure.repositories.mongo import Mongo as MongoRepository
-from ...struct.ticket import Ticket as TicketDomain
-from ...struct.ticket import TicketStruct
+from ..interface.ticket import Ticket as TicketInterface
+from ..interface.ticket import TicketStruct
 from .ControllerError import ControllerError
 
 
@@ -38,27 +38,15 @@ class Ticket:
         return datos
 
     def create(self, write_uid, ticket_id, description):
-        errors = list()
-
-        identity_error = TicketDomain.validateTicketId(ticket_id)
-        if identity_error is not None:
-            errors.append("\nIdentity not valid for ticket")
-
-        description_error = TicketDomain.validateDescription(description)
-        if len(description_error) > 0:
-            errors.append("\nDescription not valid for ticket")
-
-        if errors:
-            ControllerError(errors)
-
         my_dto = {
             "write_uid": write_uid,
             "ticket_id": ticket_id,
             "description": description,
         }
+        my_ticket_struct = TicketInterface.fromDict(my_dto)
         my_ticket_use_case = TicketUseCase(self.my_repository)
         my_ticket = my_ticket_use_case.stateMachine(
-            write_uid, TicketEvent.CREATED, my_dto
+            write_uid, TicketEvent.CREATED, my_ticket_struct
         )
 
         return my_ticket
