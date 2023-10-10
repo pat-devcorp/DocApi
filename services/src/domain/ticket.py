@@ -1,6 +1,7 @@
+from collections import namedtuple
 from enum import Enum
 
-from ..presentation.interface.ticket import TicketStruct
+from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
 
 
 class TicketCategory(Enum):
@@ -19,10 +20,17 @@ class TicketState(Enum):
     OBSERVE = "O"
     END = "E"
 
+
+TicketStruct = namedtuple("ticket", ["ticket_id", "description", "category", "state"])
+
+
 class Ticket:
-    def __init__(self, my_ticket_struct: TicketStruct):
-        print(my_ticket_struct)
-    
+    @staticmethod
+    def validateTicketId(ticket_id: str) -> str:
+        if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.UUID_V4):
+            return "Identity not valid for ticket"
+        return ""
+
     @staticmethod
     def validateState(state: str) -> str:
         for member in TicketState:

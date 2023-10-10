@@ -5,6 +5,7 @@ from flask import Flask
 
 from .config import Config
 from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
+from .middleware.Prometheus import Prometheus as PrometheusMiddleware
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -18,11 +19,7 @@ def registerBlueprints(app, path_ref: Path, blueprints: list):
 def getBlueprints(path_ref: Path, predicate: str = "") -> list:
     blueprints = []
     for item_path in path_ref.iterdir():
-        if not (
-            item_path.name.startswith("__")
-            or item_path.suffix == ".http"
-            or item_path.name == "InterfaceError.py"
-        ):
+        if not (item_path.name.startswith("__") or item_path.suffix == ".http"):
             if item_path.is_file() and item_path.suffix == ".py":
                 blueprints.append(predicate + item_path.stem)
             elif item_path.is_dir():
@@ -39,6 +36,7 @@ def createServer():
     blueprints = getBlueprints(blueprint_path)
     # Register the blueprints with the app.
     registerBlueprints(app, blueprint_path, blueprints)
+    app.wsgi_app = PrometheusMiddleware(app.wsgi_app)
     # Add the exception middleware to the app
     app.wsgi_app = ExceptionHandlerMiddleware(app.wsgi_app)
     return app

@@ -7,7 +7,7 @@ class IdentityAlgorithm(Enum):
     UUID_V4 = 1
 
 
-class Identity:
+class IdentityHandler:
     _id = None
 
     def __init__(self, algorithm: IdentityAlgorithm):

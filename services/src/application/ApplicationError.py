@@ -3,4 +3,4 @@ class ApplicationError(Exception):
         self.message = ".\n".join(messages)
 
     def __str__(self):
-        return "--- NOT PRESENT ---\n" + self.message + "-" * 13
+        return "--- APPLICATION ---\n" + self.message + "-" * 13

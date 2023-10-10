@@ -3,9 +3,11 @@ import traceback
 from flask import jsonify
 
 from ...application.ApplicationError import ApplicationError
+from ...domain.DomainError import DomainError
 from ...presentation.controller import ControllerError
 from ...presentation.interface import InterfaceError
-from ...struct.DomainError import DomainError
+from ...utils.HandlerError import HandlerError
+from ..InfraestructureError import InfraestructureError
 
 
 class ExceptionHandler(object):
@@ -18,6 +20,9 @@ class ExceptionHandler(object):
         except InterfaceError as ie:
             response = jsonify(ie)
             response.status_code = 400
+        except HandlerError as he:
+            response = jsonify(he)
+            response.status_code = 400
         except ControllerError as ce:
             response = jsonify(ce)
             response.status_code = 422
@@ -26,6 +31,9 @@ class ExceptionHandler(object):
             response.status_code = 409
         except DomainError as de:
             response = jsonify(de)
+            response.status_code = 500
+        except InfraestructureError as fe:
+            response = jsonify(fe)
             response.status_code = 500
         except Exception as e:
             error = {

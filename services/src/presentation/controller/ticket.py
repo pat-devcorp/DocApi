@@ -1,71 +1,44 @@
 from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
-from ...infraestructure.config import Config
-from ...infraestructure.repositories.mongo import Mongo as MongoRepository
-from ..interface.ticket import Ticket as TicketInterface
-from ..interface.ticket import TicketStruct
-from .ControllerError import ControllerError
+from ...infraestructure.producer import Producer
+from ...infraestructure.repositories.mongo import Mongo
+from ..interface.ticket import TicketDTO
 
 
 class Ticket:
-    my_repository = None
+    _repository = None
 
-    def __init__(self, ref_repository=None):
-        self.my_repository = (
-            self.setToDefaultServer() if ref_repository is None else ref_repository
+    def __init__(self, ref_repository=None, ref_producer=None):
+        self._repository = (
+            Mongo.setToDefault() if ref_repository is None else ref_repository
         )
-
-    def setToDefaultServer(self):
-        my_config = Config()
-        self.my_repository = MongoRepository(
-            my_config.MONGO_HOST,
-            my_config.MONGO_PORT,
-            my_config.MONGO_USER,
-            my_config.MONGO_PASSWORD,
-            my_config.MONGO_DATABASE,
+        self._producer = (
+            Producer.setToDefault() if ref_producer is None else ref_producer
         )
+        self._use_case = TicketUseCase(self._repository, self._producer)
 
-    def getAll(self):
-        my_ticket = TicketUseCase(self.my_repository)
-        data = my_ticket.getAll()
-
-        return data
-
-    def getByID(self, id):
-        my_ticket = TicketUseCase(self.my_repository)
-        datos = my_ticket.getByID(id)
-
+    def getAll(self) -> list:
+        datos = self._use_case.getAll()
         return datos
 
-    def create(self, write_uid, ticket_id, description):
-        my_dto = {
-            "write_uid": write_uid,
-            "ticket_id": ticket_id,
-            "description": description,
-        }
-        my_ticket_struct = TicketInterface.fromDict(my_dto)
-        my_ticket_use_case = TicketUseCase(self.my_repository)
-        my_ticket = my_ticket_use_case.stateMachine(
-            write_uid, TicketEvent.CREATED, my_ticket_struct
-        )
+    def getByID(self, ticket_id) -> dict:
+        data = self._use_case.getByID(ticket_id)
+        return data
 
+    def create(self, write_uid, ref_ticket: TicketDTO):
+        my_ticket = self._use_case.stateMachine(
+            write_uid, TicketEvent.CREATED, ref_ticket
+        )
         return my_ticket
 
-    def update(self, write_uid, input_dict):
-        my_dto = {k: v for k, v in input_dict if k in TicketStruct._fields}
-        my_dto.update({"write_uid": write_uid})
-
-        my_ticket_use_case = TicketUseCase(self.my_repository)
-        my_ticket = my_ticket_use_case.stateMachine(
-            write_uid, TicketEvent.UPDATED, my_dto
+    def update(self, write_uid, ref_ticket: TicketDTO):
+        my_ticket = self._use_case.stateMachine(
+            write_uid, TicketEvent.UPDATED, ref_ticket
         )
-
         return my_ticket
 
-    def delete(self, write_uid):
-        my_ticket_use_case = TicketUseCase(self.my_repository)
-        my_ticket = my_ticket_use_case.stateMachine(
-            write_uid, TicketEvent.DELETED, {"write_uid": write_uid}
+    def delete(self, write_uid, ticket_id):
+        my_ticket = self._use_case.stateMachine(
+            write_uid, TicketEvent.DELETED, {"ticket_id": ticket_id}
         )
-
         return my_ticket

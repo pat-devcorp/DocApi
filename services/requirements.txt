@@ -15,3 +15,5 @@ pytest
 ################################Streaming
 flask_cors
 kafka-python
+################################Metricts
+prometheus_client

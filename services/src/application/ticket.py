@@ -1,85 +1,104 @@
 from enum import Enum
 
-from ..infraestructure.producer import Producer
+from ..utils.AuditHandler import AuditHandler, AuditStruct
 from .ApplicationError import ApplicationError
-from .repositoryProtocol import RepositoryProtocol
+from .ProducerProtocol import ProducerProtocol
+from .RepositoryProtocol import RepositoryProtocol
 
 
 class TicketEvent(Enum):
-    CREATED = "C"
-    UPDATED = "U"
-    DELETED = "D"
+    CREATED = 0
+    UPDATED = 1
+    DELETED = 2
 
 
 class Ticket:
     my_repository = None
 
-    def __init__(self, ref_repository: RepositoryProtocol):
+    def __init__(
+        self, ref_repository: RepositoryProtocol, ref_producer: ProducerProtocol
+    ):
         self.my_repository = ref_repository
-        self._fields = TicketStruct._fields + AuditStruct._fields
-        self._producer = Producer()
+        self._name = "ticket"
+        self._fields = [
+            "ticket_id",
+            "description",
+            "category",
+            "state",
+        ] + list(AuditStruct._fields)
+        self._producer = ref_producer
 
-    def stateMachine(self, write_uid, event: TicketEvent, ref_ticket: TicketInterface) -> dict:
-        print("---DTO---")
-        kafka_topic = ""
+    def stateMachine(self, write_uid, event: TicketEvent, ref_ticket: dict) -> dict:
+        print("---STATE MACHINE---")
+        print(ref_ticket)
+        topic = ""
         message = ""
-        current_ticket = TicketDomain(ref_ticket) 
+        # current_ticket = TicketDomain(ref_ticket)
         new_ticket = None
 
-        if event.CREATED:
-            kafka_topic = f"TICKET CREATED: {current_ticket.ticket_id}"
-            new_ticket = self._create(write_uid, current_ticket)
-        if event.DELETED:
-            kafka_topic = f"TICKET DELETED: {current_ticket.ticket_id}"
-            new_ticket = self.delete(write_uid, current_ticket.ticket_id)
-        if event.UPDATED:
-            kafka_topic = f"TICKET UPDATED: {current_ticket.ticket_id}"
-            new_ticket = self._update(
-                write_uid, current_ticket.ticket_id, current_ticket
-            )
+        if event == TicketEvent.CREATED:
+            topic = f"TICKET CREATED: {ref_ticket.ticket_id}"
+            new_ticket = self._create(write_uid, ref_ticket)
+        elif event == TicketEvent.UPDATED:
+            topic = f"TICKET UPDATED: {ref_ticket.ticket_id}"
+            new_ticket = self._update(write_uid, ref_ticket)
+        elif event == TicketEvent.DELETED:
+            topic = f"TICKET DELETED: {ref_ticket.ticket_id}"
+            new_ticket = self._delete(write_uid, ref_ticket.ticket_id)
+        else:
+            raise ApplicationError("Event not found: {0}".format(event))
 
-        # self._producer.send_message(kafka_topic, message)
-        return new_ticket.asDict()
+        self._producer.send_message(topic, message)
+        return new_ticket
 
-    def ensureTicketId(self, ticket_id: Identity) -> None:
+    def ensureTicketId(self, ticket_id):
         my_ticket = self.getByID(ticket_id)
-        if not my_ticket:
-            return None
+        if my_ticket is None:
+            raise ApplicationError(["Ticket does not exist"])
         return my_ticket
 
     def getAll(self) -> list:
-        return self.my_repository.get(TicketStruct.__name__, self._fields)
+        return self.my_repository.get(self._name, self._fields)
 
     def getByID(self, ticket_id) -> dict:
         return self.my_repository.getByID(
-            TicketStruct.__name__, "ticket_id", ticket_id, self._fields
+            self._name, "ticket_id", ticket_id, self._fields
         )
 
-    def _create(self, write_uid, my_struct: TicketDomain) -> TicketDomain:
-        my_audit = AuditDomain._create(write_uid)
-        my_ticket = {k: v for k, v in my_struct._asdict().items()}
-        my_ticket._update(my_audit._asdict())
+    def _create(self, write_uid, ref_dto):
+        print("---CREATE---")
+        my_audit = AuditHandler.create(write_uid)
 
-        self.my_repository._create(TicketStruct.__name__, my_ticket)
+        my_ticket = {k: v for k, v in ref_dto._asdict().items()}
+        my_ticket.update(my_audit._asdict())
 
+        self.my_repository.create(self._name, my_ticket)
+
+        print(my_ticket)
         return my_ticket
 
-    def _update(self, write_uid, my_struct: TicketDomain) -> TicketDomain:
-        my_ticket = self.ensureTicketId(my_struct.ticket_id)
-        if not my_ticket:
-            raise ApplicationError(["Ticket does not exist"])
+    def _update(self, write_uid, ref_dto):
+        print("---UPDATE---")
+        my_ticket = self.ensureTicketId(ref_dto.ticket_id)
 
-        my_audit = AuditDomain.fromDict(my_ticket)
-        my_ticket = {k: v for k, v in my_struct._asdict().items()}
-        my_ticket._update(my_audit._asdict())
+        old_audit = AuditHandler.fromDict(my_ticket)
+        my_audit = AuditHandler.update(write_uid, old_audit)
 
-        self.my_repository._update(
-            TicketStruct.__name__, "ticket_id", str(my_struct._id), my_audit._asdict()
-        )
+        my_ticket = {k: v for k, v in ref_dto._asdict().items()}
+        my_ticket.update(my_audit._asdict())
 
+        self.my_repository.update(self._name, "ticket_id", str(ref_dto._id), my_ticket)
+
+        print(my_ticket)
         return my_audit
 
-    def delete(self, write_uid, ticket_id: Identity):
-        my_ticket = self._update(write_uid, ticket_id, dict())
+    def _delete(self, write_uid, ticket_id):
+        my_ticket = self.ensureTicketId(ticket_id)
+
+        old_audit = AuditHandler.fromDict(my_ticket)
+        my_audit = AuditHandler.update(write_uid, old_audit)
+        my_ticket.update(my_audit._asdict())
+
+        self.my_repository.update(self._name, "ticket_id", ticket_id, my_ticket)
 
         return my_ticket
