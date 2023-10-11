@@ -1,15 +1,14 @@
 from collections import namedtuple
 
-from validator_collection import checkers
-
 from ...domain.ticket import Ticket as TicketDomain
-from ...utils.AuditHandler import AuditStruct
 from .InterfaceError import InterfaceError
 
 TicketDTO = namedtuple(
-    "ticket",
-    ["ticket_id", "description", "category", "state"] + list(AuditStruct._fields),
+    "TicketDTO", ["write_uid", "ticket_id", "description", "category", "state"]
 )
+
+
+AccessTicketDTO = namedtuple("AccessTicketDTO", ["write_uid", "ticket_id"])
 
 
 class Ticket:
@@ -20,7 +19,7 @@ class Ticket:
 
         errors = list()
 
-        description_error = cls.validateDescription(ticket_dto.get("description"))
+        description_error = TicketDomain.validateDescription(ticket_dto.get("description"))
         if len(description_error) > 0:
             errors.append(description_error)
 
@@ -51,15 +50,6 @@ class Ticket:
             return ticket_id_error
         return ""
 
-    @staticmethod
-    def validateDescription(description: str) -> str:
-        if description is None or len(description) == 0:
-            return "Empty description"
-
-        if not checkers.is_string(description, maximum_lengt=200):
-            return "Max length exceeded, not allowed"
-        return ""
-
     @classmethod
     def fromDict(cls, params: dict):
         ticket_dto = {k: v for k, v in params.items() if k in TicketDTO._fields}
@@ -68,16 +58,34 @@ class Ticket:
     @classmethod
     def create(
         cls,
+        write_uid: str,
         ticket_id: str,
         description: str,
-        category: str = "U",
-        state: str = "U",
+        category: int = 0,
+        state: int = 0,
     ):
         return cls.validate(
             {
+                "write_uid": write_uid,
                 "ticket_id": ticket_id,
                 "description": description,
                 "category": category,
                 "state": state,
             }
         )
+
+    @classmethod
+    def createAcessDTO(cls, params: dict):
+        errors = list()
+
+        ticket_id_error = TicketDomain.validateTicketId(params.get("ticket_id"))
+        if len(ticket_id_error) > 0:
+            errors.append(ticket_id_error)
+
+        if params.get("write_uid") is None:
+            errors.append("User must be provided")
+
+        if len(errors) > 0:
+            raise InterfaceError(errors)
+
+        return AccessTicketDTO(params["write_uid"], params["ticket_id"])

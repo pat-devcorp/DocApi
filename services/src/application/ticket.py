@@ -1,5 +1,8 @@
 from enum import Enum
 
+from dictdiffer import diff
+
+from ..domain.ticket import TicketState
 from ..utils.AuditHandler import AuditHandler, AuditStruct
 from .ApplicationError import ApplicationError
 from .ProducerProtocol import ProducerProtocol
@@ -13,92 +16,91 @@ class TicketEvent(Enum):
 
 
 class Ticket:
-    my_repository = None
+    _name = "ticket"
+    _id = "ticket_id"
+
+    def ensureTicketId(self, ref_ticket_dto):
+        my_ticket = self.getByID(ref_ticket_dto)
+        if my_ticket is None:
+            raise ApplicationError(["Ticket does not exist"])
+        return my_ticket
 
     def __init__(
         self, ref_repository: RepositoryProtocol, ref_producer: ProducerProtocol
     ):
         self.my_repository = ref_repository
-        self._name = "ticket"
+        self._producer = ref_producer
         self._fields = [
             "ticket_id",
             "description",
             "category",
             "state",
         ] + list(AuditStruct._fields)
-        self._producer = ref_producer
 
-    def stateMachine(self, write_uid, event: TicketEvent, ref_ticket: dict) -> dict:
+    def stateMachine(self, event: TicketEvent, ref_ticket_dto) -> bool:
         print("---STATE MACHINE---")
-        print(ref_ticket)
+        print(ref_ticket_dto)
         topic = ""
         message = ""
-        # current_ticket = TicketDomain(ref_ticket)
-        new_ticket = None
+        has_error = True
 
         if event == TicketEvent.CREATED:
-            topic = f"TICKET CREATED: {ref_ticket.ticket_id}"
-            new_ticket = self._create(write_uid, ref_ticket)
+            topic = "task/created"
+            has_error = not self._create(ref_ticket_dto)
         elif event == TicketEvent.UPDATED:
-            topic = f"TICKET UPDATED: {ref_ticket.ticket_id}"
-            new_ticket = self._update(write_uid, ref_ticket)
+            topic = "task/updated"
+            has_error = not self._update(ref_ticket_dto)
         elif event == TicketEvent.DELETED:
-            topic = f"TICKET DELETED: {ref_ticket.ticket_id}"
-            new_ticket = self._delete(write_uid, ref_ticket.ticket_id)
-        else:
-            raise ApplicationError("Event not found: {0}".format(event))
+            topic = "task/deleted"
+            has_error = not self._delete(ref_ticket_dto)
 
         self._producer.send_message(topic, message)
-        return new_ticket
+        return has_error
 
-    def ensureTicketId(self, ticket_id):
-        my_ticket = self.getByID(ticket_id)
-        if my_ticket is None:
-            raise ApplicationError(["Ticket does not exist"])
-        return my_ticket
+    def getAll(self, fields: list = None) -> list:
+        return self.my_repository.get(self._name, fields or self._fields)
 
-    def getAll(self) -> list:
-        return self.my_repository.get(self._name, self._fields)
-
-    def getByID(self, ticket_id) -> dict:
+    def getByID(self, ref_ticket_dto, fields: list = None) -> list:
         return self.my_repository.getByID(
-            self._name, "ticket_id", ticket_id, self._fields
+            self._name, self._id, ref_ticket_dto.ticket_id, fields or self._fields
         )
 
-    def _create(self, write_uid, ref_dto):
+    def _create(self, ref_ticket_dto) -> bool:
         print("---CREATE---")
-        my_audit = AuditHandler.create(write_uid)
-
-        my_ticket = {k: v for k, v in ref_dto._asdict().items()}
-        my_ticket.update(my_audit._asdict())
+        my_audit = AuditHandler.create(ref_ticket_dto.write_uid)
+        my_ticket = my_audit._asdict() | ref_ticket_dto._asdict()
 
         self.my_repository.create(self._name, my_ticket)
 
-        print(my_ticket)
-        return my_ticket
+        return True
 
-    def _update(self, write_uid, ref_dto):
+    def _update(self, ref_ticket_dto) -> bool:
         print("---UPDATE---")
-        my_ticket = self.ensureTicketId(ref_dto.ticket_id)
+        my_ticket_entity = self.ensureTicketId(ref_ticket_dto)
+        current_ticket = ref_ticket_dto._asdict()
+        my_ticket = {
+            key: value[1]
+            for diff_type, key, value in diff(my_ticket_entity, current_ticket)
+            if diff_type == "change"
+        }
+        my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
+        my_ticket.update(my_audit)
 
-        old_audit = AuditHandler.fromDict(my_ticket)
-        my_audit = AuditHandler.update(write_uid, old_audit)
-
-        my_ticket = {k: v for k, v in ref_dto._asdict().items()}
-        my_ticket.update(my_audit._asdict())
-
-        self.my_repository.update(self._name, "ticket_id", str(ref_dto._id), my_ticket)
+        self.my_repository.update(
+            self._name, self._id, ref_ticket_dto.ticket_id, my_ticket
+        )
 
         print(my_ticket)
-        return my_audit
+        return True
 
-    def _delete(self, write_uid, ticket_id):
-        my_ticket = self.ensureTicketId(ticket_id)
+    def _delete(self, ref_ticket_dto) -> bool:
+        self.ensureTicketId(ref_ticket_dto, ["ticket_id"])
 
-        old_audit = AuditHandler.fromDict(my_ticket)
-        my_audit = AuditHandler.update(write_uid, old_audit)
-        my_ticket.update(my_audit._asdict())
+        my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
+        my_audit.update({"state": TicketState.DELETED})
 
-        self.my_repository.update(self._name, "ticket_id", ticket_id, my_ticket)
+        self.my_repository.update(
+            self._name, self._id, ref_ticket_dto.ticket_id, my_audit
+        )
 
-        return my_ticket
+        return True

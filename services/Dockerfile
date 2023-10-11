@@ -3,7 +3,7 @@
 ###########
 
 # pull official base image
-FROM python:3.9.5-slim-buster as builder
+FROM python:3.11-slim as builder
 
 # set work directory
 WORKDIR /usr
@@ -27,7 +27,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/wheels -r requirements.t
 #########
 
 # pull official base image
-FROM python:3.9.5-slim-buster
+FROM python:3.11-slim
 
 # create the app user
 RUN addgroup --system app && adduser --system --group app

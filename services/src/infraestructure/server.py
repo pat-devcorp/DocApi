@@ -4,7 +4,8 @@ from pathlib import Path
 from flask import Flask
 
 from .config import Config
-from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
+from .middleware.ExceptionHandler import \
+    ExceptionHandler as ExceptionHandlerMiddleware
 from .middleware.Prometheus import Prometheus as PrometheusMiddleware
 
 

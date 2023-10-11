@@ -9,6 +9,7 @@ class Config:
         current_directory = os.getcwd()
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, "..", ".."))
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
+        self.API_VERSION = os.getenv("API_VERSION", "1.0.0")
 
         allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")
         self.ALLOWED_EXTENSIONS = allowed_extensions.split(",")

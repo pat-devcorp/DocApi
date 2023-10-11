@@ -14,6 +14,8 @@ class Producer:
     def __init__(self, host: str = None, port: int = None):
         self.host = host
         self.port = port
+        my_config = Config()
+        self.api_version = my_config.API_VERSION
 
     def startConnection(self):
         try:
@@ -32,10 +34,11 @@ class Producer:
 
     def send_message(self, topic: str, message: str):
         self.startConnection()
-        pattern = r"[a-zA-Z0-9\._\-]+"
+        pattern = r"[a-zA-Z0-9]+([&_/|!]|(->)|(<->))[a-zA-Z0-9]+"
         if not re.match(pattern, message):
             raise InfraestructureError("Pattern '{pattern}' not found in {message}")
         try:
+            topic = self.api_version + "/" + topic
             self.producer.send(topic, value=message)
             self.producer.flush()
             print(f"Message sent to topic '{topic}': {message}")
