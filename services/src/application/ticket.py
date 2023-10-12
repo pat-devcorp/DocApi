@@ -41,23 +41,23 @@ class Ticket:
         print("---STATE MACHINE---")
         print(ref_ticket_dto)
         topic = ""
-        message = ""
-        has_error = True
+        message = {k: v for k, v in ref_ticket_dto._asdict().items()}
+        is_ok = False
 
         if event == TicketEvent.CREATED:
             topic = "task/created"
-            has_error = not self._create(ref_ticket_dto)
+            is_ok = self._create(ref_ticket_dto)
         elif event == TicketEvent.UPDATED:
             topic = "task/updated"
-            has_error = not self._update(ref_ticket_dto)
+            is_ok = self._update(ref_ticket_dto)
         elif event == TicketEvent.DELETED:
             topic = "task/deleted"
-            has_error = not self._delete(ref_ticket_dto)
+            is_ok = self._delete(ref_ticket_dto)
 
         self._producer.send_message(topic, message)
-        return has_error
+        return is_ok
 
-    def getAll(self, fields: list = None) -> list:
+    def get(self, fields: list = None) -> list:
         return self.my_repository.get(self._name, fields or self._fields)
 
     def getByID(self, ref_ticket_dto, fields: list = None) -> list:
@@ -81,7 +81,7 @@ class Ticket:
         my_ticket = {
             key: value[1]
             for diff_type, key, value in diff(my_ticket_entity, current_ticket)
-            if diff_type == "change"
+            if diff_type == "change" and value[1] is not None
         }
         my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
         my_ticket.update(my_audit)
@@ -94,7 +94,7 @@ class Ticket:
         return True
 
     def _delete(self, ref_ticket_dto) -> bool:
-        self.ensureTicketId(ref_ticket_dto, ["ticket_id"])
+        self.ensureTicketId(ref_ticket_dto)
 
         my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
         my_audit.update({"state": TicketState.DELETED})

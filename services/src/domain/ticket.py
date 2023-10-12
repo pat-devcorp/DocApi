@@ -1,5 +1,6 @@
 from collections import namedtuple
 from enum import Enum
+
 from validator_collection import checkers
 
 from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
@@ -27,6 +28,31 @@ TicketStruct = namedtuple("ticket", ["ticket_id", "description", "category", "st
 
 
 class Ticket:
+    @classmethod
+    def partialValidate(cls, ref_ticket: dict) -> str:
+        print("---DOMAIN---")
+        print(ref_ticket)
+        validate_funcs = {
+            "ticket_id": cls.validateTicketId,
+            "description": cls.validateDescription,
+            "category": cls.validateCategory,
+            "state": cls.validateState,
+        }
+
+        ticket = {k: v for k, v in ref_ticket.items() if k in validate_funcs.keys()}
+
+        errors = list()
+        for k, v in ticket.items():
+            func = validate_funcs[k]
+            err = func(v)
+            if len(err) > 0:
+                errors.append(err)
+
+        if len(errors) > 0:
+            return "\n".join(errors)
+
+        return None
+
     @staticmethod
     def validateTicketId(ticket_id: str) -> str:
         if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.UUID_V4):
@@ -46,12 +72,9 @@ class Ticket:
             if member.value == category:
                 return ""
         return "Invalid state"
-    
+
     @staticmethod
     def validateDescription(description: str) -> str:
-        if description is None or len(description) == 0:
-            return "Empty description"
-
         if not checkers.is_string(description, maximum_lengt=200):
             return "Max length exceeded, not allowed"
         return ""

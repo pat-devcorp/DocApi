@@ -2,7 +2,7 @@ from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
 from ...infraestructure.producer import Producer
 from ...infraestructure.repositories.mongo import Mongo
-from ..interface.ticket import AccessTicketDTO, TicketDTO
+from ..interface.ticket import TicketDTO
 
 
 class Ticket:
@@ -15,11 +15,11 @@ class Ticket:
         )
         self._use_case = TicketUseCase(self._repository, self._producer)
 
-    def getAll(self) -> list:
-        datos = self._use_case.getAll()
+    def get(self) -> list:
+        datos = self._use_case.get()
         return datos
 
-    def getByID(self, ref_ticket: AccessTicketDTO) -> dict:
+    def getByID(self, ref_ticket: TicketDTO) -> dict:
         data = self._use_case.getByID(ref_ticket)
         return data
 
@@ -31,6 +31,6 @@ class Ticket:
         my_ticket = self._use_case.stateMachine(TicketEvent.UPDATED, ref_ticket)
         return my_ticket
 
-    def delete(self, ref_ticket: AccessTicketDTO):
+    def delete(self, ref_ticket: TicketDTO):
         my_ticket = self._use_case.stateMachine(TicketEvent.DELETED, ref_ticket)
         return my_ticket

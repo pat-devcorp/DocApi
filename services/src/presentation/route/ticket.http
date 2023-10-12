@@ -1,17 +1,26 @@
-@baseUrl = {{API_HOST}}:{{API_PORT}}/ticket
-@rdpVersion = v1
+@base_url = http://localhost:5000/ticket/
 @ticket_id = b4b69df7-f852-4318-bc3d-1437ee5dddee
+@write_uid = b4b69df7-f852-4318-bc3d-1437ee5dddee
 
 ### Create Ticket
-POST {{baseUrl}}
+POST {{base_url}}
 Content-Type: application/json
-
 {
+    "write_uid": {{write_uid}},
     "ticket_id":{{ticket_id}}, 
     "description":"I HAVE PROBLEMS WITH"
 }
 ### Tickets
-GET {{baseUrl}}
+GET {{base_url}}
+
+### Update Ticket
+PUT {{base_url}}
+Content-Type: application/json
+{
+    "write_uid": {{write_uid}},
+    "ticket_id":{{ticket_id}}, 
+    "description":"SORRY I HAVE THE SOLUTION"
+}
 
 ### Ticket by id
-GET {{baseUrl}}/{{baseUrl}}
+GET {{base_url}}/{{ticket_id}}

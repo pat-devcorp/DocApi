@@ -4,4 +4,4 @@ class RepositoryError(Exception):
         self.message = message
 
     def __str__(self):
-        return "--- REPOSITORY ---\n" + self.message + "\n"
+        return "--- REPOSITORY ---\n" + self.message

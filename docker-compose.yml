@@ -4,8 +4,8 @@ services:
   api:
     build: ./services
     volumes:
-      - ./services/src/:/usr/src/app/
+      - ./services:/home/services/task
     ports:
-      - 5000:${API_PORT}
+      - 5000:5000
     env_file:
       - ./.env

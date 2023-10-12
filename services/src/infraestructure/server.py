@@ -4,9 +4,10 @@ from pathlib import Path
 from flask import Flask
 
 from .config import Config
-from .middleware.ExceptionHandler import \
-    ExceptionHandler as ExceptionHandlerMiddleware
-from .middleware.Prometheus import Prometheus as PrometheusMiddleware
+from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
+
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from prometheus_client import make_wsgi_app
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -35,9 +36,11 @@ def createServer():
     # Import all the blueprints dynamically.
     blueprint_path = Path("src/presentation/route")
     blueprints = getBlueprints(blueprint_path)
-    # Register the blueprints with the app.
-    registerBlueprints(app, blueprint_path, blueprints)
-    app.wsgi_app = PrometheusMiddleware(app.wsgi_app)
     # Add the exception middleware to the app
     app.wsgi_app = ExceptionHandlerMiddleware(app.wsgi_app)
+    registerBlueprints(app, blueprint_path, blueprints)
+    # Add prometheus wsgi middleware to route /metrics requests
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/metrics': make_wsgi_app()
+    })
     return app

@@ -37,7 +37,7 @@ ENV APP_HOME=/home/services/task
 RUN mkdir -p $APP_HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd 
 COPY --from=builder /usr/wheels /wheels
 COPY --from=builder /usr/requirements.txt .
 RUN pip install --upgrade pip

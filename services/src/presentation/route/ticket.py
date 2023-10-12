@@ -8,22 +8,22 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
-def get(ticket_id: str = None):
+def getTicket(id = None):
     my_ticket_controller = TicketController()
 
-    if ticket_id is not None:
+    if id is not None:
         params = request.get_json()
-        params["ticket_id"] = ticket_id
-        my_ticked = TicketInterface.createAcessDTO(params)
+        params["ticket_id"] = id
+        my_ticked = TicketInterface.fromDict(params)
         datos = my_ticket_controller.getByID(my_ticked)
     else:
-        datos = my_ticket_controller.getAll()
+        datos = my_ticket_controller.get()
 
     return jsonify(datos, 200)
 
 
 @ticket.post("/")
-def create():
+def createTicket():
     params = request.get_json()
     my_ticket_dto = TicketInterface.fromDict(params)
 
@@ -34,9 +34,9 @@ def create():
 
 
 @ticket.put("/<id>")
-def update(ticket_id):
+def updateTicket(id):
     params = request.get_json()
-    params["ticket_id"] = ticket_id
+    params["ticket_id"] = id
     my_ticket_dto = TicketInterface.fromDict(params)
 
     my_ticket_controller = TicketController()
@@ -46,10 +46,10 @@ def update(ticket_id):
 
 
 @ticket.delete("/<id>")
-def delete(ticket_id):
+def deleteTicket(id):
     params = request.get_json()
-    params["ticket_id"] = ticket_id
-    my_ticked = TicketInterface.createAcessDTO(params)
+    params["ticket_id"] = id
+    my_ticked = TicketInterface.fromDict(params)
 
     my_ticket_controller = TicketController()
     data = my_ticket_controller.delete(my_ticked)

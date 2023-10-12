@@ -3,4 +3,4 @@ class HandlerError(Exception):
         self.message = messages
 
     def __str__(self):
-        return "--- HANDLER ---\n" + self.message + "-" * 12
+        return "--- HANDLER ---\n" + self.message

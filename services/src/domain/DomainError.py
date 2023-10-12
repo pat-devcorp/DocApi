@@ -3,4 +3,4 @@ class DomainError(Exception):
         self.message = ".\n".join(messages)
 
     def __str__(self):
-        return "--- STRUCT DOES NOT MATCH ---\n" + self.message + "-" * 29
+        return "--- STRUCT DOES NOT MATCH ---\n" + self.message
