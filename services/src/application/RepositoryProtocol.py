@@ -4,6 +4,9 @@ from typing import Dict, List, Protocol
 
 
 class RepositoryProtocol(Protocol):
+    def setToDefault(cls):
+        pass
+    
     def stateMachine(self, state: Enum, event: Enum) -> dict:
         pass
 

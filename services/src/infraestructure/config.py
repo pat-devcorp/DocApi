@@ -18,11 +18,11 @@ class Config:
         self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
 
-        self.PRODUCER_HOST = os.getenv("PRODUCER_HOST", "172.25.0.2")
-        self.PRODUCER_PORT = os.getenv("PRODUCER_PORT", 9092)
+        self.KAFKA_HOST = os.getenv("KAFKA_HOST", "172.25.0.2")
+        self.KAFKA_PORT = os.getenv("KAFKA_PORT", 9092)
 
         self.MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
         self.MONGO_PORT = os.getenv("MONGO_PORT", 27017)
         self.MONGO_USER = os.getenv("MONGO_USER", "mongo")
         self.MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "mongo")
-        self.MONGO_DATABASE = os.getenv("MONGO_DATABASE", "dev")
+        self.MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "dev")

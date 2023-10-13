@@ -2,12 +2,11 @@ import importlib.util
 from pathlib import Path
 
 from flask import Flask
+from prometheus_client import make_wsgi_app
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from .config import Config
 from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
-
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -40,7 +39,5 @@ def createServer():
     app.wsgi_app = ExceptionHandlerMiddleware(app.wsgi_app)
     registerBlueprints(app, blueprint_path, blueprints)
     # Add prometheus wsgi middleware to route /metrics requests
-    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-        '/metrics': make_wsgi_app()
-    })
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
     return app

@@ -1,6 +1,6 @@
 from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
-from ...infraestructure.producer import Producer
+from ...infraestructure.kafka import Kafka
 from ...infraestructure.repositories.mongo import Mongo
 from ..interface.ticket import TicketDTO
 
@@ -11,7 +11,7 @@ class Ticket:
             Mongo.setToDefault() if ref_repository is None else ref_repository
         )
         self._producer = (
-            Producer.setToDefault() if ref_producer is None else ref_producer
+            Kafka.setToDefault() if ref_producer is None else ref_producer
         )
         self._use_case = TicketUseCase(self._repository, self._producer)
 

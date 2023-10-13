@@ -8,7 +8,7 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
-def getTicket(id = None):
+def getTicket(id=None):
     my_ticket_controller = TicketController()
 
     if id is not None:

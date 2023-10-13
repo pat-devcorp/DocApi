@@ -54,7 +54,7 @@ class Ticket:
             topic = "task/deleted"
             is_ok = self._delete(ref_ticket_dto)
 
-        self._producer.send_message(topic, message)
+        self._producer.sendMessage(topic, message)
         return is_ok
 
     def get(self, fields: list = None) -> list:

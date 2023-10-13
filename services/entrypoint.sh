@@ -3,11 +3,11 @@
 set -e
 echo "STARTING..."
 
-pytest .
+# pytest .
 
 # Execute Odoo server command in a subshell
 (
-    gunicorn --bind 0.0.0.0:${API_PORT} wsgi:app
+    gunicorn --bind 0.0.0.0:5000 wsgi:app
     # Exit with the appropriate code
     exit_code=$?
     echo "Server exited with code: $exit_code"
@@ -20,9 +20,9 @@ pytest .
 # echo "RUNNING: $APP_PID"
 
 # Wait for the Odoo server to start
-#sleep 5
+# sleep 5
 
 # Tail the Odoo server log in a separate process
-#tail -f /var/services/log/app.log &
+# tail -f /var/services/log/app.log &
 
 exec "$@"

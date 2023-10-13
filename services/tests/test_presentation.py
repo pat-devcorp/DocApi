@@ -41,7 +41,7 @@ class RepositoryMock:
 
 
 class ProducerMock:
-    def send_message(self, topic: str, message: str) -> bool:
+    def sendMessage(self, topic: str, message: str) -> bool:
         print(f"Message sent to topic '{topic}': {message}")
         return True
 

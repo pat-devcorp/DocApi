@@ -2,8 +2,8 @@ from typing import Protocol
 
 
 class ProducerProtocol(Protocol):
-    def getToDefaultServer(self):
+    def setToDefault(self):
         pass
 
-    def send_message(self, topic: str, message: str):
+    def sendMessage(self, topic: str, message: str):
         pass
