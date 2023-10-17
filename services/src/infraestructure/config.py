@@ -26,3 +26,5 @@ class Config:
         self.MONGO_USER = os.getenv("MONGO_USER", "mongo")
         self.MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "mongo")
         self.MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "dev")
+
+        self.KAFKA_PREFIX = "task:" + self.API_VERSION

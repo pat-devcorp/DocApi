@@ -1,7 +1,9 @@
+from enum import Enum
 import json
 import re
 
 from kafka import KafkaProducer, KafkaConsumer
+from ..application.ProducerProtocol import ProducerTopic
 
 from .config import Config
 from .InfraestructureError import InfraestructureError
@@ -15,7 +17,7 @@ class Kafka:
         self.host = host
         self.port = port
         my_config = Config()
-        self.api_version = my_config.API_VERSION
+        self.prefix = my_config.KAFKA_PREFIX
 
     @property
     def chain_connection(self):
@@ -44,16 +46,16 @@ class Kafka:
         except Exception as e:
             raise InfraestructureError(f"Failed to connect to Kafka {str(e)}")
 
-    def sendMessage(self, topic: str, message: str):
+    def sendMessage(self, topic: ProducerTopic, message: str):
         self.startConnection()
         pattern = r"\b\w+:\d+\.\d+\.\d+\.\d+\/"
         if re.match(pattern, message):
             raise InfraestructureError("Pattern '{pattern}' not found in {message}")
         try:
-            topic = self.api_version + "/" + topic
+            topic = self.prefix + "/" + topic.value
             self.producer.send(topic, value=message)
             self.producer.flush()
-            print(f"Message sent to topic '{topic}': {message}")
+            print(f"Message sent to topic '{topic.value}': {message}")
 
         except Exception as e:
             raise InfraestructureError(f"Error sending message to Kafka: {str(e)}")

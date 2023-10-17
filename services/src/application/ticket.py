@@ -5,7 +5,7 @@ from dictdiffer import diff
 from ..domain.ticket import TicketState
 from ..utils.AuditHandler import AuditHandler, AuditStruct
 from .ApplicationError import ApplicationError
-from .ProducerProtocol import ProducerProtocol
+from .ProducerProtocol import ProducerProtocol, ProducerTopic
 from .RepositoryProtocol import RepositoryProtocol
 
 
@@ -40,18 +40,18 @@ class Ticket:
     def stateMachine(self, event: TicketEvent, ref_ticket_dto) -> bool:
         print("---STATE MACHINE---")
         print(ref_ticket_dto)
-        topic = ""
+        topic = ProducerTopic.DEFAULT
         message = {k: v for k, v in ref_ticket_dto._asdict().items()}
         is_ok = False
 
         if event == TicketEvent.CREATED:
-            topic = "task/created"
+            topic = ProducerTopic.TASK_CREATED
             is_ok = self._create(ref_ticket_dto)
         elif event == TicketEvent.UPDATED:
-            topic = "task/updated"
+            topic = ProducerTopic.TASK_UPDATED
             is_ok = self._update(ref_ticket_dto)
         elif event == TicketEvent.DELETED:
-            topic = "task/deleted"
+            topic = ProducerTopic.TASK_DELETED
             is_ok = self._delete(ref_ticket_dto)
 
         self._producer.sendMessage(topic, message)
