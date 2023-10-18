@@ -12,3 +12,5 @@ kafka-avro-console-producer \
 kafka-avro-console-consumer --topic my-avro-topic \
     --bootstrap-server kafka-broker-1:9092 --from-beginning \
     --property schema.registry.url=http://localhost:8081
+
+kafka-avro-console-consumer --bootstrap-server kafka-broker-1:19092 --topic quickstart-jdbc-test --from-beginning --max-messages 10
