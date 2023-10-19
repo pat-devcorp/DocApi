@@ -3,10 +3,10 @@ import json
 import re
 
 from kafka import KafkaProducer, KafkaConsumer
-from ..application.ProducerProtocol import ProducerTopic
+from ...application.ProducerProtocol import ProducerTopic
 
-from .config import Config
-from .InfraestructureError import InfraestructureError
+from ..config import Config
+from ..InfraestructureError import InfraestructureError
 
 
 class Kafka:

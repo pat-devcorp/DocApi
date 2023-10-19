@@ -1,6 +1,6 @@
 from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
-from ...infraestructure.kafka import Kafka
+from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.mongo import Mongo
 from ..interface.ticket import TicketDTO
 

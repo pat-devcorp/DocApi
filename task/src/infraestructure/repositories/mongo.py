@@ -3,7 +3,7 @@ from typing import Dict, List
 from pymongo import MongoClient
 
 from ..config import Config
-from .RepositoryError import RepositoryError
+from ..InfraestructureError import InfraestructureError
 
 
 class Mongo:
@@ -47,14 +47,14 @@ class Mongo:
             self.connection = MongoClient(self.chain_connection)
             self.client = self.connection[self.database]
         except Exception as err:
-            raise RepositoryError(
+            raise InfraestructureError(
                 f"{self.chain_connection}\n{str(err)}",
             )
 
     def getCollection(self, tablename: str):
         self.startConnection()
         if self.client is None:
-            raise RepositoryError("Connection not established")
+            raise InfraestructureError("Connection not established")
         return self.client[tablename]
 
     def get(self, tablename: str, pk_name: str, attrs: List[str]) -> List[Dict]:
@@ -65,7 +65,7 @@ class Mongo:
                 item[pk_name] = item.pop("_id")
             return datos
         except Exception as err:
-            raise RepositoryError(str(err))
+            raise InfraestructureError(str(err))
 
     def getByID(self, tablename: str, pk_name: str, id_val: str, attrs: List[str]) -> Dict:
         collection = self.getCollection(tablename)
@@ -74,12 +74,12 @@ class Mongo:
             data[pk_name] = data.pop("_id")
             return data
         except Exception as err:
-            raise RepositoryError(str(err))
+            raise InfraestructureError(str(err))
 
     def update(self, tablename: str, pk_name: str, id_val: str, kwargs: dict):
         collection = self.getCollection(tablename)
         if not self.getByID(tablename, pk_name, id_val, []):
-            raise RepositoryError(
+            raise InfraestructureError(
                 f"No record found for ID {id_val} not found in table {tablename}"
             )
         collection.update_one({"_id": id_val}, {"$set": kwargs})

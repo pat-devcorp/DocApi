@@ -5,7 +5,8 @@ from dictdiffer import diff
 from ..domain.ticket import TicketState
 from ..utils.AuditHandler import AuditHandler, AuditStruct
 from .ApplicationError import ApplicationError
-from .ProducerProtocol import ProducerProtocol, ProducerTopic
+from .ProducerProtocol import ProducerProtocol
+from .ProducerTopic import ProducerTopic
 from .RepositoryProtocol import RepositoryProtocol
 
 
