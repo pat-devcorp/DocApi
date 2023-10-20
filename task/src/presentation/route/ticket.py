@@ -8,7 +8,7 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
-def getTicket(id=None):
+def fetchTicket(id=None):
     my_ticket_controller = TicketController()
 
     if id is not None:
@@ -17,7 +17,7 @@ def getTicket(id=None):
         my_ticked = TicketInterface.fromDict(params)
         datos = my_ticket_controller.getByID(my_ticked)
     else:
-        datos = my_ticket_controller.get()
+        datos = my_ticket_controller.fetch()
 
     return jsonify(datos, 200)
 

@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from ...domain.ticket import Ticket as TicketDomain
+from ...domain.ticket import EnsureTicket
 from .InterfaceError import InterfaceError
 
 TicketDTO = namedtuple(
@@ -15,7 +15,7 @@ class Ticket:
 
         errors = list()
 
-        domain_error = TicketDomain.partialValidate(ticket_dto)
+        domain_error = EnsureTicket.partialValidate(ticket_dto)
         if domain_error is not None:
             errors.append(domain_error)
 
@@ -29,7 +29,7 @@ class Ticket:
             raise InterfaceError("Identifier must be provided")
 
     @classmethod
-    def getDefault(cls):
+    def getNewTicket(cls):
         return {
             "write_uid": None,
             "ticket_id": None,

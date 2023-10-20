@@ -1,4 +1,4 @@
-from ...application.ProducerTopic import ProducerTopic
+from ...application.BrokerTopic import BrokerTopic
 
 class BrokerMock:
     @property
@@ -9,5 +9,5 @@ class BrokerMock:
     def setToDefault(cls):
         pass
     
-    def sendMessage(self, topic: ProducerTopic, message: str):
+    def sendMessage(self, topic: BrokerTopic, message: str):
         pass

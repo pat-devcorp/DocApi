@@ -5,8 +5,8 @@ from dictdiffer import diff
 from ..domain.ticket import TicketState
 from ..utils.AuditHandler import AuditHandler, AuditStruct
 from .ApplicationError import ApplicationError
-from .ProducerProtocol import ProducerProtocol
-from .ProducerTopic import ProducerTopic
+from .BrokerTopic import BrokerTopic
+from .BrokerProtocol import BrokerProtocol
 from .RepositoryProtocol import RepositoryProtocol
 
 
@@ -19,46 +19,43 @@ class TicketEvent(Enum):
 class Ticket:
     _name = "ticket"
     _id = "ticket_id"
-
-    def ensureTicketId(self, ref_ticket_dto):
-        my_ticket = self.getByID(ref_ticket_dto)
-        if my_ticket is None:
-            raise ApplicationError(["Ticket does not exist"])
-        return my_ticket
-
-    def __init__(
-        self, ref_repository: RepositoryProtocol, ref_producer: ProducerProtocol
-    ):
-        self.my_repository = ref_repository
-        self._producer = ref_producer
-        self._fields = [
+    _fields = [
             "ticket_id",
             "description",
             "category",
             "state",
-        ] + list(AuditStruct._fields)
+    ]
+
+    def __init__(
+        self, ref_repository: RepositoryProtocol, ref_broker: BrokerProtocol
+    ):
+        self.my_repository = ref_repository
+        self.my_broker = ref_broker
+        self._fields += list(AuditStruct._fields)
 
     def stateMachine(self, event: TicketEvent, ref_ticket_dto) -> bool:
         print("---STATE MACHINE---")
         print(ref_ticket_dto)
-        topic = ProducerTopic.DEFAULT
-        message = {k: v for k, v in ref_ticket_dto._asdict().items()}
+        topic = None
         is_ok = False
+        message = {k: v for k, v in ref_ticket_dto._asdict().items()}
 
         if event == TicketEvent.CREATED:
-            topic = ProducerTopic.TASK_CREATED
+            topic = BrokerTopic.TASK_CREATED
             is_ok = self._create(ref_ticket_dto)
         elif event == TicketEvent.UPDATED:
-            topic = ProducerTopic.TASK_UPDATED
+            topic = BrokerTopic.TASK_UPDATED
             is_ok = self._update(ref_ticket_dto)
         elif event == TicketEvent.DELETED:
-            topic = ProducerTopic.TASK_DELETED
+            topic = BrokerTopic.TASK_DELETED
             is_ok = self._delete(ref_ticket_dto)
-
-        self._producer.sendMessage(topic, message)
+    
+        if topic is not None:
+            self.my_broker.sendMessage(topic, message)
+        
         return is_ok
 
-    def get(self, fields: list = None) -> list:
+    def fetch(self, fields: list = None) -> list:
         return self.my_repository.get(self._name, fields or self._fields)
 
     def getByID(self, ref_ticket_dto, fields: list = None) -> list:
@@ -77,7 +74,10 @@ class Ticket:
 
     def _update(self, ref_ticket_dto) -> bool:
         print("---UPDATE---")
-        my_ticket_entity = self.ensureTicketId(ref_ticket_dto)
+        my_ticket_entity = self.getByID(ref_ticket_dto)
+        if my_ticket_entity is None:
+            raise ApplicationError(["Ticket does not exist"])
+        
         current_ticket = ref_ticket_dto._asdict()
         my_ticket = {
             key: value[1]
@@ -95,7 +95,8 @@ class Ticket:
         return True
 
     def _delete(self, ref_ticket_dto) -> bool:
-        self.ensureTicketId(ref_ticket_dto)
+        if self.getByID(ref_ticket_dto) is None:
+            raise ApplicationError(["Ticket does not exist"])
 
         my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
         my_audit.update({"state": TicketState.DELETED})

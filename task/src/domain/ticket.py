@@ -24,10 +24,10 @@ class TicketState(Enum):
     END = 5
 
 
-TicketStruct = namedtuple("ticket", ["ticket_id", "description", "category", "state"])
+Ticket = namedtuple("ticket", ["ticket_id", "description", "category", "state"])
 
 
-class Ticket:
+class EnsureTicket:
     @classmethod
     def partialValidate(cls, ref_ticket: dict) -> str:
         print("---DOMAIN---")
@@ -52,7 +52,7 @@ class Ticket:
             return "\n".join(errors)
 
         return None
-
+    
     @staticmethod
     def validateTicketId(ticket_id: str) -> str:
         if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.UUID_V4):

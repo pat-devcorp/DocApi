@@ -3,7 +3,7 @@ import json
 import re
 
 from kafka import KafkaProducer, KafkaConsumer
-from ...application.ProducerProtocol import ProducerTopic
+from ...application.BrokerTopic import BrokerTopic
 
 from ..config import Config
 from ..InfraestructureError import InfraestructureError
@@ -46,7 +46,7 @@ class Kafka:
         except Exception as e:
             raise InfraestructureError(f"Failed to connect to Kafka {str(e)}")
 
-    def sendMessage(self, topic: ProducerTopic, message: str):
+    def sendMessage(self, topic: BrokerTopic, message: str):
         self.startConnection()
         pattern = r"\b\w+:\d+\.\d+\.\d+\.\d+\/"
         if re.match(pattern, message):
