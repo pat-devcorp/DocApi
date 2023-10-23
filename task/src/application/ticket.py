@@ -3,7 +3,7 @@ from enum import Enum
 from dictdiffer import diff
 
 from ..domain.ticket import TicketState
-from ..utils.AuditHandler import AuditHandler, AuditStruct
+from ..utils.AuditHandler import AuditHandler, AuditDTO
 from .ApplicationError import ApplicationError
 from .BrokerTopic import BrokerTopic
 from .BrokerProtocol import BrokerProtocol
@@ -31,7 +31,7 @@ class Ticket:
     ):
         self.my_repository = ref_repository
         self.my_broker = ref_broker
-        self._fields += list(AuditStruct._fields)
+        self._fields += list(AuditDTO._fields)
 
     def stateMachine(self, event: TicketEvent, ref_ticket_dto) -> bool:
         print("---STATE MACHINE---")

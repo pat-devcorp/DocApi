@@ -16,3 +16,6 @@ kafka-python
 prometheus_client
 # Repositories
 pymongo
+# utils
+subprocess
+magic

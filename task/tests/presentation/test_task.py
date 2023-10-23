@@ -37,6 +37,7 @@ def assert_type_dto():
     assert isinstance(my_ticket_dto, TicketDTO)
 
 
+## Basic task methods
 def getControllerMock():
     my_repository = RepositoryMock()
     my_producer = BrokerMock()
@@ -112,6 +113,7 @@ def test_task_member():
     assert response
 
 
+## Aggregate for task
 def test_task_keyword():
     my_ticket_controller = getControllerMock()
 
@@ -130,7 +132,52 @@ def test_task_meeting():
 
     test_ticket_dto = {
         "write_uid": "9999",
+        "subject": "Dealing with bugs",
         "meeting_date": "03/10/2023 16:30",
+        "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+    }
+    my_ticket_member_dto = TicketInterface.fromDict(test_ticket_dto)
+    response = my_ticket_controller.addKeyword(my_ticket_member_dto)
+    assert response
+
+
+def test_task_cheklist():
+    my_ticket_controller = getControllerMock()
+
+    test_ticket_dto = {
+        "write_uid": "9999",
+        "checklist": "Milestone for Project",
+        "items": [
+            "get notifications about project",
+            "generate documentation for project"
+        ],
+        "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+    }
+    my_ticket_member_dto = TicketInterface.fromDict(test_ticket_dto)
+    response = my_ticket_controller.addKeyword(my_ticket_member_dto)
+    assert response
+
+
+def test_task_attachment():
+    my_ticket_controller = getControllerMock()
+
+    test_ticket_dto = {
+        "write_uid": "9999",
+        "attachment_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+        "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+    }
+    my_ticket_member_dto = TicketInterface.fromDict(test_ticket_dto)
+    response = my_ticket_controller.addKeyword(my_ticket_member_dto)
+    assert response
+
+
+def test_task_assignee():
+    my_ticket_controller = getControllerMock()
+
+    test_ticket_dto = {
+        "write_uid": "9999",
+        "estimate_time_in_minutes": "240",
+        "end_at": "03/10/2023 16:30",
         "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
     }
     my_ticket_member_dto = TicketInterface.fromDict(test_ticket_dto)

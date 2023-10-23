@@ -1,65 +1,63 @@
 from collections import namedtuple
+import requests
 
-from .DatetimeHandler import DateTimeHandler
+from ..infraestructure.config import Config
+from .DatetimeHandler import valdiateDatetimeFormat, getDatetime
 from .HandlerError import HandlerError
 
-AuditStruct = namedtuple("audit", ["write_uid", "write_at", "create_uid", "create_at"])
+AuditDTO = namedtuple("audit", ["write_uid", "write_at", "create_uid", "create_at"])
 
 
 class AuditHandler:
-    @classmethod
-    def validate(cls, my_audit: dict) -> AuditStruct:
+    def _validate(cls, my_audit: dict) -> list:
         errors = list()
+
+        if my_audit.get("create_uid") is None:
+            errors.append("Create User is required")
 
         my_write_at = my_audit.get("write_at")
         if my_write_at is not None:
-            if not DateTimeHandler.valdiateDatetimeFormat(my_write_at):
+            if not valdiateDatetimeFormat(my_write_at):
                 errors.append("Date format is not supported for write datetime")
 
         my_create_at = my_audit.get("create_at")
         if my_create_at is not None:
-            if not DateTimeHandler.valdiateDatetimeFormat(my_create_at):
+            if not valdiateDatetimeFormat(my_create_at):
                 errors.append("Date format is not supported for create datetime")
 
-        if len(errors) > 0:
-            raise HandlerError("\n".join(errors))
+        return errors
 
-        return AuditStruct(**my_audit)
+    @classmethod
+    def validateIdentity(ticket_id):
+        my_config = Config()
+        payload = {"user_id": id}
+        r = requests.get(my_config.USER_API, params=payload)
+        return True if r.status_code == 200 else False
 
     @classmethod
     def fromDict(cls, params: dict):
         if params.get("write_uid") is None:
             raise HandlerError("User for write is required")
 
-        my_audit = {k: v for k, v in params.items() if k in AuditStruct._fields}
-        cls.create(**my_audit)
+        audit_dto = dict()
+        for k in AuditDTO._fields:
+            audit_dto[k] = params[k] if params.get(k) is not None else None
 
-    @classmethod
-    def create(cls, write_uid, create_uid=None, create_at=None, write_at=None):
-        now = DateTimeHandler.getDatetime()
-        my_audit = {
-            "write_uid": write_uid,
-            "write_at": (write_at or now),
-            "create_uid": (create_uid or write_uid),
-            "create_at": (create_at or now),
-        }
-        return cls.validate(my_audit)
-
-    @classmethod
-    def update(cls, current_uid, old_audit: dict):
-        errors = list()
-
-        if old_audit.get("create_uid") is None:
-            errors.append("User that create the entity is not defined")
-
-        if old_audit.get("create_at") is None:
-            errors.append("The date that entity was created is not defined")
-
+        errors = cls._validate(params)
         if len(errors) > 0:
             raise HandlerError("\n".join(errors))
 
-        cls.create(current_uid, old_audit["create_uid"], old_audit["create_at"])
+        return AuditDTO(**audit_dto)
 
     @classmethod
     def getUpdateFields(cls, current_uid):
-        return {"write_uid": current_uid, "write_at": DateTimeHandler.getDatetime()}
+        return {"write_uid": current_uid, "write_at": getDatetime()}
+    
+    @classmethod
+    def getNewAudit(cls, current_uid):
+        return AuditDTO(
+            write_uid= current_uid, 
+            write_at= getDatetime(), 
+            create_uid= current_uid, 
+            create_at= getDatetime()
+        )

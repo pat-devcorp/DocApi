@@ -24,7 +24,7 @@ class TicketState(Enum):
     END = 5
 
 
-Ticket = namedtuple("ticket", ["ticket_id", "description", "category", "state"])
+Ticket = namedtuple("ticket", ["ticket_id", "description", "category", "state", "end_at", "points"])
 
 
 class EnsureTicket:

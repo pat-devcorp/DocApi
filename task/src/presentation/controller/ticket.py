@@ -5,14 +5,16 @@ from ...infraestructure.repositories.mongo import Mongo
 
 
 class Ticket:
-    def __init__(self, ref_repository=None, ref_producer=None):
-        self._repository = (
+    def __init__(self, write_uid, ref_repository=None, ref_producer=None):
+        self._write_uid = write_uid
+        self._ref_repository = (
             Mongo.setToDefault() if ref_repository is None else ref_repository
         )
-        self._producer = (
+        self._ref_producer = (
             Kafka.setToDefault() if ref_producer is None else ref_producer
         )
-        self._use_case = TicketUseCase(self._repository, self._producer)
+        self._use_case = TicketUseCase(self._ref_repository, self._ref_producer)
+
 
     @staticmethod
     def getTemplate() -> str:
@@ -34,10 +36,6 @@ class Ticket:
         datos = self._use_case.fetch()
         return datos
 
-    def getByID(self, ref_ticket) -> dict:
-        data = self._use_case.getByID(ref_ticket)
-        return data
-
     def create(self, ref_ticket):
         my_ticket = self._use_case.stateMachine(TicketEvent.CREATED, ref_ticket)
         return my_ticket
@@ -45,7 +43,19 @@ class Ticket:
     def update(self, ref_ticket):
         my_ticket = self._use_case.stateMachine(TicketEvent.UPDATED, ref_ticket)
         return my_ticket
+    
+    def getByID(self, ticket_id) -> dict:
+        data = self._use_case.getByID(ticket_id)
+        return data
 
-    def delete(self, ref_ticket):
-        my_ticket = self._use_case.stateMachine(TicketEvent.DELETED, ref_ticket)
+    def delete(self, ticket_id):
+        my_ticket = self._use_case.stateMachine(TicketEvent.DELETED, ticket_id)
+        return my_ticket
+    
+    def addMember(self, ticket_id, member_id):
+        my_ticket = self._use_case.stateMachine(TicketEvent.ADDING_MEMBER, ticket_id)
+        return my_ticket
+    
+    def removeMember(self, ticket_id, member_id):
+        my_ticket = self._use_case.stateMachine(TicketEvent.REMOVING_MEMBER, ticket_id)
         return my_ticket
