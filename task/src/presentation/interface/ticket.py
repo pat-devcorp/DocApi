@@ -1,36 +1,48 @@
 from collections import namedtuple
 
-from ...domain.ticket import EnsureTicket
+from ...domain.ticket import EnsureTicket, TicketCategory, TicketState
 from .InterfaceError import InterfaceError
 
+
 TicketDTO = namedtuple(
-    "TicketDTO", ["write_uid", "ticket_id", "description", "category", "state"]
+    "TicketDTO", ["ticket_id", "description", "category", "state"]
 )
 
-class Ticket:
-    def _validateRequiredParams(params: dict):
-        if params.get("write_uid") is None:
-            raise InterfaceError("User must be provided")
 
-        if params.get("ticket_id") is None:
-            raise InterfaceError("Identifier must be provided")
-    
+class Ticket:        
     @classmethod
-    def validateIdentity(ticket_id):
-        domain_error = EnsureTicket.validateTicketId(ticket_id)
-        if domain_error is not None:
-            raise InterfaceError("Identifier must be provided")
+    def getIdentifier(cls, ticket_id):
+        return EnsureTicket.getIdentifier(ticket_id)
 
     @classmethod
     def fromDict(cls, params: dict):
-        cls._validateRequiredParams(params)
+        if params.get("ticket_id") is None:
+            raise InterfaceError("Identifier must be provided")
 
-        ticket_dto = dict()
+        ticket = dict()
         for k in TicketDTO._fields:
-            ticket_dto[k] = params[k] if params.get(k) is not None else None
+            ticket[k] = params[k] if params.get(k) is not None else None
 
-        errors = EnsureTicket.partialValidate(ticket_dto)
+        errors = EnsureTicket.partialValidate(ticket)
         if len(errors) > 0:
             raise InterfaceError("\n".join(errors))
 
-        return TicketDTO(**ticket_dto)
+        return TicketDTO(**ticket)
+    
+    @classmethod
+    def create(
+        ticket_id, 
+        description, 
+        category=TicketCategory.DEFAULT, 
+        state=TicketState.CREATED
+    ):
+        ticket_dto = TicketDTO(
+            ticket_id, 
+            description, 
+            category=category, 
+            state=state
+        )
+        errors = EnsureTicket.partialValidate(ticket_dto)
+        if len(errors) > 0:
+            raise InterfaceError("\n".join(errors))
+        return ticket_dto

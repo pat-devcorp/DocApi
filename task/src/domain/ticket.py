@@ -78,3 +78,8 @@ class EnsureTicket:
         if not checkers.is_string(description, maximum_lengt=200):
             return "Max length exceeded, not allowed"
         return ""
+
+    @classmethod
+    def getIdentifier(cls, identifier):
+        cls.validateTicketId(identifier)
+        return IdentityHandler(IdentityAlgorithm.UUID_V4, identifier)

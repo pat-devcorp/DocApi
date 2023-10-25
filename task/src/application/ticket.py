@@ -3,6 +3,7 @@ from enum import Enum
 from dictdiffer import diff
 
 from ..domain.ticket import TicketState
+from ..utils.IdentityHandler import IdentityHandler
 from ..utils.AuditHandler import AuditHandler, AuditDTO
 from .ApplicationError import ApplicationError
 from .BrokerTopic import BrokerTopic
@@ -29,8 +30,8 @@ class Ticket:
     def __init__(
         self, ref_repository: RepositoryProtocol, ref_broker: BrokerProtocol
     ):
-        self.my_repository = ref_repository
-        self.my_broker = ref_broker
+        self._repository = ref_repository
+        self._broker = ref_broker
         self._fields += list(AuditDTO._fields)
 
     def stateMachine(self, event: TicketEvent, ref_ticket_dto) -> bool:
@@ -51,16 +52,16 @@ class Ticket:
             is_ok = self._delete(ref_ticket_dto)
     
         if topic is not None:
-            self.my_broker.sendMessage(topic, message)
+            self._broker.sendMessage(topic, message)
         
         return is_ok
 
     def fetch(self, fields: list = None) -> list:
-        return self.my_repository.get(self._name, fields or self._fields)
+        return self._repository.get(self._name, fields or self._fields)
 
-    def getByID(self, ref_ticket_dto, fields: list = None) -> list:
-        return self.my_repository.getByID(
-            self._name, self._id, ref_ticket_dto.ticket_id, fields or self._fields
+    def getByID(self, ticket_id: IdentityHandler, fields: list = None) -> list:
+        return self._repository.getByID(
+            self._name, self._id, ticket_id, fields or self._fields
         )
 
     def _create(self, ref_ticket_dto) -> bool:
@@ -68,26 +69,26 @@ class Ticket:
         my_audit = AuditHandler.create(ref_ticket_dto.write_uid)
         my_ticket = my_audit._asdict() | ref_ticket_dto._asdict()
 
-        self.my_repository.create(self._name, my_ticket)
+        self._repository.create(self._name, my_ticket)
 
         return True
 
     def _update(self, ref_ticket_dto) -> bool:
         print("---UPDATE---")
-        my_ticket_entity = self.getByID(ref_ticket_dto)
-        if my_ticket_entity is None:
+        entity = self.getByID(ref_ticket_dto.ticket_id)
+        if entity is None:
             raise ApplicationError(["Ticket does not exist"])
         
         current_ticket = ref_ticket_dto._asdict()
         my_ticket = {
             key: value[1]
-            for diff_type, key, value in diff(my_ticket_entity, current_ticket)
+            for diff_type, key, value in diff(entity, current_ticket)
             if diff_type == "change" and value[1] is not None
         }
         my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
         my_ticket.update(my_audit)
 
-        self.my_repository.update(
+        self._repository.update(
             self._name, self._id, ref_ticket_dto.ticket_id, my_ticket
         )
 
@@ -95,13 +96,13 @@ class Ticket:
         return True
 
     def _delete(self, ref_ticket_dto) -> bool:
-        if self.getByID(ref_ticket_dto) is None:
+        if self.getByID(ref_ticket_dto.ticket_id) is None:
             raise ApplicationError(["Ticket does not exist"])
 
         my_audit = AuditHandler.getUpdateFields(ref_ticket_dto.write_uid)
         my_audit.update({"state": TicketState.DELETED})
 
-        self.my_repository.update(
+        self._repository.update(
             self._name, self._id, ref_ticket_dto.ticket_id, my_audit
         )
 

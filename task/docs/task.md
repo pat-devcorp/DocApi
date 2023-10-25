@@ -21,6 +21,10 @@
 
 **NOTES:** The module should be developed following clean architecture principles.
 
+## Milestones
+
+1.
+
 ## Members
 
 **AS A:** **ASSIGNEE** Patrick Alonso Fuentes Carpio

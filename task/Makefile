@@ -38,7 +38,7 @@ export-env:
 	
 init: ## sets up environment and installs requirements
 init:
-	pip install -r requirements.txt
+	pip install -r /task/requirements.txt
 	# Used for packaging and publishing
 	pip install setuptools wheel twine
 	# Used for linting and formatting

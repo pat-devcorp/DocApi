@@ -18,11 +18,11 @@ def isSafe(file) -> str:
         return False
     
 
-def uploadFile(uploaded_file):
+def uploadFile(uploaded_file, directory):
     my_config = Config()
     if isValidType(uploaded_file.stream) and isSafe(uploaded_file):
         # Process the file here (e.g., save it to a specific folder)
-        uploaded_file.save(my_config.MEDIA_PATH + uploaded_file.filename)
+        uploaded_file.save(os.path.join(my_config.MEDIA_PATH, directory, uploaded_file.filename))
         return 'File uploaded and validated successfully.'
     else:
         return 'Invalid file type or contains a virus.'

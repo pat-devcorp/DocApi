@@ -10,11 +10,9 @@ class IdentityAlgorithm(Enum):
 class IdentityHandler:
     _id = None
 
-    def __init__(self, algorithm: IdentityAlgorithm):
-        self.algorithm = algorithm
-
-    def setIdentity(self, identity):
+    def __init__(self, algorithm: IdentityAlgorithm, identity):
         self.validateIdentity(identity, self.algorithm)
+        self.algorithm = algorithm
         self._id = identity
 
     @classmethod
