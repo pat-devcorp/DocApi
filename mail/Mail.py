@@ -89,7 +89,10 @@ class EMessage:
         self.To = toaddrs
 
     def __str__(self):
-        return f"FROM:{self.From}\nSubject:{self.Subject}\nDate:{self.Date}\nTo:{self.To}"
+        return (
+            f"FROM:{self.From}\nSubject:{self.Subject}\nDate:{self.Date}\nTo:{self.To}"
+        )
+
 
 class MailService(ServiceManager):
     """
@@ -97,7 +100,9 @@ class MailService(ServiceManager):
     and reading
     """
 
-    def __init__(self, user: str, password: str, service: ServiceManager, ssl: bool = False):
+    def __init__(
+        self, user: str, password: str, service: ServiceManager, ssl: bool = False
+    ):
         self._user = user
         self._password = password
         self.ssl = ssl

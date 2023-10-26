@@ -17,5 +17,5 @@ prometheus_client
 # Repositories
 pymongo
 # utils
-subprocess
-magic
+python-magic
+subprocess.run

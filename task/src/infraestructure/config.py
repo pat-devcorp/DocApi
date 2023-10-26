@@ -11,6 +11,7 @@ class Config:
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0")
 
+        self.VIRUS_ANALIZER_API = os.getenv("ALLOWED_EXTENSIONS", None)
         allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")
         self.ALLOWED_EXTENSIONS = allowed_extensions.split(",")
         self.MAX_FILE_WEIGTH = os.getenv("MAX_FILE_WEIGTH", 16000)

@@ -11,6 +11,7 @@ def valdiateDatetimeFormat(write_at) -> bool:
     except ValueError:
         return False
 
+
 def getDatetime() -> str:
     my_config = Config()
     current_datetime = datetime.now()

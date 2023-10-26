@@ -1,10 +1,11 @@
 from collections import namedtuple
+
 import requests
 
 from ..infraestructure.config import Config
-from .DatetimeHandler import valdiateDatetimeFormat, getDatetime
+from .DatetimeHandler import getDatetime, valdiateDatetimeFormat
 from .HandlerError import HandlerError
-from .IdentityHandler import IdentityHandler, IdentityAlgorithm
+from .IdentityHandler import IdentityAlgorithm, IdentityHandler
 
 AuditDTO = namedtuple("audit", ["write_uid", "write_at", "create_uid", "create_at"])
 
@@ -59,12 +60,12 @@ class AuditHandler:
     @classmethod
     def getUpdateFields(cls, current_uid):
         return {"write_uid": current_uid, "write_at": getDatetime()}
-    
+
     @classmethod
     def getNewAudit(cls, current_uid):
         return AuditDTO(
-            write_uid= current_uid, 
-            write_at= getDatetime(), 
-            create_uid= current_uid, 
-            create_at= getDatetime()
+            write_uid=current_uid,
+            write_at=getDatetime(),
+            create_uid=current_uid,
+            create_at=getDatetime(),
         )

@@ -67,7 +67,9 @@ class Mongo:
         except Exception as err:
             raise InfraestructureError(str(err))
 
-    def getByID(self, tablename: str, pk_name: str, id_val: str, attrs: List[str]) -> Dict:
+    def getByID(
+        self, tablename: str, pk_name: str, id_val: str, attrs: List[str]
+    ) -> Dict:
         collection = self.getCollection(tablename)
         try:
             data = collection.find_one({"_id": id_val}, {attr: 1 for attr in attrs})
@@ -89,3 +91,11 @@ class Mongo:
         data["_id"] = data.pop(pk_name)
         collection = self.getCollection(tablename)
         collection.insert_one(data)
+
+    def delete(self, tablename: str, pk_name: str, id_val: str) -> bool:
+        collection = self.getCollection(tablename)
+        if not self.getByID(tablename, pk_name, id_val, []):
+            raise InfraestructureError(
+                f"No record found for ID {id_val} not found in table {tablename}"
+            )
+        collection.delete_one({pk_name: id_val})

@@ -1,8 +1,7 @@
 import pytest
-
-from src.infraestructure.server import createServer
-from src.infraestructure.repositories.mongo import Mongo
 from src.infraestructure.kafka import Kafka
+from src.infraestructure.repositories.mongo import Mongo
+from src.infraestructure.server import createServer
 
 
 @pytest.fixture
@@ -24,9 +23,13 @@ def test_404_not_found(client):
     assert response.status_code == 404
     assert b"404 Not Found" in response.data
 
+
 def mongo_repository():
     mongo_repository = Mongo.setToDefault()
-    assert mongo_repository.chain_connection == "mongodb://mongo:mongo@localhost:27017/?authMechanism=DEFAULT"
+    assert (
+        mongo_repository.chain_connection
+        == "mongodb://mongo:mongo@localhost:27017/?authMechanism=DEFAULT"
+    )
     fields = ["write_uid", "_id", "description"]
     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
@@ -47,6 +50,7 @@ def mongo_repository():
     data = mongo_repository.getByID("ticket", "ticket_id", current_id, ["description"])
     assert data["description"] == text
 
+
 def test_kafka_producer():
     print("----KAFKA PROD")
     kafka_producer = Kafka.setToDefault()
@@ -63,4 +67,3 @@ def test_kafka_producer():
         assert True
     except Exception as e:
         assert False
-

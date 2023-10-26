@@ -3,13 +3,10 @@ from collections import namedtuple
 from ...domain.ticket import EnsureTicket, TicketCategory, TicketState
 from .InterfaceError import InterfaceError
 
-
-TicketDTO = namedtuple(
-    "TicketDTO", ["ticket_id", "description", "category", "state"]
-)
+TicketDTO = namedtuple("TicketDTO", ["ticket_id", "description", "category", "state"])
 
 
-class Ticket:        
+class Ticket:
     @classmethod
     def getIdentifier(cls, ticket_id):
         return EnsureTicket.getIdentifier(ticket_id)
@@ -28,20 +25,15 @@ class Ticket:
             raise InterfaceError("\n".join(errors))
 
         return TicketDTO(**ticket)
-    
+
     @classmethod
     def create(
-        ticket_id, 
-        description, 
-        category=TicketCategory.DEFAULT, 
-        state=TicketState.CREATED
+        ticket_id,
+        description,
+        category=TicketCategory.DEFAULT,
+        state=TicketState.CREATED,
     ):
-        ticket_dto = TicketDTO(
-            ticket_id, 
-            description, 
-            category=category, 
-            state=state
-        )
+        ticket_dto = TicketDTO(ticket_id, description, category, state)
         errors = EnsureTicket.partialValidate(ticket_dto)
         if len(errors) > 0:
             raise InterfaceError("\n".join(errors))

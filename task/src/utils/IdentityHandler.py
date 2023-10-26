@@ -1,6 +1,8 @@
 import re
 from enum import Enum
 
+from ..utils.HandlerError import HandlerError
+
 
 class IdentityAlgorithm(Enum):
     DEFAULT = 0
@@ -20,7 +22,7 @@ class IdentityHandler:
         identity_functions = [cls.ensureDefault, cls.ensureUuidV4]
         error_identity = identity_functions[algorithm.value](identity)
         if len(error_identity) > 0:
-            raise ValueError(error_identity)
+            raise HandlerError(error_identity)
         return True
 
     @staticmethod

@@ -2,6 +2,7 @@ from typing import Protocol
 
 from .BrokerTopic import BrokerTopic
 
+
 class BrokerProtocol(Protocol):
     def setToDefault(self):
         pass

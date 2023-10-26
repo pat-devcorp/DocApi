@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 
+from ...utils.FileHandler import fileExists, uploadFile
 from ..controller.ticket import Ticket as TicketController
-from ..interface.ticket import Ticket as TicketInterface
 from ..interface.keyword import Keyword as KeywordInterface
-from ..interface.attachment import Attachment as AttachmentInterface
 from ..interface.meeting import Meeting as MeetingInterface
 from ..interface.member import Member as MemberInterface
 from ..interface.milestone import Milestone as MilestoneInterface
+from ..interface.ticket import Ticket as TicketInterface
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
@@ -17,11 +17,11 @@ def createTicket():
     write_uid = request.args.get("write_uid")
     params = request.get_json()
     my_ticket_dto = TicketInterface.create(
-            params.get("ticket_id"),
-            params.get("description"),
-            params.get("category"),
-            params.get("state")
-        )
+        params.get("ticket_id"),
+        params.get("description"),
+        params.get("category"),
+        params.get("state"),
+    )
 
     lc = TicketController(write_uid)
     data = lc.create(my_ticket_dto)
@@ -68,7 +68,7 @@ def deleteTicket(id):
     return jsonify(data, 200)
 
 
-## Keyword 
+## Keyword
 @ticket.post("/<id>/keyword")
 def addTicketKeyword(id):
     write_uid = request.args.get("write_uid")
@@ -92,6 +92,7 @@ def removeTicketKeyword(id, keyword_id):
     data = lc.removeKeyword(identifier, keyword_identifier)
 
     return jsonify(data, 200)
+
 
 ## Meeting
 @ticket.post("/<id>/meeting")
@@ -125,7 +126,7 @@ def addTicketMilestone(id):
     write_uid = request.args.get("write_uid")
     params = request.get_json()
     identifier = TicketInterface.getIdentifier(id)
-    milestone = MilestoneInterface.fromDict(params)
+    milestone = MilestoneInterface.create(params)
 
     lc = TicketController(write_uid)
     data = lc.addMeeting(identifier, milestone)
@@ -150,24 +151,27 @@ def removeTicketMilestone(id, milestone_id):
 def addAttachment(id):
     write_uid = request.args.get("write_uid")
     identifier = TicketInterface.getIdentifier(id)
+    uploaded_file = request.files["attachment"]
 
     path = TICKET_PATH.format(str(id))
-    uploaded_file = request.files["attachment"]
-    attachment_identifier = AttachmentInterface.create(uploaded_file, path)
-    
+    file_name = uploadFile.create(uploaded_file, path)
+
     lc = TicketController(write_uid)
-    data = lc.addAttachment(identifier, attachment_identifier)
+    data = lc.addAttachment(identifier, file_name)
 
     return jsonify(data, 200)
 
 
-@ticket.post("/<id>/attachment/<attachment_id>")
-def addAttachment(id, attachment_id):
+@ticket.delete("/<id>/attachment/<file_name>")
+def removeAttachment(id, file_name):
     write_uid = request.args.get("write_uid")
     identifier = TicketInterface.getIdentifier(id)
-    
+
+    path = TICKET_PATH.format(str(id))
+    fileExists(file_name, path)
+
     lc = TicketController(write_uid)
-    data = lc.removeAttachment(identifier, attachment_id)
+    data = lc.removeAttachment(identifier, file_name)
 
     return jsonify(data, 200)
 
@@ -178,7 +182,7 @@ def addTicketMember(id):
     write_uid = request.args.get("write_uid")
     params = request.get_json()
     identifier = TicketInterface.getIdentifier(id)
-    member_identifier = MemberInterface.fromDict(params)
+    member_identifier = MemberInterface.create(params)
 
     lc = TicketController(write_uid)
     data = lc.addMeeting(identifier, member_identifier)
@@ -200,7 +204,7 @@ def removeTicketMember(id, member_id):
 
 ## Assignee
 @ticket.post("/<id>/member/set_assignee")
-def defineTicketAssignee(id, member_id):
+def setTicketAssignee(id, member_id):
     write_uid = request.args.get("write_uid")
     params = request.get_json()
     identifier = TicketInterface.getIdentifier(id)

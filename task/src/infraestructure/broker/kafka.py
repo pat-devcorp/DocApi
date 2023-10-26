@@ -1,10 +1,10 @@
-from enum import Enum
 import json
 import re
+from enum import Enum
 
-from kafka import KafkaProducer, KafkaConsumer
+from kafka import KafkaConsumer, KafkaProducer
+
 from ...application.BrokerTopic import BrokerTopic
-
 from ..config import Config
 from ..InfraestructureError import InfraestructureError
 
@@ -21,8 +21,8 @@ class Kafka:
 
     @property
     def chain_connection(self):
-        return self.host + ':' + str(self.port)
-    
+        return self.host + ":" + str(self.port)
+
     @classmethod
     def setToDefault(cls):
         my_config = Config()
@@ -59,7 +59,7 @@ class Kafka:
 
         except Exception as e:
             raise InfraestructureError(f"Error sending message to Kafka: {str(e)}")
-        
+
     def consumeMessage(self, topic: str):
         try:
             return self.consumer(topic)

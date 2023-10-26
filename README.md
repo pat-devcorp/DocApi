@@ -44,3 +44,8 @@ Deliver the framework
 
 1. Provide the configuration
 2. Create the Comunication with external modules
+
+# Annotations
+pip show flake8 
+export PATH=$PATH:/home/pat/.local/lib/python3.10/site-packages
+source ~/.profile

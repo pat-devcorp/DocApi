@@ -1,41 +1,43 @@
-from ...infraestructure.broker.kafka import Kafka
-from ...infraestructure.repositories.mongo import Mongo
 from ...application.ticket import Ticket as TicketUseCase
 from ...application.ticket import TicketEvent
+from ...infraestructure.broker.kafka import Kafka
+from ...infraestructure.repositories.mongo import Mongo
 from ...utils.IdentityHandler import IdentityHandler
-from ..interface.ticket import TicketDTO
 from ..interface.keyword import KeywordDTO
 from ..interface.meeting import MeetingDTO
 from ..interface.member import MemberDTO
 from ..interface.milestone import MilestoneDTO
+from ..interface.ticket import TicketDTO
 
 
 class Ticket:
-    def __init__(self, write_uid, ref_repository=None, ref_producer=None):
-        self._write_uid = write_uid
-        self._r = (
-            Mongo.setToDefault() if ref_repository is None else ref_repository
-        )
-        self._p = (
-            Kafka.setToDefault() if ref_producer is None else ref_producer
-        )
-        self._uc = TicketUseCase(self._r, self._p)
-
+    def __init__(self, ref_write_uid, ref_repository=None, ref_producer=None):
+        self._w = ref_write_uid
+        self._r = Mongo.setToDefault() if ref_repository is None else ref_repository
+        self._p = Kafka.setToDefault() if ref_producer is None else ref_producer
+        self._uc = TicketUseCase(self._w, self._r, self._p)
 
     @staticmethod
     def getTemplate() -> str:
         return """
-            **YO:** Patrick Alonso Fuentes Carpio
+            **I:** Patrick Alonso Fuentes Carpio
 
-            **COMO:** Usuario del módulo de Administración
+            **AS:** A developer, I need a task module.
 
-            **QUIERO:** Generar una nueva tarea en el dashboard para desarrollo que me indique la conformidad del requerimiento.
+            **I WANT TO:** Create a new task, associate users with different roles to the task, add meetings, link related words to the task for searching, conduct surveys, and maintain a list of milestones related to the task.
 
-            **PORQUE:** Mejorar la trazabilidad y proporcionar estadísticas reales.
+            **BECAUSE**: I want to enhance traceability and provide accurate statistics.
 
-            **HITO:** Recibir un correo que confirme la culminación de la tarea.
+            **MILESTONES:**
+            - Create, edit, and delete tasks.
+            - Add team members.
+            - Send notifications to team members based on task-related events.
+            - Create surveys.
+            - Schedule meetings.
+            - Associate keywords with the task for searching.
+            - Generate a task document.
 
-            **ANOTACIONES:** Las áreas afectadas serán sistemas y desarrollo en el módulo dashboard.
+            **NOTES:** The module should be developed following clean architecture principles.
             """
 
     def fetch(self) -> list:
@@ -43,23 +45,20 @@ class Ticket:
         return datos
 
     def create(self, ref_ticket: TicketDTO):
-        my_ticket = self._uc.stateMachine(TicketEvent.CREATED, ref_ticket)
-        return my_ticket
+        return self._uc.create(ref_ticket)
 
     def update(self, ref_ticket: TicketDTO):
-        my_ticket = self._uc.stateMachine(TicketEvent.UPDATED, ref_ticket)
-        return my_ticket
-    
+        return self._uc.update(ref_ticket)
+
     def getByID(self, ticket_id: IdentityHandler) -> dict:
         data = self._uc.getByID(ticket_id)
         return data
 
     def delete(self, ticket_id: IdentityHandler):
-        my_ticket = self._uc.stateMachine(TicketEvent.DELETED, ticket_id)
-        return my_ticket
-    
+        return self._uc.delete(ticket_id)
+
     def addKeyword(self, ticket_id: IdentityHandler, keyword: KeywordDTO):
-        pass
+        return self._uc.addKeyword(ticket_id, keyword)
 
     def removeKeyword(self, ticket_id: IdentityHandler, keyword_id: IdentityHandler):
         pass
@@ -67,24 +66,26 @@ class Ticket:
     def addMeeting(self, ticket_id: IdentityHandler, meeting: MeetingDTO):
         pass
 
-    def addMilestone(self, ticket_id: IdentityHandler, milestone: MilestoneDTO):
-        pass
-
-    def removeMilestone(self, ticket_id: IdentityHandler, milestone_id: IdentityHandler):
-        pass
-
     def removeMeeting(self, ticket_id: IdentityHandler, meeting_id: IdentityHandler):
         pass
 
-    def addAttachment(self, ticket_id: IdentityHandler, attachment_id: IdentityHandler):
+    def addMilestone(self, ticket_id: IdentityHandler, milestone: MilestoneDTO):
         pass
 
-    def removeAttachment(self, ticket_id: IdentityHandler, attachment_id: IdentityHandler):
+    def removeMilestone(
+        self, ticket_id: IdentityHandler, milestone_id: IdentityHandler
+    ):
         pass
-    
+
+    def addAttachment(self, ticket_id: IdentityHandler, file_name: str):
+        pass
+
+    def removeAttachment(self, ticket_id: IdentityHandler, file_name: str):
+        pass
+
     def addMember(self, ticket_id: IdentityHandler, member: MemberDTO):
         pass
-    
+
     def removeMember(self, ticket_id: IdentityHandler, member_id: IdentityHandler):
         pass
 

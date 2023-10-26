@@ -1,28 +1,52 @@
+import mimetypes
 import os
-import magic
 import subprocess
+
+import magic
+import requests
+
 from ..infraestructure.config import Config
+from ..utils.HandlerError import HandlerError
+
 
 def isValidType(file):
-    mime = magic.Magic()
-    file_type = mime.from_buffer(file.read(1024))
-    return 'text' in file_type  # Adjust the condition as per your allowed types
+    my_config = Config()
+
+    mime_type, _ = mimetypes.guess_type(file)
+    if mime_type not in my_config.ALLOWED_EXTENSIONS:
+        raise HandlerError(f"File type {file_type} is not supported")
+
+    my_magic = magic.Magic()
+    file_type = my_magic.from_buffer(file.read(1024))
+    my_magic.close()
+    if file_type not in my_config.ALLOWED_EXTENSIONS:
+        raise HandlerError(f"File type {file_type} is not supported")
+
+    return True
 
 
 def isSafe(file) -> str:
-    try:
-        # Use ClamAV to scan the file for viruses
-        subprocess.check_output(['clamscan', '--no-summary', file])
-        return True
-    except subprocess.CalledProcessError:
-        return False
-    
+    my_config = Config()
+    if my_config.VIRUS_ANALIZER_API is not None:
+        is_ok = requests.post(my_config.VIRUS_ANALIZER_API, files=file)
+        if is_ok != 200:
+            raise HandlerError(f"File could be a virus")
+
 
 def uploadFile(uploaded_file, directory):
+    isValidType(uploaded_file.stream)
+    isSafe(uploaded_file)
+
     my_config = Config()
-    if isValidType(uploaded_file.stream) and isSafe(uploaded_file):
-        # Process the file here (e.g., save it to a specific folder)
-        uploaded_file.save(os.path.join(my_config.MEDIA_PATH, directory, uploaded_file.filename))
-        return 'File uploaded and validated successfully.'
-    else:
-        return 'Invalid file type or contains a virus.'
+    uploaded_file.save(
+        os.path.join(my_config.MEDIA_PATH, directory, uploaded_file.filename)
+    )
+    return True
+
+
+def fileExists(file_name, directory) -> str:
+    my_config = Config()
+    file_path = os.path.join(my_config.MEDIA_PATH, directory, file_name)
+    if not os.path.exists(file_path):
+        raise HandlerError(f"The file at {file_name} does not exist.")
+    return file_path
