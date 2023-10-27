@@ -29,7 +29,18 @@ class TicketState(Enum):
 class EnsureTicket:
     @staticmethod
     def getFields() -> list:
-        return ["ticket_id", "description", "category", "state", "end_at", "points"]
+        return ["ticket_id", "description", "category", "state", "end_at"]
+    
+    @classmethod
+    def getMock():
+        return {
+            "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+            "description": "Test task",
+            "category": 0,
+            "state": 0,
+            "events": "2023/07/18 14:00",
+            "points": 0
+        }
 
     @classmethod
     def domainFilter(cls, params: dict, is_partial=True) -> dict:

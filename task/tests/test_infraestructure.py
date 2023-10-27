@@ -1,5 +1,5 @@
 import pytest
-from src.infraestructure.kafka import Kafka
+from src.infraestructure.broker.kafka import Kafka
 from src.infraestructure.repositories.mongo import Mongo
 from src.infraestructure.server import createServer
 

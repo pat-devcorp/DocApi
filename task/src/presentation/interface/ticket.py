@@ -8,6 +8,15 @@ TicketDTO = namedtuple("TicketDTO", ["ticket_id", "description", "category", "st
 
 class Ticket:
     @classmethod
+    def getMock():
+        return TicketDTO(
+            ticket_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+            description = "Test task",
+            category = 0,
+            state = 0,
+        )
+    
+    @classmethod
     def getIdentifier(cls, ticket_id):
         return EnsureTicket.getIdentifier(ticket_id)
 
