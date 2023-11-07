@@ -57,7 +57,7 @@ class Mongo:
             raise InfraestructureError("Connection not established")
         return self.client[tablename]
 
-    def get(self, tablename: str, pk_name: str, attrs: List[str]) -> List[Dict]:
+    def fetch(self, tablename: str, pk_name: str, attrs: List[str]) -> List[Dict]:
         collection = self.getCollection(tablename)
         try:
             datos = list(collection.find({}, {attr: 1 for attr in attrs}))

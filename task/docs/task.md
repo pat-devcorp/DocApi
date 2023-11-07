@@ -25,6 +25,8 @@
 
 1.
 
+## Not covered
+
 ## Members
 
 **AS A:** **ASSIGNEE** Patrick Alonso Fuentes Carpio
