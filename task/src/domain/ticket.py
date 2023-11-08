@@ -30,7 +30,7 @@ class EnsureTicket:
     @staticmethod
     def getFields() -> list:
         return ["ticket_id", "description", "category", "state", "end_at"]
-    
+
     @classmethod
     def getMock():
         return {
@@ -39,7 +39,7 @@ class EnsureTicket:
             "category": 0,
             "state": 0,
             "events": "2023/07/18 14:00",
-            "points": 0
+            "points": 0,
         }
 
     @classmethod
@@ -60,9 +60,7 @@ class EnsureTicket:
         return data
 
     @classmethod
-    def partialValidate(cls, ref_ticket: dict) -> str:
-        print("---DOMAIN---")
-        print(ref_ticket)
+    def partialValidate(cls, ref_object: dict) -> str:
         validate_funcs = {
             "ticket_id": cls.validateTicketId,
             "description": cls.validateDescription,
@@ -71,7 +69,7 @@ class EnsureTicket:
             "end_at": cls.validateEndAt,
         }
 
-        ticket = {k: v for k, v in ref_ticket.items() if k in validate_funcs.keys()}
+        ticket = {k: v for k, v in ref_object.items() if k in validate_funcs.keys()}
 
         errors = list()
         for k, v in ticket.items():

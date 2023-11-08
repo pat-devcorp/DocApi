@@ -1,9 +1,9 @@
 import os
 
-from src.infraestructure.config import Config
 from src.domain.sticker import StickerInterface
-from src.infraestructure.sticker import getDatos
 from src.infraestructure.barcode import Barcode
+from src.infraestructure.config import Config
+from src.infraestructure.sticker import getDatos
 
 
 def test_createBarcode():
@@ -15,6 +15,7 @@ def test_createBarcode():
     print("---EXPECT")
     print(file_path)
     assert os.path.exists(file_path)
+
 
 # def test_createBarcodes():
 #     my_config = Config()

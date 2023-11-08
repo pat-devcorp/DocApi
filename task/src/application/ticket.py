@@ -1,11 +1,10 @@
 from enum import Enum
 
-from ..domain.params import EnsureTicket, TicketState
-from ..utils.AuditHandler import AuditDTO, AuditHandler
+from ..domain.RepositoryProtocol import RepositoryProtocol
+from ..domain.ticketrepository import TicketRepository
+from ..infraestructure.config import Config
 from ..utils.IdentityHandler import IdentityHandler
-from .ApplicationError import ApplicationError
 from .BrokerProtocol import BrokerProtocol
-from .RepositoryProtocol import RepositoryProtocol
 
 
 class TicketEvent(Enum):
@@ -15,65 +14,34 @@ class TicketEvent(Enum):
     ADD_MEMBER = 3
 
 
-class params:
-    _name = "ticket"
-    _id = "ticket_id"
-
+class Ticket:
     def __init__(
         self,
-        ref_write_uid,
+        ref_write_uid: IdentityHandler,
         ref_repository: RepositoryProtocol,
         ref_broker: BrokerProtocol,
     ):
         self._write_uid = ref_write_uid
-        self._repository = ref_repository
+        self._ticket = TicketRepository(ref_write_uid, ref_repository)
         self._broker = ref_broker
-        self._fields += list(EnsureTicket.getFields()) + list(AuditDTO._fields)
-
-    def setFields(self, fields: list):
-        self._fields = [field for field in fields if field in self._fields]
 
     @classmethod
     def entityExists(cls, ref_repository, identifier) -> bool:
-        return (
-            True
-            if ref_repository.getByID(cls._name, cls._id, identifier, cls._id) is None
-            else False
-        )
+        my_config = Config()
+        ticket = TicketRepository(my_config.SYSTEM_UID, ref_repository)
+        return ticket.entityExists(ref_repository, identifier)
 
     def fetch(self) -> list:
-        return self._repository.get(self._name, self._fields)
+        return self._ticket.fetch()
 
-    def create(self, params: dict) -> bool:
-        data = EnsureTicket.domainFilter(params)
-        my_audit = AuditHandler.create(self._write_uid)
-        my_ticket = my_audit._asdict() | data
+    def create(self, params: dict):
+        return self._ticket.create(params)
 
-        self._repository.create(self._name, my_ticket)
-        return True
-
-    def update(self, params: dict) -> bool:
-        print("---UPDATE---")
-        data = EnsureTicket.domainFilter(params)
-        if not self.entityExists(data[self._id]):
-            raise ApplicationError(["params does not exist"])
-
-        my_audit = AuditHandler.getUpdateFields(self._write_uid)
-        data.update(my_audit)
-
-        self._repository.update(self._name, self._id, data[self._id], data)
-        return True
+    def update(self, params: dict):
+        return self._ticket.update(params)
 
     def getByID(self, identifier: IdentityHandler) -> list:
-        return self._repository.getByID(self._name, self._id, identifier, self._fields)
+        return self._ticket.getByID(identifier)
 
-    def delete(self, identifier) -> bool:
-        if not self.entityExists(identifier):
-            raise ApplicationError(["params does not exist"])
-
-        my_audit = AuditHandler.getUpdateFields(self._write_uid)
-        my_audit.update({"state": TicketState.DELETED})
-
-        self._repository.update(self._name, self._id, identifier, my_audit)
-
-        return True
+    def delete(self, identifier: IdentityHandler) -> bool:
+        return self._ticket.delete(identifier)

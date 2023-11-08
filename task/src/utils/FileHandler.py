@@ -33,20 +33,34 @@ def isSafe(file) -> str:
             raise HandlerError(f"File could be a virus")
 
 
-def uploadFile(uploaded_file, directory):
-    isValidType(uploaded_file.stream)
-    isSafe(uploaded_file)
+class FileHanlder:
+    file_id = None
 
-    my_config = Config()
-    uploaded_file.save(
-        os.path.join(my_config.MEDIA_PATH, directory, uploaded_file.filename)
-    )
-    return True
+    def __init__(self) -> None:
+        my_config = Config()
+        _path = my_config.MEDIA_PATH
 
+    def uploadFile(self, uploaded_file, name=None, directory: str = None) -> bool:
+        isValidType(uploaded_file.stream)
+        isSafe(uploaded_file)
 
-def fileExists(file_name, directory) -> str:
-    my_config = Config()
-    file_path = os.path.join(my_config.MEDIA_PATH, directory, file_name)
-    if not os.path.exists(file_path):
-        raise HandlerError(f"The file at {file_name} does not exist.")
-    return file_path
+        file_name = name or uploaded_file.filename
+        file_path = self._path
+        if directory is not None and directory != "":
+            file_path = os.path.join(self.path, directory)
+
+        uploaded_file.save(os.path.join(file_path, file_name))
+        file_path = os.path.join(file_path, file_name)
+        self.file_id = file_path
+        return True
+
+    def fileExists(self, file_name: str, directory: str = None) -> bool:
+        file_path = self._path
+        if directory is not None and directory != "":
+            file_path = os.path.join(self.path, directory)
+        file_path = os.path.join(file_path, file_name)
+
+        if not os.path.exists(file_path):
+            raise HandlerError(f"The file at {file_name} does not exist.")
+        self.file_id = file_path
+        return True

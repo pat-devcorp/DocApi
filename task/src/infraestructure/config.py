@@ -10,6 +10,8 @@ class Config:
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0")
+        self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
+        self.SYTEM_UID = os.getenv("SYTEM_UID", "IamBatman")
 
         self.VIRUS_ANALIZER_API = os.getenv("ALLOWED_EXTENSIONS", None)
         allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")

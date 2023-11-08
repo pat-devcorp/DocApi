@@ -4,7 +4,7 @@ import json
 def getDatos():
     file_path = "sticker.json"
     try:
-        with open(file_path, 'r') as json_file:
+        with open(file_path, "r") as json_file:
             data = json.load(json_file)
             if isinstance(data, list):
                 return data

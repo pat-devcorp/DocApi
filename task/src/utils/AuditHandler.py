@@ -1,8 +1,6 @@
 from collections import namedtuple
 
-import requests
-
-from ..infraestructure.config import Config
+from ..infraestructure.middleware.User import validateIdentity
 from .DatetimeHandler import getDatetime, valdiateDatetimeFormat
 from .HandlerError import HandlerError
 from .IdentityHandler import IdentityAlgorithm, IdentityHandler
@@ -30,15 +28,8 @@ class AuditHandler:
         return errors
 
     @classmethod
-    def validateIdentity(user_id):
-        my_config = Config()
-        payload = {"user_id": id}
-        r = requests.get(my_config.USER_API, params=payload)
-        return True if r.status_code == 200 else False
-
-    @classmethod
     def getIdentifier(cls, user_id):
-        if not cls.validateIdentity:
+        if not validateIdentity(user_id):
             raise HandlerError("User ID is not valid")
         return IdentityHandler(IdentityAlgorithm.DEFAULT, user_id)
 

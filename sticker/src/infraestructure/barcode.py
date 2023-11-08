@@ -1,4 +1,5 @@
 import os
+
 import barcode
 
 from .config import Config
@@ -10,8 +11,8 @@ class Barcode:
         my_config = Config()
         file_path = os.path.join(my_config.ASSETS_PATH, identifier)
         print(file_path)
-        
-        ean = barcode.get('ean13', identifier)
+
+        ean = barcode.get("ean13", identifier)
         print(ean.get_fullcode())
 
         ean.save(file_path)

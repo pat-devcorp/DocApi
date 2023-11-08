@@ -15,6 +15,7 @@ class ExceptionHandler(object):
         self.app = app
 
     def __call__(self, environ, start_response):
+        response.status_code = 403
         try:
             return self.app(environ, start_response)
         except InterfaceError as ie:
@@ -41,5 +42,4 @@ class ExceptionHandler(object):
                 "traceback": traceback.format_exc(),
             }
             response = jsonify(error)
-            response.status_code = 403
             return response(environ, start_response)

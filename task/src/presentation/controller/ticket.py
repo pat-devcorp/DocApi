@@ -1,12 +1,8 @@
 from ...application.ticket import Ticket as TicketUseCase
-from ...application.ticket import TicketEvent
 from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.mongo import Mongo
+from ...utils.FileHandler import FileHanlder
 from ...utils.IdentityHandler import IdentityHandler
-from ..interface.keyword import KeywordDTO
-from ..interface.meeting import MeetingDTO
-from ..interface.member import MemberDTO
-from ..interface.milestone import MilestoneDTO
 from ..interface.ticket import TicketDTO
 
 
@@ -44,11 +40,11 @@ class Ticket:
         datos = self._uc.fetch()
         return datos
 
-    def create(self, ref_ticket: TicketDTO):
-        return self._uc.create(ref_ticket)
+    def create(self, ref_object: TicketDTO):
+        return self._uc.create(ref_object)
 
-    def update(self, ref_ticket: TicketDTO):
-        return self._uc.update(ref_ticket)
+    def update(self, ref_object: TicketDTO):
+        return self._uc.update(ref_object)
 
     def getByID(self, ticket_id: IdentityHandler) -> dict:
         data = self._uc.getByID(ticket_id)
@@ -57,19 +53,19 @@ class Ticket:
     def delete(self, ticket_id: IdentityHandler):
         return self._uc.delete(ticket_id)
 
-    def addKeyword(self, ticket_id: IdentityHandler, keyword: KeywordDTO):
-        return self._uc.addKeyword(ticket_id, keyword)
+    def addKeyword(self, ticket_id: IdentityHandler, keyword_id: IdentityHandler):
+        return self._uc.addKeyword(ticket_id, keyword_id)
 
     def removeKeyword(self, ticket_id: IdentityHandler, keyword_id: IdentityHandler):
         pass
 
-    def addMeeting(self, ticket_id: IdentityHandler, meeting: MeetingDTO):
+    def addMeeting(self, ticket_id: IdentityHandler, meeting_id: IdentityHandler):
         pass
 
     def removeMeeting(self, ticket_id: IdentityHandler, meeting_id: IdentityHandler):
         pass
 
-    def addMilestone(self, ticket_id: IdentityHandler, milestone: MilestoneDTO):
+    def addMilestone(self, ticket_id: IdentityHandler, milestone_id: IdentityHandler):
         pass
 
     def removeMilestone(
@@ -77,13 +73,13 @@ class Ticket:
     ):
         pass
 
-    def addAttachment(self, ticket_id: IdentityHandler, file_name: str):
+    def addAttachment(self, ticket_id: IdentityHandler, file_name: FileHanlder):
         pass
 
-    def removeAttachment(self, ticket_id: IdentityHandler, file_name: str):
+    def removeAttachment(self, ticket_id: IdentityHandler, file_name: FileHanlder):
         pass
 
-    def addMember(self, ticket_id: IdentityHandler, member: MemberDTO):
+    def addMember(self, ticket_id: IdentityHandler, member_id: IdentityHandler):
         pass
 
     def removeMember(self, ticket_id: IdentityHandler, member_id: IdentityHandler):

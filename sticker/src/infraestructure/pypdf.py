@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from fpdf import FPDF
 
 
@@ -19,13 +20,13 @@ class PyPdf(FPDF):
 
     def getMaxWidth(self) -> float:
         return float(self.w - self.r_margin - self.l_margin - (2 * self.c_margin))
-    
+
     def getYPageEnd(self) -> float:
         y0 = int(self.page_break_trigger) - 1
         y1 = int(self.y) + 1
         return y0 if y1 < y0 else y1
-    
-     # adds a page break if h is too high
+
+    # adds a page break if h is too high
     def PageBreak(self, h) -> int:
         # If the height h would cause an overflow, add a new page immediately
         if (self.y + h) > self.page_break_trigger and self.accept_page_break():
@@ -33,7 +34,7 @@ class PyPdf(FPDF):
             return 1
         else:
             return 0
-    
+
     def row(self, data: list, wds: list = []):
         # Calculate the height of the row
         nb = 0
