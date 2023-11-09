@@ -6,8 +6,7 @@ from src.infraestructure.server import createServer
 
 @pytest.fixture
 def client():
-    app = createServer()  # Create your Flask app
-    app.config["TESTING"] = True
+    app = createServer()
     with app.test_client() as client:
         yield client
 

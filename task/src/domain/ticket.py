@@ -51,7 +51,7 @@ class EnsureTicket:
                 if k in cls.getFields() and v is not None
             }
         if params.keys() != cls.getFields():
-            raise DomainError("Fail to create ticket")
+            raise DomainError(OPERATION_FAIL)
         data = dict()
         for k in cls.getFields():
             if params.get(k) is None:

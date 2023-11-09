@@ -5,6 +5,7 @@ import subprocess
 import magic
 import requests
 
+from ..utils.ErrorHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 from ..infraestructure.config import Config
 from ..utils.HandlerError import HandlerError
 
@@ -14,13 +15,13 @@ def isValidType(file):
 
     mime_type, _ = mimetypes.guess_type(file)
     if mime_type not in my_config.ALLOWED_EXTENSIONS:
-        raise HandlerError(f"File type {file_type} is not supported")
+        raise HandlerError(UNSUPPORTED_MEDIA_TYPE)
 
     my_magic = magic.Magic()
     file_type = my_magic.from_buffer(file.read(1024))
     my_magic.close()
     if file_type not in my_config.ALLOWED_EXTENSIONS:
-        raise HandlerError(f"File type {file_type} is not supported")
+        raise HandlerError(UNSUPPORTED_MEDIA_TYPE)
 
     return True
 
@@ -30,7 +31,7 @@ def isSafe(file) -> str:
     if my_config.VIRUS_ANALIZER_API is not None:
         is_ok = requests.post(my_config.VIRUS_ANALIZER_API, files=file)
         if is_ok != 200:
-            raise HandlerError(f"File could be a virus")
+            raise HandlerError(WARNING_FILE)
 
 
 class FileHanlder:
@@ -61,6 +62,6 @@ class FileHanlder:
         file_path = os.path.join(file_path, file_name)
 
         if not os.path.exists(file_path):
-            raise HandlerError(f"The file at {file_name} does not exist.")
+            raise HandlerError(NOT_FOUND)
         self.file_id = file_path
         return True

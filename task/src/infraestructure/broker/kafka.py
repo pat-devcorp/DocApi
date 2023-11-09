@@ -28,18 +28,9 @@ class Kafka:
         my_config = Config()
         return cls(my_config.KAFKA_HOST, my_config.KAFKA_PORT)
 
-    def startProduce(self):
+    def startConnection(self):
         try:
             self.producer = KafkaProducer(
-                bootstrap_servers=self.chain_connection,
-                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-            )
-        except Exception as e:
-            raise InfraestructureError(f"Failed to connect to Kafka {str(e)}")
-
-    def startConsumer(self):
-        try:
-            self.consumer = KafkaConsumer(
                 bootstrap_servers=self.chain_connection,
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
             )

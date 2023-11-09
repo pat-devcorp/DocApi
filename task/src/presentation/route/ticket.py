@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 
-from ...utils.FileHandler import fileExists, uploadFile
 from ..controller.ticket import Ticket as TicketController
 from ..interface.keyword import Keyword as KeywordInterface
 from ..interface.meeting import Meeting as MeetingInterface
 from ..interface.member import Member as MemberInterface
 from ..interface.milestone import Milestone as MilestoneInterface
 from ..interface.ticket import Ticket as TicketInterface
+
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")

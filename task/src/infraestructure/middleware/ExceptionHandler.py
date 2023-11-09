@@ -10,7 +10,7 @@ from ...utils.HandlerError import HandlerError
 from ..InfraestructureError import InfraestructureError
 
 
-class ExceptionHandler(object):
+class ExceptionHandler:
     def __init__(self, app):
         self.app = app
 

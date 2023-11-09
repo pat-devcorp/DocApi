@@ -9,7 +9,7 @@ class Config:
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
-        self.API_VERSION = os.getenv("API_VERSION", "1.0.0")
+        self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
         self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
         self.SYTEM_UID = os.getenv("SYTEM_UID", "IamBatman")
 
