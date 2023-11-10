@@ -1,7 +1,7 @@
 from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.mongo import Mongo
 from ...utils.IdentityHandler import IdentityHandler
-from ..interface.keyword import KeywordDTO
+from ..dto.keyword import KeywordDTO
 
 
 class Keyword:

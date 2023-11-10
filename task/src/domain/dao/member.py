@@ -1,24 +1,25 @@
 from enum import Enum
+from typing import Tuple
 
 from validator_collection import checkers
 
-from ..utils.DatetimeHandler import valdiateDateFormat
-from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
-from .DomainError import DomainError
+from ...utils.DatetimeHandler import valdiateDateFormat
+from ...utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
+from ..DomainError import DomainError
 
 
 class MemberRole(Enum):
     MEMBER: 0
 
 
-class Milestone:
+class Member:
     @staticmethod
     def getFields() -> list:
-        return ["milestone_id", "description"]
+        return ["member_id", "role_id"]
 
     @classmethod
     def getMock():
-        return {"milestone_id": 0, "description": "Test"}
+        return {"member_id": 0, "role_id": 0}
 
     @classmethod
     def domainFilter(cls, params: dict, is_partial=True) -> dict:
@@ -42,8 +43,8 @@ class Milestone:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {
-            "milestone_id": cls.validateIdentifier,
-            "description": cls.validateDescription,
+            "member_id": cls.isValidIdentifier,
+            "role_id": cls.validateRole,
         }
 
         meeting = {k: v for k, v in ref_object.items() if k in validate_funcs.keys()}
@@ -51,8 +52,8 @@ class Milestone:
         errors = list()
         for k, v in meeting.items():
             func = validate_funcs[k]
-            err = func(v)
-            if len(err) > 0:
+            is_ok, err = func(v)
+            if not is_ok:
                 errors.append(err)
 
         if len(errors) > 0:
@@ -61,13 +62,14 @@ class Milestone:
         return None
 
     @staticmethod
-    def validateIdentifier(ticket_id: str) -> str:
-        if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.DEFAULT):
-            return "Identity not valid for meeting"
-        return ""
+    def isValidIdentifier(ticket_id: str)-> Tuple[bool, str]:
+        if not IdentityHandler.isValid(ticket_id, IdentityAlgorithm.DEFAULT):
+            return False, "Identity not valid for meeting"
+        return True, ""
 
     @staticmethod
-    def validateDescription(description: str) -> str:
-        if not checkers.is_string(description, maximum_lengt=200):
-            return "Max length exceeded, not allowed"
-        return ""
+    def isValidRole(category: str)-> Tuple[bool, str]:
+        for member in MemberRole:
+            if member.value == category:
+                return True, ""
+        return False, "Invalid state"

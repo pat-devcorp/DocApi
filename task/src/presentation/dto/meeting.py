@@ -5,7 +5,7 @@ from ...utils.DatetimeHandler import valdiateDatetimeFormat
 MeetingDTO = namedtuple("MeetingDTO", ["meeting_date"])
 
 
-class Meeting:
+class MeetingHandler:
     @classmethod
     def create(meeting_date):
         valdiateDatetimeFormat(meeting_date)

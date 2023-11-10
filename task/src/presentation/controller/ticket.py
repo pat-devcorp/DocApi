@@ -3,7 +3,7 @@ from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.mongo import Mongo
 from ...utils.FileHandler import FileHanlder
 from ...utils.IdentityHandler import IdentityHandler
-from ..interface.ticket import TicketDTO
+from ..dto.ticket import TicketDTO
 
 
 class Ticket:
@@ -41,20 +41,20 @@ class Ticket:
         return datos
 
     def create(self, ref_object: TicketDTO):
-        return self._uc.create(ref_object)
+        return self._uc.create(ref_object._asdict())
 
     def update(self, ref_object: TicketDTO):
-        return self._uc.update(ref_object)
+        return self._uc.update(ref_object._asdict())
 
     def getByID(self, ticket_id: IdentityHandler) -> dict:
-        data = self._uc.getByID(ticket_id)
+        data = self._uc.getByID(ticket_id.value)
         return data
 
     def delete(self, ticket_id: IdentityHandler):
-        return self._uc.delete(ticket_id)
+        return self._uc.delete(ticket_id.value)
 
     def addKeyword(self, ticket_id: IdentityHandler, keyword_id: IdentityHandler):
-        return self._uc.addKeyword(ticket_id, keyword_id)
+        return self._uc.addKeyword(ticket_id.value, keyword_id.value)
 
     def removeKeyword(self, ticket_id: IdentityHandler, keyword_id: IdentityHandler):
         pass

@@ -1,7 +1,7 @@
 from enum import Enum
 
+from ..domain.controller.ticket import TicketRepository
 from ..domain.RepositoryProtocol import RepositoryProtocol
-from ..domain.ticketrepository import TicketRepository
 from ..infraestructure.config import Config
 from ..utils.IdentityHandler import IdentityHandler
 from .BrokerProtocol import BrokerProtocol

@@ -1,17 +1,16 @@
 from collections import namedtuple
 
+from ..infraestructure.middleware.User import isValidUserID
 from ..utils.ErrorHandler import FORMAT_NOT_MATCH, ID_NOT_FOUND, WRITE_UID_NOT_FOUND
-from ..infraestructure.middleware.User import validateIdentity
 from .DatetimeHandler import getDatetime, valdiateDatetimeFormat
 from .HandlerError import HandlerError
 from .IdentityHandler import IdentityAlgorithm, IdentityHandler
-
 
 AuditDTO = namedtuple("audit", ["write_uid", "write_at", "create_uid", "create_at"])
 
 
 class AuditHandler:
-    def _validate(cls, my_audit: dict) -> list:
+    def isValid(cls, my_audit: dict) -> list:
         errors = list()
 
         if my_audit.get("create_uid") is None:
@@ -31,7 +30,7 @@ class AuditHandler:
 
     @classmethod
     def getIdentifier(cls, user_id):
-        if not validateIdentity(user_id):
+        if not isValidUserID(user_id):
             raise HandlerError(ID_NOT_FOUND)
         return IdentityHandler(IdentityAlgorithm.DEFAULT, user_id)
 
@@ -39,12 +38,15 @@ class AuditHandler:
     def fromDict(cls, params: dict):
         if params.get("write_uid") is None:
             raise HandlerError(WRITE_UID_NOT_FOUND)
+        
+        if not isValidUserID(params.get("write_uid")):
+            raise HandlerError(ID_NOT_FOUND)
 
         audit_dto = dict()
         for k in AuditDTO._fields:
             audit_dto[k] = params[k] if params.get(k) is not None else None
 
-        errors = cls._validate(params)
+        errors = cls.isValid(params)
         if len(errors) > 0:
             raise HandlerError("\n".join(errors))
 
@@ -55,7 +57,10 @@ class AuditHandler:
         return {"write_uid": current_uid, "write_at": getDatetime()}
 
     @classmethod
-    def getNewAudit(cls, current_uid):
+    def create(cls, current_uid):
+        if not isValidUserID(current_uid):
+            raise HandlerError(ID_NOT_FOUND)
+        
         return AuditDTO(
             write_uid=current_uid,
             write_at=getDatetime(),

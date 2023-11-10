@@ -1,7 +1,7 @@
 from validator_collection import checkers
 
-from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
-from .DomainError import DomainError
+from ...utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
+from ..DomainError import DomainError
 
 
 class EnsureKeyword:
@@ -12,7 +12,7 @@ class EnsureKeyword:
     @classmethod
     def getMock():
         return {
-            "ticket_id": 0,
+            "keyword_id": 0,
             "description": "Test task",
         }
 
@@ -38,8 +38,8 @@ class EnsureKeyword:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {
-            "ticket_id": cls.validateIdentifier,
-            "description": cls.validateDescription,
+            "ticket_id": cls.isValidIdentifier,
+            "description": cls.isValidDescription,
         }
 
         keyword = {k: v for k, v in ref_object.items() if k in validate_funcs.keys()}
@@ -47,8 +47,8 @@ class EnsureKeyword:
         errors = list()
         for k, v in keyword.items():
             func = validate_funcs[k]
-            err = func(v)
-            if len(err) > 0:
+            is_ok, err = func(v)
+            if not is_ok:
                 errors.append(err)
 
         if len(errors) > 0:
@@ -57,13 +57,13 @@ class EnsureKeyword:
         return None
 
     @staticmethod
-    def validateIdentifier(ticket_id: str) -> str:
-        if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.DEFAULT):
-            return "Identity not valid for keyword"
-        return ""
+    def isValidIdentifier(ticket_id: str) -> str:
+        if not IdentityHandler.isValid(ticket_id, IdentityAlgorithm.DEFAULT):
+            return False, "Identity not valid for keyword"
+        return True, ""
 
     @staticmethod
-    def validateDescription(description: str) -> str:
+    def isValidDescription(description: str) -> str:
         if not checkers.is_string(description, maximum_lengt=200):
-            return "Max length exceeded, not allowed"
-        return ""
+            return False, "Max length exceeded, not allowed"
+        return True, ""

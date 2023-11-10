@@ -8,7 +8,7 @@ from src.infraestructure.sticker import getDatos
 
 def test_createBarcode():
     my_config = Config()
-    data = StickerInterface.getMock()
+    data = Stickerdto.getMock()
     file_name = data.sticker_id
     Barcode.create(file_name)
     file_path = os.path.join(my_config.ASSETS_PATH, file_name)

@@ -1,9 +1,8 @@
 import json
 import re
-from enum import Enum
-
 from kafka import KafkaConsumer, KafkaProducer
 
+from ...utils.ErrorHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ...application.BrokerTopic import BrokerTopic
 from ..config import Config
 from ..InfraestructureError import InfraestructureError
@@ -35,7 +34,7 @@ class Kafka:
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
             )
         except Exception as e:
-            raise InfraestructureError(f"Failed to connect to Kafka {str(e)}")
+            raise InfraestructureError(BROKER_CONNECTION_FAIL)
 
     def sendMessage(self, topic: BrokerTopic, message: str):
         self.startConnection()
@@ -49,10 +48,10 @@ class Kafka:
             print(f"Message sent to topic '{topic.value}': {message}")
 
         except Exception as e:
-            raise InfraestructureError(f"Error sending message to Kafka: {str(e)}")
+            raise InfraestructureError(BROKER_SEND_FAIL)
 
     def consumeMessage(self, topic: str):
         try:
             return self.consumer(topic)
         except Exception as e:
-            raise InfraestructureError(f"Error sending message to Kafka: {str(e)}")
+            raise InfraestructureError(BROKER_SEND_FAIL)

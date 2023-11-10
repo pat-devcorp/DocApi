@@ -3,7 +3,7 @@ from collections import namedtuple
 MemberDTO = namedtuple("MemberDTO", ["member_id", "role_id"])
 
 
-class Member:
+class MemberHandler:
     @classmethod
     def create(member_id, role_id):
         role_identifier = MemberDomain.ensureRole(role_id)

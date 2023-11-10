@@ -7,7 +7,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from .config import Config
 from .middleware.ExceptionHandler import ExceptionHandler as ExceptionHandlerMiddleware
-from .middleware.User import validate_user_id_middleware
+from .middleware.User import isValidUserID
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -37,7 +37,7 @@ def createServer():
     blueprint_path = Path("src/presentation/route")
     blueprints = getBlueprints(blueprint_path)
     # Add authentication
-    app.wsgi_app = validate_user_id_middleware()(app.wsgi_app)
+    app.wsgi_app = isValidUserID()(app.wsgi_app)
     # Add the exception middleware to the app
     app.wsgi_app = ExceptionHandlerMiddleware(app.wsgi_app)
     registerBlueprints(app, blueprint_path, blueprints)

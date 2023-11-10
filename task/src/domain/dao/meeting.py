@@ -1,8 +1,8 @@
 from validator_collection import checkers
 
-from ..utils.DatetimeHandler import valdiateDateFormat
-from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
-from .DomainError import DomainError
+from ...utils.DatetimeHandler import valdiateDateFormat
+from ...utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
+from ..DomainError import DomainError
 
 
 class EnsureMeeting:
@@ -36,7 +36,7 @@ class EnsureMeeting:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {
-            "ticket_id": cls.validateIdentifier,
+            "ticket_id": cls.isValidIdentifier,
             "description": cls.validateDescription,
             "meet_date": cls.validateMeetDate,
         }
@@ -56,19 +56,19 @@ class EnsureMeeting:
         return None
 
     @staticmethod
-    def validateIdentifier(ticket_id: str) -> str:
-        if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.DEFAULT):
-            return "Identity not valid for meeting"
-        return ""
+    def isValidIdentifier(ticket_id: str) -> str:
+        if not IdentityHandler.isValid(ticket_id, IdentityAlgorithm.DEFAULT):
+            return False, "Identity not valid for meeting"
+        return True, ""
 
     @staticmethod
-    def validateDescription(description: str) -> str:
+    def isValidDescription(description: str) -> str:
         if not checkers.is_string(description, maximum_lengt=200):
-            return "Max length exceeded, not allowed"
-        return ""
+            return False, "Max length exceeded, not allowed"
+        return True, ""
 
     @staticmethod
-    def validateMeetDate(end_at) -> str:
+    def isValidMeetDate(end_at) -> str:
         if not valdiateDateFormat(end_at):
-            return "Date of end format not valid"
-        return ""
+            return False, "Date of end format not valid"
+        return True, ""

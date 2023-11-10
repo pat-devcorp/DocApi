@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-
 ResponseDTO = namedtuple("ResponseDTO", ["error_id", "description"])
 
 
@@ -8,13 +7,15 @@ DEFAULT = ResponseDTO("1000", "CRASH_LOGIC")
 ID_NOT_FOUND = ResponseDTO("1000", "ID must be provided")
 ID_NOT_VALID = ResponseDTO("1000", "ID not valid")
 WRITE_UID_NOT_FOUND = ResponseDTO("1000", "Writer must be provided")
-FORMAT_NOT_MATCH = ResponseDTO("1000", "The format specificated is not valid") 
-UNSUPPORTED_MEDIA_TYPE = ResponseDTO("415", "This type of file is not supported") 
-WARNING_FILE = ResponseDTO("1000", "File could have pottential virus") 
+FORMAT_NOT_MATCH = ResponseDTO("1000", "The format specificated is not valid")
+UNSUPPORTED_MEDIA_TYPE = ResponseDTO("415", "This type of file is not supported")
+WARNING_FILE = ResponseDTO("1000", "File could have pottential virus")
 NOT_FOUND = ResponseDTO("404", "Not found")
 OPERATION_FAIL = ResponseDTO("417", "Operation fail")
 REQUIRED_FIELD = ResponseDTO("417", "Required param was not send")
 IS_NOT_MEMBER = ResponseDTO("1000", "Required param was not send")
+BROKER_CONNECTION_FAIL = ResponseDTO("1000", "Required param was not send")
+BROKER_SEND_FAIL = ResponseDTO("1000", "Required param was not send")
 
 # ERROR_REQUIRED_FIELD          = 1000
 # ID_NOT_FOUND                  = 1001

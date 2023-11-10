@@ -2,14 +2,14 @@ import re
 from collections import namedtuple
 
 from ...utils.StringHandler import contains_only_letters
-from .InterfaceError import InterfaceError
+from ..PresentationError import PresentationError
 
 KeywordDTO = namedtuple("KeywordDTO", ["keyword"])
 
 
-class Keyword:
+class KeywordHandler:
     @classmethod
-    def validate(keyword):
+    def isValid(keyword):
         error = list()
         if keyword is None:
             error += "Empty string"
@@ -20,7 +20,7 @@ class Keyword:
         if not contains_only_letters(keyword):
             error += "Symbools is not supported"
         if len(error) > 0:
-            InterfaceError(
+            PresentationError(
                 "Invalid keyword: %s for this reasons: %s"
                 % (keyword, "\n".joint(error))
             )

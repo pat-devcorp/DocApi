@@ -1,12 +1,12 @@
-from ..application.ApplicationError import ApplicationError
-from ..domain.keyword import EnsureKeyword
-from ..utils.IdentityHandler import IdentityHandler
-from .RepositoryProtocol import RepositoryProtocol
+from ...application.ApplicationError import ApplicationError
+from ...utils.IdentityHandler import IdentityHandler
+from ..dao.meeting import EnsureMeeting
+from ..RepositoryProtocol import RepositoryProtocol
 
 
-class KeywordRepository:
-    _name = "keyword"
-    _id = "keyword_id"
+class MeetingRepository:
+    _name = "meeting"
+    _id = "meeting_id"
 
     def __init__(
         self,
@@ -15,7 +15,7 @@ class KeywordRepository:
     ):
         self._write_uid = ref_write_uid
         self._repository = ref_repository
-        self._fields += list(EnsureKeyword.getFields())
+        self._fields += list(EnsureMeeting.getFields())
 
     def setFields(self, fields: list):
         self._fields = [field for field in fields if field in self._fields]
@@ -32,13 +32,13 @@ class KeywordRepository:
         return self._repository.get(self._name, self._fields)
 
     def create(self, params: dict) -> bool:
-        data = EnsureKeyword.domainFilter(params)
+        data = EnsureMeeting.domainFilter(params)
 
         self._repository.create(self._name, data)
         return True
 
     def update(self, params: dict) -> bool:
-        data = EnsureKeyword.domainFilter(params)
+        data = EnsureMeeting.domainFilter(params)
         if not self.entityExists(data[self._id]):
             raise ApplicationError(["params does not exist"])
 
@@ -48,7 +48,7 @@ class KeywordRepository:
     def getByID(self, identifier: IdentityHandler) -> list:
         return self._repository.getByID(self._name, self._id, identifier, self._fields)
 
-    def delete(self, identifier: IdentityHandler) -> bool:
+    def delete(self, identifier) -> bool:
         if not self.entityExists(identifier):
             raise ApplicationError(["params does not exist"])
 

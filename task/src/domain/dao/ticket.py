@@ -1,11 +1,12 @@
 from collections import namedtuple
 from enum import Enum
-
+from typing import Tuple
 from validator_collection import checkers
 
-from ..domain.DomainError import DomainError
-from ..utils.DatetimeHandler import valdiateDatetimeFormat
-from ..utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
+from ...utils.ErrorHandler import REQUIRED_FIELD
+from ...utils.DatetimeHandler import valdiateDatetimeFormat
+from ...utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
+from ..DomainError import DomainError
 
 
 class TicketCategory(Enum):
@@ -18,12 +19,11 @@ class TicketCategory(Enum):
 
 
 class TicketState(Enum):
-    UNDIFINED = 0
+    CREATED = 0
     DELETED = 1
-    CREATED = 2
-    IN_PROCESS = 3
-    OBSERVE = 4
-    END = 5
+    IN_PROCESS = 2
+    OBSERVE = 3
+    END = 4
 
 
 class EnsureTicket:
@@ -31,7 +31,7 @@ class EnsureTicket:
     def getFields() -> list:
         return ["ticket_id", "description", "category", "state", "end_at"]
 
-    @classmethod
+    @staticmethod
     def getMock():
         return {
             "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
@@ -50,23 +50,21 @@ class EnsureTicket:
                 for k, v in params.items()
                 if k in cls.getFields() and v is not None
             }
-        if params.keys() != cls.getFields():
-            raise DomainError(OPERATION_FAIL)
         data = dict()
         for k in cls.getFields():
             if params.get(k) is None:
-                raise DomainError(f"{k}: must be present in ticket")
+                raise DomainError(REQUIRED_FIELD)
             data[k] = params[k]
         return data
 
     @classmethod
     def partialValidate(cls, ref_object: dict) -> str:
         validate_funcs = {
-            "ticket_id": cls.validateTicketId,
-            "description": cls.validateDescription,
-            "category": cls.validateCategory,
-            "state": cls.validateState,
-            "end_at": cls.validateEndAt,
+            "ticket_id": cls.isValidTicketId,
+            "description": cls.isValidDescription,
+            "category": cls.isValidCategory,
+            "state": cls.isValidState,
+            "end_at": cls.isValidEndAt,
         }
 
         ticket = {k: v for k, v in ref_object.items() if k in validate_funcs.keys()}
@@ -74,48 +72,48 @@ class EnsureTicket:
         errors = list()
         for k, v in ticket.items():
             func = validate_funcs[k]
-            err = func(v)
-            if len(err) > 0:
+            is_ok, err = func(v)
+            if not is_ok:
                 errors.append(err)
 
         if len(errors) > 0:
             return "\n".join(errors)
 
-        return None
-
-    @staticmethod
-    def validateTicketId(ticket_id: str) -> str:
-        if not IdentityHandler.validate(ticket_id, IdentityAlgorithm.UUID_V4):
-            return "Identity not valid for ticket"
         return ""
 
     @staticmethod
-    def validateState(state: str) -> str:
+    def isValidTicketId(ticket_id: str) -> Tuple[bool, str]:
+        if not IdentityHandler.isValid(ticket_id, IdentityAlgorithm.UUID_V4):
+            return False, "Identity not valid for ticket"
+        return True, ""
+
+    @staticmethod
+    def isValidState(state: str) -> Tuple[bool, str]:
         for member in TicketState:
             if member.value == state:
-                return ""
-        return "Invalid state"
+                return True, ""
+        return False, "Invalid state"
 
     @staticmethod
-    def validateCategory(category: str) -> str:
+    def isValidCategory(category: str) -> Tuple[bool, str]:
         for member in TicketCategory:
             if member.value == category:
-                return ""
-        return "Invalid state"
+                return True, ""
+        return False, "Invalid state"
 
     @staticmethod
-    def validateDescription(description: str) -> str:
+    def isValidDescription(description: str) -> Tuple[bool, str]:
         if not checkers.is_string(description, maximum_lengt=200):
-            return "Max length exceeded, not allowed"
-        return ""
+            return False, "Max length exceeded, not allowed"
+        return True, ""
 
     @staticmethod
-    def validateEndAt(end_at) -> str:
+    def isValidEndAt(end_at) -> Tuple[bool, str]:
         if not valdiateDatetimeFormat(end_at):
-            return "Date of end format not valid"
-        return ""
+            return False, "Date of end format not valid"
+        return True, ""
 
     @classmethod
     def getIdentifier(cls, identifier):
-        cls.validateTicketId(identifier)
+        cls.isValidTicketId(identifier)
         return IdentityHandler(IdentityAlgorithm.UUID_V4, identifier)

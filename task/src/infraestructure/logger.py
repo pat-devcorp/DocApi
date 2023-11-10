@@ -15,7 +15,7 @@ class RequestFormatter(logging.Formatter):
         return super().format(record)
 
 
-def set_logger_format_to_json(file_path: str):
+def setFormatToJson(file_path: str):
     formatter = RequestFormatter(
         "{'TIME':%(asctime)s,'ADDRESS':'%(remote_addr)s','URL': '%(url)s','TYPE':'%(levelname)s','MODULE':'%(module)s','MSG':{%(message)s}}"
     )

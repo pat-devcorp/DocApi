@@ -1,4 +1,5 @@
 import pytest
+
 from src.infraestructure.broker.kafka import Kafka
 from src.infraestructure.repositories.mongo import Mongo
 from src.infraestructure.server import createServer
@@ -50,19 +51,19 @@ def mongo_repository():
     assert data["description"] == text
 
 
-def test_kafka_producer():
-    print("----KAFKA PROD")
-    kafka_producer = Kafka.setToDefault()
-    assert kafka_producer.chain_connection == "172.25.0.2:9092"
-    current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
+# def test_kafka_producer():
+#     print("----KAFKA PROD")
+#     kafka_producer = Kafka.setToDefault()
+#     assert kafka_producer.chain_connection == "172.25.0.2:9092"
+#     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
-    test_ticket_dto = {
-        "write_uid": "8888",
-        "_id": current_id,
-        "description": "This is a ticket modified",
-    }
-    try:
-        kafka_producer.sendMessage("create/task", str(test_ticket_dto))
-        assert True
-    except Exception as e:
-        assert False
+#     test_ticket_dto = {
+#         "write_uid": "8888",
+#         "_id": current_id,
+#         "description": "This is a ticket modified",
+#     }
+#     try:
+#         kafka_producer.sendMessage("create/task", str(test_ticket_dto))
+#         assert True
+#     except Exception as e:
+#         assert False

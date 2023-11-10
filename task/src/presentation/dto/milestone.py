@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from .InterfaceError import InterfaceError
+from ..PresentationError import PresentationError
 
 MilestoneItemDTO = namedtuple(
     "MilestoneItemsDTO", ["milestone_id", "description", "state"]
@@ -8,7 +8,7 @@ MilestoneItemDTO = namedtuple(
 MilestoneDTO = namedtuple("MilestoneDTO", ["milestone_id", "name", "items"])
 
 
-class Milestone:
+class MilestoneHandler:
     @classmethod
     def getIdentifier(identifier):
         return MilestoneDomain.getIdentifier(identifier)

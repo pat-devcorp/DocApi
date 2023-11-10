@@ -1,6 +1,10 @@
+from ..utils.ErrorHandler import ResponseDTO
+
+
 class DomainError(Exception):
-    def __init__(self, messages: list):
-        self.message = ".\n".join(messages)
+    def __init__(self, message, ref_response: ResponseDTO):
+        self. message = message
+        self.response = ref_response
 
     def __str__(self):
-        return "--- STRUCT DOES NOT MATCH ---\n" + self.message
+        return str(self.response)

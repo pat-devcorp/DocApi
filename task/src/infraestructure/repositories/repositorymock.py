@@ -31,3 +31,6 @@ class RepositoryMock:
             "create_uid": "9999",
             "create_at": "2023-10-10 16:41:53",
         }
+
+    def delete(self, tablename: str, pk: str, id_val: str):
+        return True

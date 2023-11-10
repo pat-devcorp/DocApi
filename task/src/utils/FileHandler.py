@@ -5,8 +5,8 @@ import subprocess
 import magic
 import requests
 
-from ..utils.ErrorHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 from ..infraestructure.config import Config
+from ..utils.ErrorHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 from ..utils.HandlerError import HandlerError
 
 

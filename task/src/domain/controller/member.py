@@ -1,12 +1,12 @@
-from ..application.ApplicationError import ApplicationError
-from ..utils.IdentityHandler import IdentityHandler
-from .meeting import EnsureMeeting
-from .RepositoryProtocol import RepositoryProtocol
+from ...application.ApplicationError import ApplicationError
+from ...utils.IdentityHandler import IdentityHandler
+from ..dao.meeting import EnsureMeeting
+from ..RepositoryProtocol import RepositoryProtocol
 
 
-class MilestoneRepository:
-    _name = "milestone"
-    _id = "milestone_id"
+class MemberRepository:
+    _name = "member"
+    _id = "member_id"
 
     def __init__(
         self,
