@@ -32,13 +32,13 @@ class MemberRepository:
         return self._repository.get(self._name, self._fields)
 
     def create(self, params: dict) -> bool:
-        data = EnsureMeeting.domainFilter(params)
+        data = EnsureMeeting.filterKeys(params)
 
         self._repository.create(self._name, data)
         return True
 
     def update(self, params: dict) -> bool:
-        data = EnsureMeeting.domainFilter(params)
+        data = EnsureMeeting.filterKeys(params)
         if not self.entityExists(data[self._id]):
             raise ApplicationError(["params does not exist"])
 

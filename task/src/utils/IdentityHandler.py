@@ -2,7 +2,6 @@ import re
 from enum import Enum
 
 from ..infraestructure.middleware.User import isValidUserID
-
 from ..utils.ErrorHandler import ID_NOT_FOUND, ID_NOT_VALID
 from ..utils.HandlerError import HandlerError
 

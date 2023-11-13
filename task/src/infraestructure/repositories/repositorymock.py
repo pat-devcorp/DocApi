@@ -2,7 +2,7 @@ from typing import List
 
 
 class RepositoryMock:
-    def get(self, tablename: str, attrs: List[str]):
+    def fetch(self, tablename: str, attrs: List[str]):
         return [{"ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"}]
 
     def getByID(self, tablename: str, pk: str, id_val: str, attrs: List[str]):

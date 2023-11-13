@@ -29,16 +29,16 @@ class KeywordRepository:
         )
 
     def fetch(self) -> list:
-        return self._repository.get(self._name, self._fields)
+        return self._repository.fetch(self._name, self._fields)
 
     def create(self, params: dict) -> bool:
-        data = EnsureKeyword.domainFilter(params)
+        data = EnsureKeyword.filterKeys(params)
 
         self._repository.create(self._name, data)
         return True
 
     def update(self, params: dict) -> bool:
-        data = EnsureKeyword.domainFilter(params)
+        data = EnsureKeyword.filterKeys(params)
         if not self.entityExists(data[self._id]):
             raise ApplicationError(["params does not exist"])
 
@@ -53,5 +53,4 @@ class KeywordRepository:
             raise ApplicationError(["params does not exist"])
 
         self._repository.delete(self._name, self._id, identifier)
-
         return True

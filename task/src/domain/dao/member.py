@@ -22,7 +22,7 @@ class Member:
         return {"member_id": 0, "role_id": 0}
 
     @classmethod
-    def domainFilter(cls, params: dict, is_partial=True) -> dict:
+    def filterKeys(cls, params: dict, is_partial=True) -> dict:
         if is_partial:
             return {
                 k: v
@@ -39,7 +39,7 @@ class Member:
         return data
 
     @classmethod
-    def partialValidate(cls, ref_object: dict) -> str:
+    def isValid(cls, ref_object: dict) -> str:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {
@@ -62,13 +62,13 @@ class Member:
         return None
 
     @staticmethod
-    def isValidIdentifier(ticket_id: str)-> Tuple[bool, str]:
+    def isValidIdentifier(ticket_id: str) -> Tuple[bool, str]:
         if not IdentityHandler.isValid(ticket_id, IdentityAlgorithm.DEFAULT):
             return False, "Identity not valid for meeting"
         return True, ""
 
     @staticmethod
-    def isValidRole(category: str)-> Tuple[bool, str]:
+    def isValidRole(category: str) -> Tuple[bool, str]:
         for member in MemberRole:
             if member.value == category:
                 return True, ""

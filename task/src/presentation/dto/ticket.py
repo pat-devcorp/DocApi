@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from ...utils.ErrorHandler import ID_NOT_FOUND
 from ...domain.dao.ticket import EnsureTicket, TicketCategory, TicketState
+from ...utils.ErrorHandler import ID_NOT_FOUND
 from ..PresentationError import PresentationError
 
 TicketDTO = namedtuple("TicketDTO", ["ticket_id", "description", "category", "state"])
@@ -26,27 +26,27 @@ class TicketHandler:
         if params.get("ticket_id") is None:
             raise PresentationError(ID_NOT_FOUND)
 
-        ticket = dict()
-        for k in TicketDTO._fields:
-            ticket[k] = params[k] if params.get(k) is not None else None
+        ticket = {k: params.get(k, None) for k in TicketDTO._fields}
 
-        errors = EnsureTicket.partialValidate(ticket)
-        if len(errors) > 0:
-            raise PresentationError("\n".join(errors))
-
+        is_ok, err = EnsureTicket.isValid(ticket)
+        if not is_ok:
+            raise PresentationError("\n".join(err))
         return TicketDTO(**ticket)
 
     @staticmethod
     def create(
         ticket_id,
         description,
-        category:int|TicketCategory=TicketCategory.UNDEFINED,
-        state:int|TicketState=TicketState.CREATED
+        category: int | TicketCategory = TicketCategory.UNDEFINED,
+        state: int | TicketState = TicketState.CREATED,
     ):
-        category_value = category if isinstance(category, int) else TicketCategory.UNDEFINED.value
+        category_value = (
+            category if isinstance(category, int) else TicketCategory.UNDEFINED.value
+        )
         state_value = state if isinstance(state, int) else TicketState.CREATED.value
         ticket_dto = TicketDTO(ticket_id, description, category_value, state_value)
-        errors = EnsureTicket.partialValidate(ticket_dto._asdict())
-        if len(errors) > 0:
-            raise PresentationError("\n".join(errors))
+
+        is_ok, err = EnsureTicket.isValid(ticket_dto._asdict(), False)
+        if not is_ok:
+            raise PresentationError("\n".join(err))
         return ticket_dto

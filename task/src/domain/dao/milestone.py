@@ -22,7 +22,7 @@ class Milestone:
         return {"milestone_id": 0, "description": "Test"}
 
     @classmethod
-    def domainFilter(cls, params: dict, is_partial=True) -> dict:
+    def filterKeys(cls, params: dict, is_partial=True) -> dict:
         if is_partial:
             return {
                 k: v
@@ -39,7 +39,7 @@ class Milestone:
         return data
 
     @classmethod
-    def partialValidate(cls, ref_object: dict) -> str:
+    def isValid(cls, ref_object: dict) -> str:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {

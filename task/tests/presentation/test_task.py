@@ -1,10 +1,12 @@
 from src.infraestructure.broker.brokermock import BrokerMock
 from src.infraestructure.repositories.repositorymock import RepositoryMock
 from src.presentation.controller.ticket import Ticket as TicketController
-from src.presentation.dto.ticket import TicketHandler, TicketDTO
+from src.presentation.dto.ticket import TicketDTO, TicketHandler
+
 
 def getTicketId():
     return "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
+
 
 def test_fail_interface_identifier():
     try:
@@ -72,23 +74,23 @@ def test_controller_create():
     assert response
 
 
-# def test_controller_get():
-#     lc = getControllerMock("9999")
+def test_controller_get():
+    lc = getControllerMock("9999")
 
-#     response_get = lc.fetch()
-#     assert isinstance(response_get, list)
+    response_get = lc.fetch()
+    assert isinstance(response_get, list)
 
 
-# def test_controller_update():
-#     lc = getControllerMock("9999")
+def test_controller_update():
+    lc = getControllerMock("9999")
 
-#     dto = {
-#         "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
-#         "description": "This is a ticket modified",
-#     }
-#     my_ticket_update_dto = TicketHandler.fromDict(dto)
-#     response = lc.update(my_ticket_update_dto)
-#     assert response
+    dto = {
+        "ticket_id": "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c",
+        "description": "This is a ticket modified",
+    }
+    my_ticket_update_dto = TicketHandler.fromDict(dto)
+    response = lc.update(my_ticket_update_dto)
+    assert response
 
 
 # def test_controller_get_by_id():

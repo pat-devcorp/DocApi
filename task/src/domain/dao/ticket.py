@@ -1,12 +1,13 @@
-from collections import namedtuple
 from enum import Enum
 from typing import Tuple
+
 from validator_collection import checkers
 
-from ...utils.ErrorHandler import REQUIRED_FIELD
+from ...domain.DomainError import DomainError
+from ...utils.ErrorHandler import ID_NOT_FOUND
+from ...domain.DomainProtocol import DomainProtocol
 from ...utils.DatetimeHandler import valdiateDatetimeFormat
 from ...utils.IdentityHandler import IdentityAlgorithm, IdentityHandler
-from ..DomainError import DomainError
 
 
 class TicketCategory(Enum):
@@ -26,7 +27,7 @@ class TicketState(Enum):
     END = 4
 
 
-class EnsureTicket:
+class EnsureTicket(DomainProtocol):
     @staticmethod
     def getFields() -> list:
         return ["ticket_id", "description", "category", "state", "end_at"]
@@ -41,24 +42,35 @@ class EnsureTicket:
             "events": "2023/07/18 14:00",
             "points": 0,
         }
+    
+    @staticmethod
+    def create(
+        ticket_id,
+        description,
+        category,
+        state,
+        end_at=None
+    ):
+        return {
+            "ticket_id": ticket_id,
+            "description": description,
+            "category": category,
+            "state": state,
+            "end_at": end_at
+        }
 
     @classmethod
-    def domainFilter(cls, params: dict, is_partial=True) -> dict:
-        if is_partial:
-            return {
-                k: v
-                for k, v in params.items()
-                if k in cls.getFields() and v is not None
-            }
-        data = dict()
-        for k in cls.getFields():
-            if params.get(k) is None:
-                raise DomainError(REQUIRED_FIELD)
-            data[k] = params[k]
-        return data
+    def fromDict(cls, params: dict) -> dict:
+        if params.get("ticket_id")  is None:
+            raise DomainError(ID_NOT_FOUND, "Ticket Id not defined")
+        return {
+            k: v
+            for k, v in params.items()
+            if k in cls.getFields() and v is not None
+        }
 
     @classmethod
-    def partialValidate(cls, ref_object: dict) -> str:
+    def isValid(cls, ref_object: dict, is_partial=True) -> Tuple[bool, str]:
         validate_funcs = {
             "ticket_id": cls.isValidTicketId,
             "description": cls.isValidDescription,
@@ -67,19 +79,19 @@ class EnsureTicket:
             "end_at": cls.isValidEndAt,
         }
 
-        ticket = {k: v for k, v in ref_object.items() if k in validate_funcs.keys()}
-
         errors = list()
-        for k, v in ticket.items():
-            func = validate_funcs[k]
-            is_ok, err = func(v)
-            if not is_ok:
-                errors.append(err)
+        for k, v in ref_object.items():
+            if is_partial and v is None:
+                continue
+            if func := validate_funcs.get(k):
+                is_ok, err = func(v)
+                if not is_ok:
+                    errors.append(err)
 
         if len(errors) > 0:
-            return "\n".join(errors)
+            return False, "\n".join(errors)
 
-        return ""
+        return True, ""
 
     @staticmethod
     def isValidTicketId(ticket_id: str) -> Tuple[bool, str]:

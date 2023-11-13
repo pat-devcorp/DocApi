@@ -1,50 +1,66 @@
+from ...domain.DomainProtocol import DomainProtocol
+from ...domain.RepositoryProtocol import RepositoryProtocol
+from ...utils.ErrorHandler import ID_NOT_FOUND
 from ...utils.IdentityHandler import IdentityHandler
 from ..DomainError import DomainError
 
 
 class BaseRepository:
-    _name = None
-    _id = None
-    _write_uid = None
-    _repository = None
-    _fields = None
-    _func_filter = None
+    def __init__(
+            self,
+            name:str,
+            pk:str,
+            write_uid:IdentityHandler,
+            ref_domain:DomainProtocol,
+            fields:list,
+            repository:RepositoryProtocol,
+        ):
+        self.name = name
+        self.pk = pk
+        self.write_uid = write_uid
+        self.domain = ref_domain
+        self.fields = fields
+        self.repository = repository
 
     def setFields(self, fields: list):
-        self._fields = [field for field in fields if field in self._fields]
+        self.fields = fields
 
     @classmethod
-    def entityExists(cls, ref_repository, identifier) -> bool:
+    def entityExists(
+        cls, ref_repository:RepositoryProtocol, name:str, pk:str, identifier: IdentityHandler
+    ) -> bool:
         return (
             True
-            if ref_repository.getByID(cls._name, cls._id, identifier, cls._name) is None
+            if ref_repository.getByID(name, pk, identifier, [pk]) is not None
             else False
         )
 
     def fetch(self) -> list:
-        return self._repository.get(self._name, self._fields)
+        return self.repository.fetch(self.name, self.fields)
 
     def getByID(self, identifier: IdentityHandler) -> list:
-        return self._repository.getByID(self._name, self._id, identifier, self._fields)
+        return self.repository.getByID(self.name, self.pk, identifier, self.fields)
 
     def delete(self, identifier: IdentityHandler) -> bool:
-        if not self.entityExists(identifier):
-            raise DomainError(["params does not exist"])
+        if not self.entityExists(self.repository, self.name, self.pk, identifier):
+            raise DomainError(ID_NOT_FOUND)
 
-        self._repository.delete(self._name, self._id, identifier)
+        self.repository.delete(self.name, self.pk, identifier)
         return True
 
     def create(self, params: dict) -> bool:
-        data = self._func_filter(params)
+        data = self.ref_domain.create(params)
 
-        self._repository.create(self._name, data)
+        self.repository.create(self.name, data)
         return True
 
     def update(self, params: dict) -> bool:
-        if not self.entityExists(params.get(self._id)):
-            raise DomainError(["params does not exist"])
+        if not self.entityExists(
+            self.repository, self.name, self.pk, params.get(self.pk)
+        ):
+            raise DomainError(ID_NOT_FOUND)
 
-        data = self._func_filter(params, False)
+        data = self.ref_domain.fromDict(params, False)
 
-        self._repository.update(self._name, self._id, data[self._id], data)
+        self.repository.update(self.name, self.pk, data[self.pk], data)
         return True

@@ -38,7 +38,7 @@ class AuditHandler:
     def fromDict(cls, params: dict):
         if params.get("write_uid") is None:
             raise HandlerError(WRITE_UID_NOT_FOUND)
-        
+
         if not isValidUserID(params.get("write_uid")):
             raise HandlerError(ID_NOT_FOUND)
 
@@ -60,7 +60,7 @@ class AuditHandler:
     def create(cls, current_uid):
         if not isValidUserID(current_uid):
             raise HandlerError(ID_NOT_FOUND)
-        
+
         return AuditDTO(
             write_uid=current_uid,
             write_at=getDatetime(),

@@ -15,7 +15,7 @@ class EnsureMeeting:
         return {"meeting_id": 0, "subject": "Test task", "meet_date": "2023/04/01"}
 
     @classmethod
-    def domainFilter(cls, params: dict, is_partial=True) -> dict:
+    def filterKeys(cls, params: dict, is_partial=True) -> dict:
         if is_partial:
             return {
                 k: v
@@ -32,7 +32,7 @@ class EnsureMeeting:
         return data
 
     @classmethod
-    def partialValidate(cls, ref_object: dict) -> str:
+    def isValid(cls, ref_object: dict) -> str:
         print("---DOMAIN---")
         print(ref_object)
         validate_funcs = {

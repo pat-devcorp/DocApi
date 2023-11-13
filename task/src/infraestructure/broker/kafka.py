@@ -1,9 +1,10 @@
 import json
 import re
+
 from kafka import KafkaConsumer, KafkaProducer
 
-from ...utils.ErrorHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ...application.BrokerTopic import BrokerTopic
+from ...utils.ErrorHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ..config import Config
 from ..InfraestructureError import InfraestructureError
 
