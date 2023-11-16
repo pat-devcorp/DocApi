@@ -1,0 +1,22 @@
+# Types
+validator-collection
+mypy
+pydantic
+dictdiffer
+# Test
+pytest
+# git
+pre-commit
+# services
+gunicorn
+flask
+flask_cors
+# Streaming
+kafka-python
+# Metricts
+prometheus_client
+# Repositories
+pymongo
+# utils
+python-magic
+subprocess.run
