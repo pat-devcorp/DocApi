@@ -32,4 +32,4 @@ class Ticket:
         data = dao.toRepository()
         data.update(AuditHandler.getUpdateFields(self._write_uid))
 
-        return self._r.update(data)
+        return self._r.update(dao.ticket_id.value, data)

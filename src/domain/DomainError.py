@@ -7,4 +7,4 @@ class DomainError(Exception):
         self.response = ref_response
 
     def __str__(self):
-        return str(self.response)
+        return str(self.message)

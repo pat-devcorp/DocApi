@@ -1,6 +1,10 @@
+from ..utils.ErrorHandler import ResponseDTO
+
+
 class PresentationError(Exception):
-    def __init__(self, messages: list):
-        self.message = messages
+    def __init__(self, ref_response: ResponseDTO, message=""):
+        self.message = message
+        self.response = ref_response
 
     def __str__(self):
-        return "--- PRESENTATION ---\n" + self.message
+        return str(self.message)

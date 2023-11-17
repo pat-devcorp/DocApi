@@ -1,9 +1,16 @@
 from collections import namedtuple
 
-from ...domain.dao.ticket import TicketCategory, TicketDAO, TicketState, ValidTicket
+from ...domain.dao.ticket import (
+    TicketCategory,
+    TicketDAO,
+    TicketState,
+    TicketTypeCommit,
+    ValidTicket,
+)
+from ...utils.ErrorHandler import PRESENTATION_VALIDATION
 from ..PresentationError import PresentationError
 
-TicketDTO = namedtuple("TicketDTO", ["description", "category", "state"])
+TicketDTO = namedtuple("TicketDTO", ["description", "category", "type_commit", "state"])
 
 
 class TicketHandler:
@@ -12,6 +19,7 @@ class TicketHandler:
         return TicketDTO(
             description="Test task",
             category=TicketCategory.UNDEFINED,
+            type_commit=TicketTypeCommit.UNDEFINED,
             state=TicketState.CREATED,
         )
 
@@ -24,10 +32,13 @@ class TicketHandler:
         data = {k: params.get(k, None) for k in TicketDTO._fields}
         is_ok, err = ValidTicket.isValid(data)
         if not is_ok:
-            raise PresentationError("\n".join(err))
+            raise PresentationError(PRESENTATION_VALIDATION, "\n".join(err))
 
         if (category := data.get("category")) is not None:
             data["category"] = TicketCategory(category)
+
+        if (type_commit := data.get("type_commit")) is not None:
+            data["type_commit"] = TicketTypeCommit(type_commit)
 
         if (state := data.get("state")) is not None:
             data["state"] = TicketCategory(state)
@@ -38,13 +49,20 @@ class TicketHandler:
     def create(
         description: str,
         category: int = TicketCategory.UNDEFINED.value,
+        type_commit: int = TicketTypeCommit.UNDEFINED.value,
         state: int = TicketState.CREATED.value,
     ) -> TicketDTO | PresentationError:
-        data = {"description": description, "category": category, "state": state}
+        data = {
+            "description": description,
+            "category": category,
+            "type_commit": type_commit,
+            "state": state,
+        }
         is_ok, err = ValidTicket.isValid(data, False)
         if not is_ok:
-            raise PresentationError("\n".join(err))
+            raise PresentationError(PRESENTATION_VALIDATION, "\n".join(err))
 
         ticket_category = TicketCategory(category)
+        ticket_type_commit = TicketTypeCommit(type_commit)
         ticket_state = TicketState(state)
-        return TicketDTO(description, ticket_category, ticket_state)
+        return TicketDTO(description, ticket_category, ticket_type_commit, ticket_state)

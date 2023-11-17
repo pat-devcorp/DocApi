@@ -9,6 +9,8 @@ from ..IdentifierHandler import IdentifierHandler
 
 
 class Ticket:
+    fields = ["description", "type_commit", "category", "state"]
+
     def __init__(
         self,
         ref_write_uid,
@@ -43,26 +45,23 @@ class Ticket:
             **NOTES:** The module should be developed following clean architecture principles.
             """
 
-    @staticmethod
-    def prepareCreate(params: dict) -> TicketDTO | PresentationError:
-        return TicketHandler.create(
-            params.get("description"),
-            params.get("category"),
-            params.get("state"),
-        )
+    @classmethod
+    def prepareCreate(cls, params: dict) -> TicketDTO | PresentationError:
+        data = cls.serialize(params)
+        return TicketHandler.create(data)
 
-    @staticmethod
-    def prepareUpdate(params: dict) -> TicketDTO | PresentationError:
-        return TicketHandler.fromDict(params)
+    @classmethod
+    def prepareUpdate(cls, params: dict) -> TicketDTO | PresentationError:
+        data = cls.serialize(params)
+        return TicketHandler.fromDict(data)
 
     @staticmethod
     def prepareIdentifier(identifier) -> IdentifierHandler | PresentationError:
         return TicketHandler.getIdentifier(identifier)
 
-    @staticmethod
-    def serialize(data: dict):
-        allowed_keys = ["description", "category", "state"]
-        return {k: v for k, v in data if k in allowed_keys}
+    @classmethod
+    def serialize(cls, data: dict):
+        return {k: v for k, v in data.items() if k in cls.fields}
 
     def fetch(self) -> list:
         datos = self._uc.fetch()

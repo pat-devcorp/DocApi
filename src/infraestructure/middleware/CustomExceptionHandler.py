@@ -1,7 +1,6 @@
 import traceback
 
 from flask import jsonify
-from werkzeug.exceptions import HTTPException
 
 from ...application.ApplicationError import ApplicationError
 from ...domain.DomainError import DomainError

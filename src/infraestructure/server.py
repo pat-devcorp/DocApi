@@ -6,8 +6,8 @@ from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from .config import Config
+from .logger import setFormatToJson
 from .middleware.CustomExceptionHandler import CustomExceptionHandler
-from .middleware.UserValidator import UserIDValidator
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -32,14 +32,20 @@ def getBlueprints(path_ref: Path, predicate: str = "") -> list:
 def createServer():
     app = Flask(__name__)
     my_config = Config()
+    print("---CONFIG")
+    print(vars(my_config))
     app.config.from_object(my_config)
     # Import all the blueprints dynamically.
-    blueprint_path = Path("src/presentation/route")
+    blueprint_path = Path(my_config.ROUTE_PATH)
     blueprints = getBlueprints(blueprint_path)
-    # Add authentication
-    # app.wsgi_app = UserIDValidator(app.wsgi_app)
-    app.wsgi_app = CustomExceptionHandler(app.wsgi_app)
     registerBlueprints(app, blueprint_path, blueprints)
+    print("---ROUTES")
+    print(blueprints)
+    # logger
+    if my_config.IS_IN_PRODUCTION:
+        setFormatToJson(my_config.LOG_PATH)
+    # eXCEPTION
+    app.wsgi_app = CustomExceptionHandler(app.wsgi_app)
     # Add prometheus wsgi middleware to route /metrics requests
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
     return app

@@ -17,6 +17,13 @@ IS_NOT_MEMBER = ResponseDTO("1000", "Required param was not send")
 BROKER_CONNECTION_FAIL = ResponseDTO("1000", "Required param was not send")
 BROKER_SEND_FAIL = ResponseDTO("1000", "Required param was not send")
 DUPLICATE_ID = ResponseDTO("1000", "Id is present in repository")
+DB_CONNECTION_ERROR = ResponseDTO("1000", "Databse server doesnt respond")
+DB_COLLECTION_NOT_FOUND = ResponseDTO("1000", "Databse server doesnt respond")
+DB_GET_FAIL = ResponseDTO("1000", "Databse server doesnt respond")
+DB_CREATE_FAIL = ResponseDTO("1000", "Databse server doesnt respond")
+DB_UPDATE_FAIL = ResponseDTO("1000", "Databse server doesnt respond")
+DB_DELETE_FAIL = ResponseDTO("1000", "Databse server doesnt respond")
+PRESENTATION_VALIDATION = ResponseDTO("1000", "Databse server doesnt respond")
 
 # ERROR_REQUIRED_FIELD          = 1000
 # ID_NOT_FOUND                  = 1001

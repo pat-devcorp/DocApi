@@ -8,11 +8,15 @@ from .RepositoryProtocol import RepositoryProtocol
 class IdentityHandler:
     value = None
 
-    def __init__(
-        self, ref_repository: RepositoryProtocol, identifier: IdentifierHandler
+    def __init__(self, identifier: IdentifierHandler) -> None | DomainError:
+        self.value = identifier
+
+    @classmethod
+    def ensureIdentity(
+        cls, ref_repository: RepositoryProtocol, identifier: IdentifierHandler
     ) -> None | DomainError:
         try:
             ref_repository.entityExists(identifier)
-            self.value = identifier
+            return cls(identifier)
         except InfraestructureError:
             raise DomainError(ID_NOT_FOUND, "Ticket doesnt exists")

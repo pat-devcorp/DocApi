@@ -38,7 +38,7 @@ export-env:
 	
 init: ## sets up environment and installs requirements
 init:
-	pip install -r requirements.txt
+	pip install -r /init/requirements.txt
 	# Used for packaging and publishing
 	pip install setuptools wheel twine
 	# Used for linting and formatting
@@ -72,13 +72,13 @@ clean:
 
 test: ## Run pytest
 test:
-	pytest . -p no:logging -p no:warnings
+	pytest tests -p no:logging -p no:warnings
 
 build: ## Build docker image
 build:
-	sed -i 's/\r/\n/g' entrypoint.sh
+	sed -i 's/\r/\n/g' ./init/entrypoint.sh
 	@docker image rm -f $(DOCKER_NAME):$(API_VERSION) || true
-	docker build -t $(DOCKER_NAME):$(API_VERSION) .
+	docker build -t $(DOCKER_NAME):$(API_VERSION) --file Dockerfile.prod .
 
 run: ## Run docker container
 run:
@@ -86,6 +86,10 @@ run:
         docker rm -f $(DOCKER_NAME); \
     fi
 	docker run -p 5000:$(API_PORT) --name $(DOCKER_NAME) $(DOCKER_NAME):$(API_VERSION)
+
+dev: ##Run with docker-compose 
+dev:
+	docker-compose up -d
 
 logs: ## Show container logs
 logs:

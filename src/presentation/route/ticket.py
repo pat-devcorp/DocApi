@@ -8,8 +8,9 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 @ticket.post("/")
 def createTicket():
-    params = request.get_json()
-
+    print("---POST ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
     lc = TicketController(params.get("write_uid"))
     obj_id = lc.prepareIdentifier(params.get("ticket_id"))
     obj = lc.prepareCreate(params)
@@ -21,8 +22,9 @@ def createTicket():
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
 def fetchTicket(id=None):
-    params = request.get_json()
-
+    print("---GET ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
     lc = TicketController(params.get("write_uid"))
     if id is not None:
         obj_id = lc.prepareIdentifier(id)
@@ -35,7 +37,9 @@ def fetchTicket(id=None):
 
 @ticket.put("/<id>")
 def updateTicket(id):
-    params = request.get_json()
+    print("---PUT ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
 
     lc = TicketController(params.get("write_uid"))
     obj_id = lc.prepareIdentifier(id)
@@ -47,7 +51,9 @@ def updateTicket(id):
 
 @ticket.delete("/<id>")
 def deleteTicket(id):
-    params = request.get_json()
+    print("---DEL ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
 
     lc = TicketController(params.get("write_uid"))
     obj_id = lc.prepareIdentifier(id)
@@ -60,7 +66,7 @@ def deleteTicket(id):
 # @ticket.post("/<id>/keyword")
 # def addTicketKeyword(id):
 #     write_uid = request.args.get("write_uid")
-#     params = request.get_json()
+#     params = request.args.to_dict()
 #     obj_id = TicketHandler.getIdentifier(id)
 #     keyword = Keyworddto.create(params.get("Keyword"))
 
@@ -86,7 +92,7 @@ def deleteTicket(id):
 # @ticket.post("/<id>/meeting")
 # def addTicketMeeting(id):
 #     write_uid = request.args.get("write_uid")
-#     params = request.get_json()
+#     params = request.args.to_dict()
 #     obj_id = TicketHandler.getIdentifier(id)
 #     meeting = Meetingdto.create(params.get("meeting_date"))
 
@@ -112,7 +118,7 @@ def deleteTicket(id):
 # @ticket.post("/<id>/milestone")
 # def addTicketMilestone(id):
 #     write_uid = request.args.get("write_uid")
-#     params = request.get_json()
+#     params = request.args.to_dict()
 #     obj_id = TicketHandler.getIdentifier(id)
 #     milestone = Milestonedto.create(params)
 
@@ -168,7 +174,7 @@ def deleteTicket(id):
 # @ticket.post("/<id>/member")
 # def addTicketMember(id):
 #     write_uid = request.args.get("write_uid")
-#     params = request.get_json()
+#     params = request.args.to_dict()
 #     obj_id = TicketHandler.getIdentifier(id)
 #     member_identifier = Memberdto.create(params)
 
@@ -194,7 +200,7 @@ def deleteTicket(id):
 # @ticket.post("/<id>/member/set_assignee")
 # def setTicketAssignee(id):
 #     write_uid = request.args.get("write_uid")
-#     params = request.get_json()
+#     params = request.args.to_dict()
 #     obj_id = TicketHandler.getIdentifier(id)
 #     member_identifier = Memberdto.getIdentifier(params.get("member_id"))
 

@@ -1,6 +1,10 @@
+from .ErrorHandler import ResponseDTO
+
+
 class HandlerError(Exception):
-    def __init__(self, messages):
-        self.message = messages
+    def __init__(self, ref_response: ResponseDTO, message=""):
+        self.message = message
+        self.response = ref_response
 
     def __str__(self):
-        return "--- HANDLER ---\n" + self.message
+        return str(self.message)

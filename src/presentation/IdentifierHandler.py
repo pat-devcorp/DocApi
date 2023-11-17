@@ -1,8 +1,7 @@
 import re
 from enum import Enum
 
-from ..infraestructure.middleware.UserValidator import isValidUserID
-
+from ..infraestructure.UserValidator import UserValidator
 from ..utils.ErrorHandler import ID_NOT_VALID
 
 
@@ -47,7 +46,7 @@ class IdentifierHandler:
 
     @staticmethod
     def ensureUserId(identifier) -> tuple[bool, str]:
-        if not isValidUserID(identifier):
+        if not UserValidator.isValidUserID(identifier):
             return False, "User doesnt exists"
         return True, ""
 

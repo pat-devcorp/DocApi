@@ -9,11 +9,23 @@ from ...utils.DatetimeHandler import valdiateDatetimeFormat
 
 class TicketCategory(Enum):
     UNDEFINED = 0
-    HOTFIX = 1
-    BUGFIX = 2
-    FEATURE = 3
-    REFACTOR = 4
+    PENDIENTES = 1
+    SOPORTE = 2
+    TICKET = 3
+
+
+class TicketTypeCommit(Enum):
+    UNDEFINED = 0
+    FEAT = 1
+    FIX = 2
+    BUILD = 3
+    CI = 4
     DOCS = 5
+    CHORE = 6
+    PERFORMANCE = 6
+    REFACTOR = 7
+    LINTER = 8
+    TEST = 9
 
 
 class TicketState(Enum):
@@ -30,8 +42,9 @@ class ValidTicket:
         validate_funcs = {
             "description": cls.isValidDescription,
             "category": cls.isValidCategory,
+            "type_commit": cls.isValidTypeCommit,
             "state": cls.isValidState,
-            "end_at": cls.isValidEndAt,
+            "estimate_end_at": cls.isValidEndAt,
         }
 
         errors = list()
@@ -60,7 +73,14 @@ class ValidTicket:
         for member in TicketCategory:
             if member.value == category:
                 return True, ""
-        return False, "Invalid state"
+        return False, "Invalid category"
+
+    @staticmethod
+    def isValidTypeCommit(type_commit: int) -> tuple[bool, str]:
+        for member in TicketTypeCommit:
+            if member.value == type_commit:
+                return True, ""
+        return False, "Invalid commit type"
 
     @staticmethod
     def isValidDescription(description: str) -> tuple[bool, str]:
@@ -69,8 +89,8 @@ class ValidTicket:
         return True, ""
 
     @staticmethod
-    def isValidEndAt(end_at: str) -> tuple[bool, str]:
-        if not valdiateDatetimeFormat(end_at):
+    def isValidEndAt(estimate_end_at: str) -> tuple[bool, str]:
+        if not valdiateDatetimeFormat(estimate_end_at):
             return False, "Date of end format not valid"
         return True, ""
 
@@ -79,9 +99,10 @@ class TicketDAO:
     ticket_id: IdentityHandler
     description: str
     category: int
+    type_commit: int
     state: int
     points: int = (0,)
-    end_at: str | None = (None,)
+    estimate_end_at: str | None = (None,)
 
     def toRepository(self) -> dict:
         data = dict()
@@ -107,9 +128,10 @@ class TicketDAO:
             "ticket_id": cls.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"),
             "description": "Test task",
             "category": TicketCategory.UNDEFINED,
+            "type_commit": TicketTypeCommit.UNDEFINED,
             "state": TicketState.CREATED,
             "points": 0,
-            "end_at": "2023/20/10 10:10",
+            "estimate_end_at": "2023/20/10 10:10",
         }
 
     def __init__(
@@ -117,16 +139,18 @@ class TicketDAO:
         ticket_id: IdentityHandler,
         description: str,
         category: TicketCategory = TicketCategory.UNDEFINED,
+        type_commit: TicketTypeCommit = TicketTypeCommit.UNDEFINED,
         state: TicketState = TicketState.CREATED,
         points: int = 0,
-        end_at: str | None = None,
+        estimate_end_at: str | None = None,
     ):
         self.ticket_id = ticket_id
         self.description = description
         self.category = category
+        self.type_commit = type_commit
         self.state = state
         self.points = points
-        self.end_at = end_at
+        self.estimate_end_at = estimate_end_at
 
     @classmethod
     def fromDict(cls, ticket_id: IdentityHandler, params: dict):
@@ -135,4 +159,12 @@ class TicketDAO:
 
     @staticmethod
     def getFields() -> list:
-        return ["ticket_id", "description", "category", "state", "points", "end_at"]
+        return [
+            "ticket_id",
+            "description",
+            "category",
+            "type_commit",
+            "state",
+            "points",
+            "estimate_end_at",
+        ]

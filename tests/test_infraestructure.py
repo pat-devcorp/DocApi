@@ -1,7 +1,7 @@
 import pytest
 
 from src.infraestructure.broker.kafka import Kafka
-from src.infraestructure.repositories.mongo import Mongo
+from src.infraestructure.repositories.ticket_mongo import Ticket
 from src.infraestructure.server import createServer
 
 
@@ -24,30 +24,30 @@ def test_404_not_found(client):
     assert b"404 Not Found" in response.data
 
 
-def mongo_repository():
-    mongo_repository = Mongo.setToDefault()
+def test_mongo_repository():
+    mongo_repository = Ticket()
     assert (
-        mongo_repository.chain_connection
+        mongo_repository._mongo.chain_connection
         == "mongodb://mongo:mongo@localhost:27017/?authMechanism=DEFAULT"
     )
     fields = ["write_uid", "_id", "description"]
     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
-    test_ticket_dto = {
+    dto = {
         "write_uid": "8888",
-        "_id": current_id,
+        "ticket_id": current_id,
         "description": "This is a ticket modified",
     }
+    if mongo_repository.getByID(current_id, ["description"]) is None:
+        mongo_repository.create(dto)
 
-    # mongo_repository.create("ticket", "ticket_id", test_ticket_dto)
-
-    datos = mongo_repository.get("ticket", "ticket_id", fields)
+    datos = mongo_repository.fetch(fields)
     assert datos
 
     text = "It was modified"
-    mongo_repository.update("ticket", "ticket_id", current_id, {"description": text})
+    mongo_repository.update(current_id, {"description": text})
 
-    data = mongo_repository.getByID("ticket", "ticket_id", current_id, ["description"])
+    data = mongo_repository.getByID(current_id, ["description"])
     assert data["description"] == text
 
 
@@ -57,13 +57,13 @@ def mongo_repository():
 #     assert kafka_producer.chain_connection == "172.25.0.2:9092"
 #     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
-#     test_ticket_dto = {
+#     dto = {
 #         "write_uid": "8888",
 #         "_id": current_id,
 #         "description": "This is a ticket modified",
 #     }
 #     try:
-#         kafka_producer.sendMessage("create/task", str(test_ticket_dto))
+#         kafka_producer.sendMessage("create/task", str(dto))
 #         assert True
 #     except Exception as e:
 #         assert False

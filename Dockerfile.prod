@@ -36,6 +36,7 @@ FROM python:3.11-slim
 ENV APP_HOME=/home/app
 RUN mkdir -p $APP_HOME
 COPY ./init/ $APP_HOME
+COPY ./src $APP_HOME/src
 RUN chmod -R 777 $APP_HOME
 
 # install dependencies
@@ -45,4 +46,13 @@ COPY --from=builder /usr/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
+# chown all the files to the app user
+# RUN chown -R app:app $APP_HOME
+
+# change to the app user
+# USER app
+
 WORKDIR $APP_HOME
+
+# run entrypoint.prod.sh
+ENTRYPOINT ["/home/app/entrypoint.sh"]
