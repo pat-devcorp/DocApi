@@ -36,6 +36,7 @@ FROM python:3.11-slim
 ENV APP_HOME=/home/app
 RUN mkdir -p $APP_HOME
 COPY ./init/ $APP_HOME
+COPY ./pytest.ini $APP_HOME
 RUN chmod -R 777 $APP_HOME
 
 # install dependencies

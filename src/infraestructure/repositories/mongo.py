@@ -94,8 +94,6 @@ class Mongo:
 
     def update(self, tablename: str, pk_name: str, id_val: str, kwargs: dict):
         collection = self.getCollection(tablename)
-        data = kwargs
-        data["_id"] = data.pop(pk_name)
         try:
             collection.update_one({"_id": id_val}, {"$set": kwargs})
         except Exception as err:

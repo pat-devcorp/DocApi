@@ -28,7 +28,7 @@ def test_mongo_repository():
     mongo_repository = Ticket()
     assert (
         mongo_repository._mongo.chain_connection
-        == "mongodb://mongo:mongo@localhost:27017/?authMechanism=DEFAULT"
+        == "mongodb://mongo:mongo@172.18.0.3:27017/?authMechanism=DEFAULT"
     )
     fields = ["write_uid", "_id", "description"]
     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"

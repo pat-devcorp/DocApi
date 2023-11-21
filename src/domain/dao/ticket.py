@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 
 from validator_collection.checkers import is_not_empty
 
@@ -98,18 +99,19 @@ class ValidTicket:
 class TicketDAO:
     ticket_id: IdentityHandler
     description: str
-    category: int
-    type_commit: int
-    state: int
+    category: TicketCategory
+    type_commit: TicketTypeCommit
+    state: TicketState
     points: int = (0,)
     estimate_end_at: str | None = (None,)
 
     def toRepository(self) -> dict:
         data = dict()
+        special_keys = ["ticket_id", "category", "type_commit", "state"]
         for field in self.getFields():
-            value = self.__getattribute__(field)
-            if value is not None:
-                data[field] = value
+            val = self.__getattribute__(field)
+            if val is not None:
+                data[field] = val if field not in special_keys else val.value
         return data
 
     @staticmethod
@@ -168,3 +170,9 @@ class TicketDAO:
             "points",
             "estimate_end_at",
         ]
+    
+    def __str__(self):
+        return json.dumps(self.toRepository())
+
+    def __repr__(self):
+        return self.__str__()

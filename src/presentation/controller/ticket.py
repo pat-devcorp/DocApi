@@ -68,10 +68,10 @@ class Ticket:
         return [self.serialize(item) for item in datos]
 
     def create(self, dto_id: IdentifierHandler, dto: TicketDTO) -> bool:
-        return self._uc.create(dto_id, dto.description, dto.category, dto.state)
+        return self._uc.create(dto_id, dto.description, dto.category, dto.state, dto.type_commit)
 
     def update(self, dto_id: IdentifierHandler, dto: TicketDTO) -> bool:
-        return self._uc.update(dto_id, dto.description, dto.category, dto.state)
+        return self._uc.update(dto_id, dto.description, dto.category, dto.state, dto.type_commit)
 
     def getByID(self, dto_id: IdentifierHandler) -> dict:
         data = self._uc.getByID(dto_id)

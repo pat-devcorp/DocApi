@@ -9,14 +9,14 @@ class IdentityHandler:
     value = None
 
     def __init__(self, identifier: IdentifierHandler) -> None | DomainError:
-        self.value = identifier
+        self.value = identifier.value
 
     @classmethod
     def ensureIdentity(
         cls, ref_repository: RepositoryProtocol, identifier: IdentifierHandler
     ) -> None | DomainError:
         try:
-            ref_repository.entityExists(identifier)
-            return cls(identifier)
+            ref_repository.entityExists(identifier.value)
+            return cls(identifier.value)
         except InfraestructureError:
             raise DomainError(ID_NOT_FOUND, "Ticket doesnt exists")
