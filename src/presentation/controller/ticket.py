@@ -9,8 +9,6 @@ from ..IdentifierHandler import IdentifierHandler
 
 
 class Ticket:
-    fields = ["description", "type_commit", "category", "state"]
-
     def __init__(
         self,
         ref_write_uid,
@@ -59,13 +57,9 @@ class Ticket:
     def prepareIdentifier(identifier) -> IdentifierHandler | PresentationError:
         return TicketHandler.getIdentifier(identifier)
 
-    @classmethod
-    def serialize(cls, data: dict):
-        return {k: v for k, v in data.items() if k in cls.fields}
-
     def fetch(self) -> list:
         datos = self._uc.fetch()
-        return [self.serialize(item) for item in datos]
+        return [TicketHandler.serialize(item) for item in datos]
 
     def create(self, dto_id: IdentifierHandler, dto: TicketDTO) -> bool:
         return self._uc.create(dto_id, dto.description, dto.category, dto.state, dto.type_commit)
@@ -75,7 +69,7 @@ class Ticket:
 
     def getByID(self, dto_id: IdentifierHandler) -> dict:
         data = self._uc.getByID(dto_id)
-        return self.serialize(data)
+        return TicketHandler.serialize(data)
 
     def delete(self, dto_id: IdentifierHandler):
         return self._uc.delete(dto_id)

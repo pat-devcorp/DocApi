@@ -22,6 +22,10 @@ class TicketHandler:
             type_commit=TicketTypeCommit.UNDEFINED,
             state=TicketState.CREATED,
         )
+    
+    @classmethod
+    def serialize(cls, data: dict):
+        return {k: v for k, v in data.items() if k in TicketDTO._fields}
 
     @staticmethod
     def getIdentifier(ticket_id):
