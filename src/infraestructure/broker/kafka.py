@@ -4,7 +4,7 @@ import re
 from kafka import KafkaProducer
 
 from ...application.BrokerTopic import BrokerTopic
-from ...utils.ErrorHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
+from ...utils.ResponseHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ..config import Config
 from ..InfraestructureError import InfraestructureError
 

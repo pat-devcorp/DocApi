@@ -6,7 +6,7 @@ from src.presentation.dto.ticket import TicketDTO, TicketHandler
 
 
 def getTicketId():
-    return "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
+    return "87378b40-894c-11ee-b9d1-0242ac120002"
 
 
 # def test_fail_interface_identifier():

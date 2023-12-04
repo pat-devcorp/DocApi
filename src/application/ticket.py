@@ -30,12 +30,26 @@ class Ticket:
     def fetch(self) -> list:
         return self._d.fetch()
 
-    def create(self, ticket_id: IdentifierHandler, description: str, category, state, type_commit):
-        obj_id = IdentityHandler(ticket_id)
+    def create(
+        self,
+        ticket_id: IdentifierHandler,
+        description: str,
+        category,
+        state,
+        type_commit,
+    ):
+        obj_id = IdentityHandler.create(ticket_id)
         obj = TicketDAO(obj_id, description, category, state, type_commit)
         return self._d.create(obj)
 
-    def update(self, ticket_id: IdentifierHandler, description: str, category, state, type_commit):
+    def update(
+        self,
+        ticket_id: IdentifierHandler,
+        description: str,
+        category,
+        state,
+        type_commit,
+    ):
         obj_id = IdentityHandler.ensureIdentity(self._r, ticket_id)
         obj = TicketDAO(obj_id, description, category, state, type_commit)
         return self._d.update(obj)

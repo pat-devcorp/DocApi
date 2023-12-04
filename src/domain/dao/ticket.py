@@ -1,10 +1,10 @@
-from enum import Enum
 import json
+from enum import Enum
 
 from validator_collection.checkers import is_not_empty
 
 from ...domain.IdentityHandler import IdentityHandler
-from ...presentation.IdentifierHandler import IdentifierHandler, IdentityAlgorithm
+from ...presentation.IdentifierHandler import IdentityAlgorithm
 from ...utils.DatetimeHandler import valdiateDatetimeFormat
 
 
@@ -105,7 +105,7 @@ class TicketDAO:
     points: int = (0,)
     estimate_end_at: str | None = (None,)
 
-    def toRepository(self) -> dict:
+    def asDict(self) -> dict:
         data = dict()
         special_keys = ["ticket_id", "category", "type_commit", "state"]
         for field in self.getFields():
@@ -118,23 +118,13 @@ class TicketDAO:
     def getIdAlgorithm():
         return IdentityAlgorithm.UUID_V4
 
-    @staticmethod
-    def getIdentifier(identifier: str):
-        pk = IdentifierHandler(TicketDAO.getIdAlgorithm())
-        pk.setIdentifier(identifier)
-        return pk
-
     @classmethod
-    def getMock(cls) -> dict:
-        return {
-            "ticket_id": cls.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"),
-            "description": "Test task",
-            "category": TicketCategory.UNDEFINED,
-            "type_commit": TicketTypeCommit.UNDEFINED,
-            "state": TicketState.CREATED,
-            "points": 0,
-            "estimate_end_at": "2023/20/10 10:10",
-        }
+    def getMock(cls):
+        identity = IdentityHandler("87378618-894c-11ee-b9d1-0242ac120002")
+        return cls(
+            ticket_id=identity,
+            description="Test task",
+        )
 
     def __init__(
         self,
@@ -170,9 +160,9 @@ class TicketDAO:
             "points",
             "estimate_end_at",
         ]
-    
+
     def __str__(self):
-        return json.dumps(self.toRepository())
+        return json.dumps(self.asDict())
 
     def __repr__(self):
         return self.__str__()

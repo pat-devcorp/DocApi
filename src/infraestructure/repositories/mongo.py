@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from pymongo import MongoClient
 
-from ...utils.ErrorHandler import (
+from ...utils.ResponseHandler import (
     DB_COLLECTION_NOT_FOUND,
     DB_CONNECTION_ERROR,
     DB_CREATE_FAIL,
@@ -76,18 +76,20 @@ class Mongo:
         try:
             datos = list(collection.find({}, {attr: 1 for attr in attrs}))
             for item in datos:
-                item[pk_name] = item.pop("_id")
+                if item is not None:
+                    item[pk_name] = item.pop("_id")
             return datos
         except Exception as err:
             raise InfraestructureError(DB_GET_FAIL, str(err))
 
     def getByID(
         self, tablename: str, pk_name: str, id_val: str, attrs: List[str]
-    ) -> Dict | InfraestructureError:
+    ) -> Dict | None | InfraestructureError:
         collection = self.getCollection(tablename)
         try:
             data = collection.find_one({"_id": id_val}, {attr: 1 for attr in attrs})
-            data[pk_name] = data.pop("_id")
+            if data is not None:
+                data[pk_name] = data.pop("_id")
             return data
         except Exception as err:
             raise InfraestructureError(ID_NOT_FOUND, str(err))
@@ -111,6 +113,6 @@ class Mongo:
     def delete(self, tablename: str, pk_name: str, id_val: str):
         collection = self.getCollection(tablename)
         try:
-            collection.delete_one({pk_name: id_val})
+            collection.delete_one({"_id": id_val})
         except Exception as err:
             raise InfraestructureError(DB_DELETE_FAIL, str(err))

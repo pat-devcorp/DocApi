@@ -1,6 +1,6 @@
 from ..infraestructure.InfraestructureError import InfraestructureError
 from ..presentation.IdentifierHandler import IdentifierHandler
-from ..utils.ErrorHandler import ID_NOT_FOUND
+from ..utils.ResponseHandler import ID_NOT_FOUND
 from .DomainError import DomainError
 from .RepositoryProtocol import RepositoryProtocol
 
@@ -8,8 +8,12 @@ from .RepositoryProtocol import RepositoryProtocol
 class IdentityHandler:
     value = None
 
-    def __init__(self, identifier: IdentifierHandler) -> None | DomainError:
-        self.value = identifier.value
+    def __init__(self, identifier) -> None | DomainError:
+        self.value = identifier
+
+    @classmethod
+    def create(cls, identifier: IdentifierHandler) -> None | DomainError:
+        return cls(identifier.value)
 
     @classmethod
     def ensureIdentity(

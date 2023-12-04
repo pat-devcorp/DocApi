@@ -1,4 +1,4 @@
-from .ErrorHandler import ResponseDTO
+from .ResponseHandler import ResponseDTO
 
 
 class HandlerError(Exception):

@@ -1,7 +1,7 @@
 import pytest
 
 from src.infraestructure.broker.kafka import Kafka
-from src.infraestructure.repositories.ticket_mongo import Ticket
+from src.infraestructure.repositories.mongo import Mongo
 from src.infraestructure.server import createServer
 
 
@@ -25,30 +25,31 @@ def test_404_not_found(client):
 
 
 def test_mongo_repository():
-    mongo_repository = Ticket()
-    assert (
-        mongo_repository._mongo.chain_connection
-        == "mongodb://mongo:mongo@172.18.0.3:27017/?authMechanism=DEFAULT"
-    )
-    fields = ["write_uid", "_id", "description"]
-    current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
+    mongo_repository = Mongo.setToDefault()
+    print(f"CONNECTION: {mongo_repository.chain_connection}")
+    current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
 
     dto = {
         "write_uid": "8888",
-        "ticket_id": current_id,
-        "description": "This is a ticket modified",
+        "identifier": current_id,
+        "description": "This is description",
     }
-    if mongo_repository.getByID(current_id, ["description"]) is None:
-        mongo_repository.create(dto)
+    mongo_repository.create("test", "identifier", dto)
 
-    datos = mongo_repository.fetch(fields)
+    datos = mongo_repository.fetch("test", "identifier", dto.keys())
     assert datos
 
     text = "It was modified"
-    mongo_repository.update(current_id, {"description": text})
+    mongo_repository.update("test", "identifier", current_id, {"description": text})
 
-    data = mongo_repository.getByID(current_id, ["description"])
+    data = mongo_repository.getByID("test", "identifier", current_id, ["description"])
     assert data["description"] == text
+
+    mongo_repository.delete("test", "identifier", current_id)
+    assert (
+        mongo_repository.getByID("test", "identifier", current_id, ["description"])
+        == None
+    )
 
 
 # def test_kafka_producer():

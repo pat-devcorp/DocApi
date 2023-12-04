@@ -4,7 +4,7 @@ from ...domain.RepositoryProtocol import RepositoryProtocol
 from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.ticket_mongo import Ticket as TicketRepository
 from ...presentation.PresentationError import PresentationError
-from ..dto.ticket import TicketDTO, TicketHandler
+from ..dto.ticket import TicketDTO
 from ..IdentifierHandler import IdentifierHandler
 
 
@@ -44,32 +44,40 @@ class Ticket:
             """
 
     @classmethod
-    def prepareCreate(cls, params: dict) -> TicketDTO | PresentationError:
-        data = cls.serialize(params)
-        return TicketHandler.create(data)
+    def prepareCreate(
+        cls, dto_id: IdentifierHandler, params: dict
+    ) -> TicketDTO | PresentationError:
+        data = cls.filterKeys(params)
+        return TicketDTO(dto_id, **data)
 
     @classmethod
-    def prepareUpdate(cls, params: dict) -> TicketDTO | PresentationError:
-        data = cls.serialize(params)
-        return TicketHandler.fromDict(data)
+    def prepareUpdate(
+        cls, dto_id: IdentifierHandler, params: dict
+    ) -> TicketDTO | PresentationError:
+        data = cls.filterKeys(params)
+        return TicketDTO.fromDict(dto_id, data)
 
     @staticmethod
     def prepareIdentifier(identifier) -> IdentifierHandler | PresentationError:
-        return TicketHandler.getIdentifier(identifier)
+        return TicketDTO.getIdentifier(identifier)
 
     def fetch(self) -> list:
         datos = self._uc.fetch()
-        return [TicketHandler.serialize(item) for item in datos]
+        return [TicketDTO.filterKeys(item) for item in datos]
 
-    def create(self, dto_id: IdentifierHandler, dto: TicketDTO) -> bool:
-        return self._uc.create(dto_id, dto.description, dto.category, dto.state, dto.type_commit)
+    def create(self, dto: TicketDTO) -> bool:
+        return self._uc.create(
+            dto.ticket_id, dto.description, dto.category, dto.type_commit, dto.state
+        )
 
-    def update(self, dto_id: IdentifierHandler, dto: TicketDTO) -> bool:
-        return self._uc.update(dto_id, dto.description, dto.category, dto.state, dto.type_commit)
+    def update(self, dto: TicketDTO) -> bool:
+        return self._uc.update(
+            dto.ticket_id, dto.description, dto.category, dto.type_commit, dto.state
+        )
 
     def getByID(self, dto_id: IdentifierHandler) -> dict:
         data = self._uc.getByID(dto_id)
-        return TicketHandler.serialize(data)
+        return TicketDTO.filterKeys(data)
 
     def delete(self, dto_id: IdentifierHandler):
         return self._uc.delete(dto_id)

@@ -2,7 +2,6 @@ from collections import namedtuple
 
 ResponseDTO = namedtuple("ResponseDTO", ["error_id", "description"])
 
-
 DEFAULT = ResponseDTO("1000", "CRASH_LOGIC")
 ID_NOT_FOUND = ResponseDTO("1000", "ID must be provided")
 ID_NOT_VALID = ResponseDTO("1000", "ID not valid")

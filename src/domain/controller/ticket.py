@@ -23,13 +23,13 @@ class Ticket:
         self._r.delete(dao_id.value)
 
     def create(self, dao: TicketDAO) -> bool:
-        data = dao.toRepository()
+        data = dao.asDict()
         data.update(AuditHandler.getCreateFields(self._write_uid))
 
         return self._r.create(data)
 
     def update(self, dao: TicketDAO) -> bool:
-        data = dao.toRepository()
+        data = dao.asDict()
         data.update(AuditHandler.getUpdateFields(self._write_uid))
 
-        return self._r.update(dao.ticket_id.value, data)
+        return self._r.update(data)

@@ -13,9 +13,9 @@ def createTicket():
     print(params)
     lc = TicketController(params.get("write_uid"))
     obj_id = lc.prepareIdentifier(params.get("ticket_id"))
-    obj = lc.prepareCreate(params)
+    obj = lc.prepareCreate(obj_id, params)
 
-    data = lc.create(obj_id, obj)
+    data = lc.create(obj)
     return jsonify(data, 200)
 
 
@@ -42,9 +42,9 @@ def updateTicket(id):
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    obj_id = lc.prepareIdentifier(id)
-    obj = lc.prepareUpdate(obj_id, params)
-    data = lc.update(obj_id, obj)
+    params["ticket_id"] = id
+    obj = lc.prepareUpdate(params)
+    data = lc.update(obj)
 
     return jsonify(data, 200)
 

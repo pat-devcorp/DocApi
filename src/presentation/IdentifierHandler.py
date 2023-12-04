@@ -1,8 +1,8 @@
-import re
 from enum import Enum
+from uuid import UUID, uuid4
 
 from ..infraestructure.UserValidator import UserValidator
-from ..utils.ErrorHandler import ID_NOT_VALID
+from ..utils.ResponseHandler import ID_NOT_VALID
 
 
 class IdentityAlgorithm(Enum):
@@ -23,6 +23,18 @@ class IdentifierHandler:
             raise ValueError(ID_NOT_VALID, err)
         self.value = identifier
 
+    def getIdentifier(self):
+        identifier_functions = [self.getDefault, self.getUuidV4, self.getDefault]
+        self.value = identifier_functions[self.algorithm]()
+
+    @staticmethod
+    def getDefault():
+        return "DEFAULT"
+
+    @staticmethod
+    def getUuidV4():
+        return uuid4()
+
     @classmethod
     def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
         identifier_functions = [cls.ensureDefault, cls.ensureUuidV4, cls.ensureUserId]
@@ -37,12 +49,11 @@ class IdentifierHandler:
         if identifier is None or len(identifier) == 0:
             return False, "Is Empty"
 
-        uuid_v4_pattern = re.compile(
-            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
-        )
-        if not bool(uuid_v4_pattern.match(identifier)):
+        try:
+            uuid_obj = UUID(identifier, version=4)
+            return True, uuid_obj
+        except ValueError:
             return False, "Algorithm doesnt match"
-        return True, ""
 
     @staticmethod
     def ensureUserId(identifier) -> tuple[bool, str]:

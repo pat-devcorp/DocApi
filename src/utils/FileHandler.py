@@ -5,8 +5,8 @@ import magic
 import requests
 
 from ..infraestructure.config import Config
-from ..utils.ErrorHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
-from ..utils.HandlerError import HandlerError
+from .HandlerError import HandlerError
+from .ResponseHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 
 
 def isValidType(file):

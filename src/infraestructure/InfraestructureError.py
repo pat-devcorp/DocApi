@@ -1,4 +1,4 @@
-from ..utils.ErrorHandler import ResponseDTO
+from ..utils.ResponseHandler import ResponseDTO
 
 
 class InfraestructureError(Exception):

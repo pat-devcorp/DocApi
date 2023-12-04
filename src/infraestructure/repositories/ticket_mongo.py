@@ -1,5 +1,5 @@
 from ...domain.dao.ticket import TicketDAO
-from ...utils.ErrorHandler import ID_NOT_FOUND
+from ...utils.ResponseHandler import ID_NOT_FOUND
 from ..InfraestructureError import InfraestructureError
 from .mongo import Mongo, MongoDTO
 
@@ -34,6 +34,6 @@ class Ticket:
         self._mongo.create(self._name, self._pk, data)
         return True
 
-    def update(self, identity, data) -> bool:
-        self._mongo.update(self._name, self._pk, identity, data)
+    def update(self, data) -> bool:
+        self._mongo.update(self._name, self._pk, data[self._pk], data)
         return True

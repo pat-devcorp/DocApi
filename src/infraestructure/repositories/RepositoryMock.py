@@ -1,7 +1,6 @@
 class RepositoryMock:
-    def __init__(self, identifier, dao_mock):
-        self.identity = identifier
-        self.data = dao_mock
+    def __init__(self, data):
+        self.data = data
 
     def entityExists(self, identifier):
         return None
