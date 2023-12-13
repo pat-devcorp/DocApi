@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
   api:
-    build: ./services/src
+    build: .
+    entrypoint: gunicorn --bind 0.0.0.0:5000 wsgi:app
     volumes:
-      - ./services/src/:/usr/src/app/
+      - ./src/:/home/app/src/
+      - ./tests/:/home/app/tests/
     ports:
       - 5000:5000
     env_file:

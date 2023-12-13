@@ -5,7 +5,8 @@ __pycache__/
 # C extensions
 *.so
 #folders
-/app/media
-/app/log
-/app/.pytest_cache
+/.venv
+/src/media
+/src/log
+/src/.pytest_cache
 *.log

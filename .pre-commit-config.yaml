@@ -28,8 +28,7 @@ repos:
       - id: isort
         args:
           - --line-length=88
-          - --src=your-src-folder-1
-          - --src=your-src-folder-2
+          - --src=task/src
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
@@ -56,24 +55,24 @@ repos:
           - --max-complexity=18
           - --select=B,C,E,F,W,T4,B9
           - --ignore=E203,E266,E402,E731,E501,W503,F403,F401,F402,F821,W291
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v0.942
-  #   hooks:
-  #     - id: mypy
-  #       additional_dependencies:
-  #         - types-requests
-  #       args:
-  #         - --ignore-missing-imports
-  # - repo: https://github.com/PyCQA/pylint
-  #   rev: v2.13.4
-  #   hooks:
-  #     - id: pylint
-  #       args:
-  #         - --disable=unused-argument
-  # - repo: https://github.com/PyCQA/pydocstyle
-  #   rev: 6.1.1
-  #   hooks:
-  #     - id: pydocstyle
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.942
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+        args:
+          - --ignore-missing-imports
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.13.4
+    hooks:
+      - id: pylint
+        args:
+          - --disable=unused-argument
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.1.1
+    hooks:
+      - id: pydocstyle
   - repo: local
     hooks:
       - id: pytest-check
