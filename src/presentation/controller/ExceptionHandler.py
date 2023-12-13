@@ -1,25 +1,22 @@
 import traceback
 
-from flask import str
+from flask import jsonify
 
 from ...application.ApplicationError import ApplicationError
 from ...domain.DomainError import DomainError
+from ...infraestructure.InfraestructureError import InfraestructureError
 from ...presentation.PresentationError import PresentationError
 from ...utils.HandlerError import HandlerError
-from ..InfraestructureError import InfraestructureError
 
 
-class CustomExceptionHandler:
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        response = dict()
+def exception_handler(func):
+    def wrapper(*args, **kwargs):
+        response = ""
         status_code = 403
 
         try:
-            print("---WELCOME!")
-            return self.app(environ, start_response)
+            response = func(*args, **kwargs) or "OK"
+            status_code = 200
         except HandlerError as he:
             response = str(he)
             status_code = 400
@@ -43,5 +40,6 @@ class CustomExceptionHandler:
             response = str(error)
 
         finally:
-            response.update({"status_code": status_code})
-            return response
+            return jsonify({"data": response, "status_code": status_code})
+
+    return wrapper

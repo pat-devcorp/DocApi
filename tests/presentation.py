@@ -75,7 +75,7 @@ def getTicketId():
 #     identifier = getTicketId()
 
 #     data = {
-#         "ticket_id": identifier,
+#         "ticketId": identifier,
 #         "description": "This is a ticket modified",
 #     }
 #     dto = TicketHandler.fromDict(data)

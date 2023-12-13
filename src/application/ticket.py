@@ -32,32 +32,32 @@ class Ticket:
 
     def create(
         self,
-        ticket_id: IdentifierHandler,
+        ticketId: IdentifierHandler,
         description: str,
         category,
         state,
-        type_commit,
+        typeCommit,
     ):
-        obj_id = IdentityHandler.create(ticket_id)
-        obj = TicketDAO(obj_id, description, category, state, type_commit)
+        objId = IdentityHandler.create(ticketId)
+        obj = TicketDAO(objId, description, category, state, typeCommit)
         return self._d.create(obj)
 
     def update(
         self,
-        ticket_id: IdentifierHandler,
+        ticketId: IdentifierHandler,
         description: str,
         category,
         state,
-        type_commit,
+        typeCommit,
     ):
-        obj_id = IdentityHandler.ensureIdentity(self._r, ticket_id)
-        obj = TicketDAO(obj_id, description, category, state, type_commit)
+        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
+        obj = TicketDAO(objId, description, category, state, typeCommit)
         return self._d.update(obj)
 
-    def getByID(self, ticket_id: IdentifierHandler) -> list:
-        obj_id = IdentityHandler.ensureIdentity(self._r, ticket_id)
-        return self._d.getByID(obj_id)
+    def getByID(self, ticketId: IdentifierHandler) -> list:
+        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
+        return self._d.getByID(objId)
 
-    def delete(self, ticket_id: IdentifierHandler) -> bool:
-        obj_id = IdentityHandler.ensureIdentity(self._r, ticket_id)
-        return self._d.delete(obj_id)
+    def delete(self, ticketId: IdentifierHandler) -> bool:
+        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
+        return self._d.delete(objId)

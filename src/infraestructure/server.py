@@ -7,7 +7,8 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from .config import Config
 from .logger import setFormatToJson
-from .middleware.CustomExceptionHandler import CustomExceptionHandler
+
+# from .middleware.CustomExceptionHandler import CustomExceptionHandler
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
@@ -45,7 +46,7 @@ def createServer():
     if my_config.IS_IN_PRODUCTION:
         setFormatToJson(my_config.LOG_PATH)
     # eXCEPTION
-    app.wsgi_app = CustomExceptionHandler(app.wsgi_app)
+    # app.wsgi_app = CustomExceptionHandler(app.wsgi_app)
     # Add prometheus wsgi middleware to route /metrics requests
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
     return app

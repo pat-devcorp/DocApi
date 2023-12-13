@@ -16,11 +16,11 @@ class Ticket:
     def fetch(self) -> list:
         return self._r.fetch(self._fields)
 
-    def getByID(self, dao_id: IdentityHandler) -> list:
-        return self._r.getByID(dao_id.value, self._fields)
+    def getByID(self, daoId: IdentityHandler) -> list:
+        return self._r.getByID(daoId.value, self._fields)
 
-    def delete(self, dao_id: IdentityHandler) -> bool:
-        self._r.delete(dao_id.value)
+    def delete(self, daoId: IdentityHandler) -> bool:
+        self._r.delete(daoId.value)
 
     def create(self, dao: TicketDAO) -> bool:
         data = dao.asDict()

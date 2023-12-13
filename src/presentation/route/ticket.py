@@ -11,24 +11,24 @@ def createTicket():
     print("---POST ATTEMPT")
     params = request.args.to_dict()
     print(params)
-    lc = TicketController(params.get("write_uid"))
-    obj_id = lc.prepareIdentifier(params.get("ticket_id"))
-    obj = lc.prepareCreate(obj_id, params)
 
-    data = lc.create(obj)
+    lc = TicketController(params.get("write_uid"))
+    data = lc.create()
+
     return jsonify(data, 200)
 
 
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
-def fetchTicket(id=None):
+def fetchTickets(id=None):
     print("---GET ATTEMPT")
     params = request.args.to_dict()
     print(params)
+
     lc = TicketController(params.get("write_uid"))
     if id is not None:
-        obj_id = lc.prepareIdentifier(id)
-        datos = lc.getByID(obj_id)
+        params["ticketId"] = id
+        datos = lc.getByID(params)
     else:
         datos = lc.fetch()
 
@@ -39,12 +39,11 @@ def fetchTicket(id=None):
 def updateTicket(id):
     print("---PUT ATTEMPT")
     params = request.args.to_dict()
+    params["ticketId"] = id
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    params["ticket_id"] = id
-    obj = lc.prepareUpdate(params)
-    data = lc.update(obj)
+    data = lc.update(params)
 
     return jsonify(data, 200)
 
@@ -53,13 +52,47 @@ def updateTicket(id):
 def deleteTicket(id):
     print("---DEL ATTEMPT")
     params = request.args.to_dict()
+    params["ticketId"] = id
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    obj_id = lc.prepareIdentifier(id)
-    data = lc.delete(obj_id)
+    data = lc.delete(params)
 
     return jsonify(data, 200)
+
+
+@ticket.get("/pending")
+def fetchPendingTicket():
+    print("---PENDING TICKET ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
+
+    lc = TicketController(params.get("write_uid"))
+    datos = lc.fetchPending(params)
+
+    return jsonify(datos, 200)
+
+@ticket.get("/pending")
+def fetchPendingTickets():
+    print("---PENDING TICKET ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
+
+    lc = TicketController(params.get("write_uid"))
+    datos = lc.fetchPending(params)
+
+    return jsonify(datos, 200)
+
+@ticket.get("/pending")
+def fetchPendingProjectTickets():
+    print("---PENDING PROJECT TICKETS ATTEMPT")
+    params = request.args.to_dict()
+    print(params)
+
+    lc = TicketController(params.get("write_uid"))
+    datos = lc.fetchPendingProject(params)
+
+    return jsonify(datos, 200)
 
 
 # ## Keyword
@@ -67,11 +100,11 @@ def deleteTicket(id):
 # def addTicketKeyword(id):
 #     write_uid = request.args.get("write_uid")
 #     params = request.args.to_dict()
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     keyword = Keyworddto.create(params.get("Keyword"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addKeyword(obj_id, keyword)
+#     data = lc.addKeyword(objId, keyword)
 
 #     return jsonify(data, 200)
 
@@ -79,11 +112,11 @@ def deleteTicket(id):
 # @ticket.delete("/<id>/keyword/<keyword_id>")
 # def removeTicketKeyword(id, keyword_id):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     keyword_identifier = Keyworddto.getIdentifier(keyword_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeKeyword(obj_id, keyword_identifier)
+#     data = lc.removeKeyword(objId, keyword_identifier)
 
 #     return jsonify(data, 200)
 
@@ -93,11 +126,11 @@ def deleteTicket(id):
 # def addTicketMeeting(id):
 #     write_uid = request.args.get("write_uid")
 #     params = request.args.to_dict()
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     meeting = Meetingdto.create(params.get("meeting_date"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(obj_id, meeting)
+#     data = lc.addMeeting(objId, meeting)
 
 #     return jsonify(data, 200)
 
@@ -105,11 +138,11 @@ def deleteTicket(id):
 # @ticket.delete("/<id>/meeting/<meeting_id>")
 # def removeTicketMeeting(id, meeting_id):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     meeting_identifier = Meetingdto.getIdentifier(meeting_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMeeting(obj_id, meeting_identifier)
+#     data = lc.removeMeeting(objId, meeting_identifier)
 
 #     return jsonify(data, 200)
 
@@ -119,11 +152,11 @@ def deleteTicket(id):
 # def addTicketMilestone(id):
 #     write_uid = request.args.get("write_uid")
 #     params = request.args.to_dict()
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     milestone = Milestonedto.create(params)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(obj_id, milestone)
+#     data = lc.addMeeting(objId, milestone)
 
 #     return jsonify(data, 200)
 
@@ -131,11 +164,11 @@ def deleteTicket(id):
 # @ticket.delete("/<id>/milestone/<milestone_id>")
 # def removeTicketMilestone(id, milestone_id):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     milestone_identifier = Milestonedto.getIdentifier(milestone_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMeeting(obj_id, milestone_identifier)
+#     data = lc.removeMeeting(objId, milestone_identifier)
 
 #     return jsonify(data, 200)
 
@@ -144,14 +177,14 @@ def deleteTicket(id):
 # @ticket.post("/<id>/attachment")
 # def addAttachment(id):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     uploaded_file = request.files["attachment"]
 
 #     path = TICKET_PATH.format(str(id))
 #     file_name = uploadFile.create(uploaded_file, path)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addAttachment(obj_id, file_name)
+#     data = lc.addAttachment(objId, file_name)
 
 #     return jsonify(data, 200)
 
@@ -159,13 +192,13 @@ def deleteTicket(id):
 # @ticket.delete("/<id>/attachment/<file_name>")
 # def removeAttachment(id, file_name):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 
 #     path = TICKET_PATH.format(str(id))
 #     fileExists(file_name, path)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeAttachment(obj_id, file_name)
+#     data = lc.removeAttachment(objId, file_name)
 
 #     return jsonify(data, 200)
 
@@ -175,11 +208,11 @@ def deleteTicket(id):
 # def addTicketMember(id):
 #     write_uid = request.args.get("write_uid")
 #     params = request.args.to_dict()
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     member_identifier = Memberdto.create(params)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(obj_id, member_identifier)
+#     data = lc.addMeeting(objId, member_identifier)
 
 #     return jsonify(data, 200)
 
@@ -187,11 +220,11 @@ def deleteTicket(id):
 # @ticket.delete("/<id>/member/<member_id>")
 # def removeTicketMember(id, member_id):
 #     write_uid = request.args.get("write_uid")
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     member_identifier = Memberdto.getIdentifier(member_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMember(obj_id, member_identifier)
+#     data = lc.removeMember(objId, member_identifier)
 
 #     return jsonify(data, 200)
 
@@ -201,10 +234,10 @@ def deleteTicket(id):
 # def setTicketAssignee(id):
 #     write_uid = request.args.get("write_uid")
 #     params = request.args.to_dict()
-#     obj_id = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.getIdentifier(id)
 #     member_identifier = Memberdto.getIdentifier(params.get("member_id"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.defineAssignee(obj_id, member_identifier)
+#     data = lc.defineAssignee(objId, member_identifier)
 
 #     return jsonify(data, 200)

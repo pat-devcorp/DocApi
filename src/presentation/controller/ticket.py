@@ -6,6 +6,7 @@ from ...infraestructure.repositories.ticket_mongo import Ticket as TicketReposit
 from ...presentation.PresentationError import PresentationError
 from ..dto.ticket import TicketDTO
 from ..IdentifierHandler import IdentifierHandler
+from .ExceptionHandler import exception_handler
 
 
 class Ticket:
@@ -45,74 +46,96 @@ class Ticket:
 
     @classmethod
     def prepareCreate(
-        cls, dto_id: IdentifierHandler, params: dict
+        cls, dtoId: IdentifierHandler, params: dict
     ) -> TicketDTO | PresentationError:
         data = cls.filterKeys(params)
-        return TicketDTO(dto_id, **data)
+        return TicketDTO(dtoId, **data)
 
     @classmethod
     def prepareUpdate(
-        cls, dto_id: IdentifierHandler, params: dict
+        cls, dtoId: IdentifierHandler, params: dict
     ) -> TicketDTO | PresentationError:
         data = cls.filterKeys(params)
-        return TicketDTO.fromDict(dto_id, data)
+        return TicketDTO.fromDict(dtoId, data)
 
     @staticmethod
     def prepareIdentifier(identifier) -> IdentifierHandler | PresentationError:
         return TicketDTO.getIdentifier(identifier)
 
+    @exception_handler
     def fetch(self) -> list:
         datos = self._uc.fetch()
         return [TicketDTO.filterKeys(item) for item in datos]
 
-    def create(self, dto: TicketDTO) -> bool:
+    @exception_handler
+    def create(self, params: dict):
+        objId = self.prepareIdentifier(params.get("ticketId"))
+        obj = self.prepareCreate(objId, params)
+        self.doCreate(obj)
+
+    @exception_handler
+    def getByID(self, identifier):
+        objId = self.prepareIdentifier(identifier)
+        self.doGetByID(objId)
+
+    @exception_handler
+    def update(self, params: dict):
+        obj = self.prepareUpdate(params)
+        self.update(obj)
+
+    @exception_handler
+    def delete(self, identifier):
+        objId = self.prepareIdentifier(identifier)
+        self.delete(objId)
+
+    def doCreate(self, dto: TicketDTO) -> bool:
         return self._uc.create(
-            dto.ticket_id, dto.description, dto.category, dto.type_commit, dto.state
+            dto.ticketId, dto.description, dto.category, dto.typeCommit, dto.state
         )
 
-    def update(self, dto: TicketDTO) -> bool:
+    def doUpdate(self, dto: TicketDTO) -> bool:
         return self._uc.update(
-            dto.ticket_id, dto.description, dto.category, dto.type_commit, dto.state
+            dto.ticketId, dto.description, dto.category, dto.typeCommit, dto.state
         )
 
-    def getByID(self, dto_id: IdentifierHandler) -> dict:
-        data = self._uc.getByID(dto_id)
+    def doGetByID(self, dtoId: IdentifierHandler) -> dict:
+        data = self._uc.getByID(dtoId)
         return TicketDTO.filterKeys(data)
 
-    def delete(self, dto_id: IdentifierHandler):
-        return self._uc.delete(dto_id)
+    def doDelete(self, dtoId: IdentifierHandler):
+        return self._uc.delete(dtoId)
 
-    # def addKeyword(self, ticket_id: IdentifierHandler, keyword_id: IdentifierHandler):
-    #     return self._uc.addKeyword(ticket_id.value, keyword_id.value)
+    # def addKeyword(self, ticketId: IdentifierHandler, keyword_id: IdentifierHandler):
+    #     return self._uc.addKeyword(ticketId.value, keyword_id.value)
 
-    # def removeKeyword(self, ticket_id: IdentifierHandler, keyword_id: IdentifierHandler):
+    # def removeKeyword(self, ticketId: IdentifierHandler, keyword_id: IdentifierHandler):
     #     pass
 
-    # def addMeeting(self, ticket_id: IdentifierHandler, meeting_id: IdentifierHandler):
+    # def addMeeting(self, ticketId: IdentifierHandler, meeting_id: IdentifierHandler):
     #     pass
 
-    # def removeMeeting(self, ticket_id: IdentifierHandler, meeting_id: IdentifierHandler):
+    # def removeMeeting(self, ticketId: IdentifierHandler, meeting_id: IdentifierHandler):
     #     pass
 
-    # def addMilestone(self, ticket_id: IdentifierHandler, milestone_id: IdentifierHandler):
+    # def addMilestone(self, ticketId: IdentifierHandler, milestone_id: IdentifierHandler):
     #     pass
 
     # def removeMilestone(
-    #     self, ticket_id: IdentifierHandler, milestone_id: IdentifierHandler
+    #     self, ticketId: IdentifierHandler, milestone_id: IdentifierHandler
     # ):
     #     pass
 
-    # def addAttachment(self, ticket_id: IdentifierHandler, file_name: FileHanlder):
+    # def addAttachment(self, ticketId: IdentifierHandler, file_name: FileHanlder):
     #     pass
 
-    # def removeAttachment(self, ticket_id: IdentifierHandler, file_name: FileHanlder):
+    # def removeAttachment(self, ticketId: IdentifierHandler, file_name: FileHanlder):
     #     pass
 
-    # def addMember(self, ticket_id: IdentifierHandler, member_id: IdentifierHandler):
+    # def addMember(self, ticketId: IdentifierHandler, member_id: IdentifierHandler):
     #     pass
 
-    # def removeMember(self, ticket_id: IdentifierHandler, member_id: IdentifierHandler):
+    # def removeMember(self, ticketId: IdentifierHandler, member_id: IdentifierHandler):
     #     pass
 
-    # def setAssignee(self, ticket_id: IdentifierHandler, member_id: IdentifierHandler):
+    # def setAssignee(self, ticketId: IdentifierHandler, member_id: IdentifierHandler):
     #     pass

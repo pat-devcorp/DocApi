@@ -1,4 +1,3 @@
-from src.domain.dao.ticket import TicketDAO
 from src.domain.DomainError import DomainError
 from src.infraestructure.broker.brokermock import BrokerMock
 from src.infraestructure.repositories.RepositoryMock import RepositoryMock
@@ -16,7 +15,7 @@ def test_TaskController():
     my_repository = RepositoryMock(dto.asDict())
     my_producer = BrokerMock()
     lc = TicketController(getUser(), my_repository, my_producer)
-    assert lc.create(dto)
+    assert lc.doCreate(dto)
 
 
 def test_TaskUseCase():
@@ -25,16 +24,16 @@ def test_TaskUseCase():
     r = TicketRepository()
     lc = TicketController(current_user, r)
     try:
-        lc.getByID(dto.ticket_id)
+        lc.doGetByID(dto.ticketId)
     except DomainError as eu:
         assert True
-    lc.create(dto)
-    data = lc.getByID(dto.ticket_id)
+    lc.doCreate(dto)
+    data = lc.doGetByID(dto.ticketId)
     print(f"DATA: {data}")
     assert data
     dto.description = "I was updated successfully"
-    lc.update(dto)
+    lc.doUpdate(dto)
     datos = lc.fetch()
     print(f"DATOS: {datos}")
     assert datos
-    lc.delete(dto.ticket_id)
+    lc.doDelete(dto.ticketId)

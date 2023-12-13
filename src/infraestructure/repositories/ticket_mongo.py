@@ -6,7 +6,7 @@ from .mongo import Mongo, MongoDTO
 
 class Ticket:
     _name = "ticket"
-    _pk = "ticket_id"
+    _pk = "ticketId"
     _fields = TicketDAO.getFields()
 
     def __init__(self, ref_mongodto: None | MongoDTO = None):

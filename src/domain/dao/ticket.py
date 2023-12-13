@@ -43,9 +43,9 @@ class ValidTicket:
         validate_funcs = {
             "description": cls.isValidDescription,
             "category": cls.isValidCategory,
-            "type_commit": cls.isValidTypeCommit,
+            "typeCommit": cls.isValidTypeCommit,
             "state": cls.isValidState,
-            "estimate_end_at": cls.isValidEndAt,
+            "estimateEndAt": cls.isValidEndAt,
         }
 
         errors = list()
@@ -77,9 +77,9 @@ class ValidTicket:
         return False, "Invalid category"
 
     @staticmethod
-    def isValidTypeCommit(type_commit: int) -> tuple[bool, str]:
+    def isValidTypeCommit(typeCommit: int) -> tuple[bool, str]:
         for member in TicketTypeCommit:
-            if member.value == type_commit:
+            if member.value == typeCommit:
                 return True, ""
         return False, "Invalid commit type"
 
@@ -90,24 +90,24 @@ class ValidTicket:
         return True, ""
 
     @staticmethod
-    def isValidEndAt(estimate_end_at: str) -> tuple[bool, str]:
-        if not valdiateDatetimeFormat(estimate_end_at):
+    def isValidEndAt(estimateEndAt: str) -> tuple[bool, str]:
+        if not valdiateDatetimeFormat(estimateEndAt):
             return False, "Date of end format not valid"
         return True, ""
 
 
 class TicketDAO:
-    ticket_id: IdentityHandler
+    ticketId: IdentityHandler
     description: str
     category: TicketCategory
-    type_commit: TicketTypeCommit
+    typeCommit: TicketTypeCommit
     state: TicketState
     points: int = (0,)
-    estimate_end_at: str | None = (None,)
+    estimateEndAt: str | None = (None,)
 
     def asDict(self) -> dict:
         data = dict()
-        special_keys = ["ticket_id", "category", "type_commit", "state"]
+        special_keys = ["ticketId", "category", "typeCommit", "state"]
         for field in self.getFields():
             val = self.__getattribute__(field)
             if val is not None:
@@ -122,43 +122,43 @@ class TicketDAO:
     def getMock(cls):
         identity = IdentityHandler("87378618-894c-11ee-b9d1-0242ac120002")
         return cls(
-            ticket_id=identity,
+            ticketId=identity,
             description="Test task",
         )
 
     def __init__(
         self,
-        ticket_id: IdentityHandler,
+        ticketId: IdentityHandler,
         description: str,
         category: TicketCategory = TicketCategory.UNDEFINED,
-        type_commit: TicketTypeCommit = TicketTypeCommit.UNDEFINED,
+        typeCommit: TicketTypeCommit = TicketTypeCommit.UNDEFINED,
         state: TicketState = TicketState.CREATED,
         points: int = 0,
-        estimate_end_at: str | None = None,
+        estimateEndAt: str | None = None,
     ):
-        self.ticket_id = ticket_id
+        self.ticketId = ticketId
         self.description = description
         self.category = category
-        self.type_commit = type_commit
+        self.typeCommit = typeCommit
         self.state = state
         self.points = points
-        self.estimate_end_at = estimate_end_at
+        self.estimateEndAt = estimateEndAt
 
     @classmethod
-    def fromDict(cls, ticket_id: IdentityHandler, params: dict):
+    def fromDict(cls, ticketId: IdentityHandler, params: dict):
         ticket = {k: params.get(k, None) for k in cls.getFields()}
-        return cls(ticket_id, **ticket)
+        return cls(ticketId, **ticket)
 
     @staticmethod
     def getFields() -> list:
         return [
-            "ticket_id",
+            "ticketId",
             "description",
             "category",
-            "type_commit",
+            "typeCommit",
             "state",
             "points",
-            "estimate_end_at",
+            "estimateEndAt",
         ]
 
     def __str__(self):
