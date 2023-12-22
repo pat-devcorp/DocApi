@@ -1,16 +1,17 @@
+from pydantic import BaseModel
+
 from ...domain.dao.ticket import (
     TicketCategory,
     TicketDAO,
     TicketState,
     TicketTypeCommit,
-    ValidTicket,
 )
 from ...utils.ResponseHandler import ID_NOT_FOUND, PRESENTATION_VALIDATION
 from ..IdentifierHandler import IdentifierHandler
 from ..PresentationError import PresentationError
 
 
-class TicketDTO:
+class TicketDTO(BaseModel):
     ticketId: IdentifierHandler
     description: str
     category: TicketCategory
@@ -20,6 +21,11 @@ class TicketDTO:
     @staticmethod
     def getFields():
         return ["ticketId", "description", "category", "typeCommit", "state"]
+
+    @classmethod
+    def getSchema(cls):
+        json_obj = TicketDAO.getSchema()
+        return {k:v for k, v in json_obj if k in cls.getFields()}
 
     @classmethod
     def getMock(cls):
@@ -39,6 +45,7 @@ class TicketDTO:
         data["state"] = self.state.value if self.state is not None else None
 
         return data
+
 
     @staticmethod
     def filterKeys(data: dict):
@@ -84,7 +91,7 @@ class TicketDTO:
             "typeCommit": typeCommit,
             "state": state,
         }
-        is_ok, err = ValidTicket.isValid(data, False)
+        is_ok, err = TicketDAO.isValid(data, False)
         if not is_ok:
             raise PresentationError(PRESENTATION_VALIDATION, "\n".join(err))
 

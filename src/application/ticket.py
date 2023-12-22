@@ -1,8 +1,7 @@
 from enum import Enum
 
-from ..domain.controller.ticket import Ticket as TicketDomain
-from ..domain.dao.ticket import TicketDAO
-from ..domain.IdentityHandler import IdentityHandler
+from ..domain.controller.ticket import TicketDomain
+from ..domain.dao.ticket import TicketCategory, TicketState, TicketTypeCommit
 from ..domain.RepositoryProtocol import RepositoryProtocol
 from ..presentation.IdentifierHandler import IdentifierHandler
 from .BrokerProtocol import BrokerProtocol
@@ -15,7 +14,7 @@ class TicketEvent(Enum):
     ADD_MEMBER = 3
 
 
-class Ticket:
+class TicketApplication:
     def __init__(
         self,
         ref_write_uid: IdentifierHandler,
@@ -34,30 +33,24 @@ class Ticket:
         self,
         ticketId: IdentifierHandler,
         description: str,
-        category,
-        state,
-        typeCommit,
+        category: TicketCategory,
+        state: TicketState,
+        typeCommit: TicketTypeCommit,
     ):
-        objId = IdentityHandler.create(ticketId)
-        obj = TicketDAO(objId, description, category, state, typeCommit)
-        return self._d.create(obj)
+        return self._d.create(ticketId, description, category, state, typeCommit)
 
     def update(
         self,
         ticketId: IdentifierHandler,
-        description: str,
-        category,
-        state,
-        typeCommit,
+        description: str = None,
+        category: TicketCategory = None,
+        state: TicketState = None,
+        typeCommit: TicketTypeCommit = None,
     ):
-        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
-        obj = TicketDAO(objId, description, category, state, typeCommit)
-        return self._d.update(obj)
+        return self._d.update(ticketId, description, category, state, typeCommit)
 
     def getByID(self, ticketId: IdentifierHandler) -> list:
-        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
-        return self._d.getByID(objId)
+        return self._d.getByID(ticketId)
 
     def delete(self, ticketId: IdentifierHandler) -> bool:
-        objId = IdentityHandler.ensureIdentity(self._r, ticketId)
-        return self._d.delete(objId)
+        return self._d.delete(ticketId)

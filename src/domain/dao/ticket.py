@@ -1,11 +1,13 @@
 import json
 from enum import Enum
+from pydantic import BaseModel
 
 from validator_collection.checkers import is_not_empty
 
 from ...domain.IdentityHandler import IdentityHandler
 from ...presentation.IdentifierHandler import IdentityAlgorithm
 from ...utils.DatetimeHandler import valdiateDatetimeFormat
+from ..SchemaHandler import SchemaHandler
 
 
 class TicketCategory(Enum):
@@ -38,30 +40,6 @@ class TicketState(Enum):
 
 
 class ValidTicket:
-    @classmethod
-    def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
-        validate_funcs = {
-            "description": cls.isValidDescription,
-            "category": cls.isValidCategory,
-            "typeCommit": cls.isValidTypeCommit,
-            "state": cls.isValidState,
-            "estimateEndAt": cls.isValidEndAt,
-        }
-
-        errors = list()
-        for k, v in ref_object.items():
-            if is_partial and v is None:
-                continue
-            if func := validate_funcs.get(k):
-                is_ok, err = func(v)
-                if not is_ok:
-                    errors.append(err)
-
-        if len(errors) > 0:
-            return False, "\n".join(errors)
-
-        return True, ""
-
     @staticmethod
     def isValidState(state: int) -> tuple[bool, str]:
         for member in TicketState:
@@ -96,7 +74,7 @@ class ValidTicket:
         return True, ""
 
 
-class TicketDAO:
+class TicketDAO(BaseModel):
     ticketId: IdentityHandler
     description: str
     category: TicketCategory
@@ -104,6 +82,7 @@ class TicketDAO:
     state: TicketState
     points: int = (0,)
     estimateEndAt: str | None = (None,)
+
 
     def asDict(self) -> dict:
         data = dict()
@@ -118,6 +97,31 @@ class TicketDAO:
     def getIdAlgorithm():
         return IdentityAlgorithm.UUID_V4
 
+    @staticmethod
+    def getFields() -> list:
+        return [
+            "ticketId",
+            "description",
+            "category",
+            "typeCommit",
+            "state",
+            "points",
+            "estimateEndAt",
+        ]
+
+    @staticmethod
+    def getSchema():
+        json_obj = {
+            "ticketId": SchemaHandler(1, 0, "String"),
+            "description": SchemaHandler(1, 1, "String"),
+            "category": SchemaHandler(0, 1, "Enum", TicketCategory.UNDEFINED.value, TicketCategory),
+            "typeCommit": SchemaHandler(0, 1, "Enum", TicketTypeCommit.UNDEFINED.value, TicketTypeCommit),
+            "state": SchemaHandler(0, 1, "Enum", TicketState.CREATED.value, TicketState),
+            "points": SchemaHandler(0, 1, "int", 0),
+            "estimateEndAt": SchemaHandler(0, 1, "String", None)
+        }
+        return {k:v.model_dump_json() for k, v in json_obj}
+    
     @classmethod
     def getMock(cls):
         identity = IdentityHandler("87378618-894c-11ee-b9d1-0242ac120002")
@@ -125,6 +129,13 @@ class TicketDAO:
             ticketId=identity,
             description="Test task",
         )
+
+    def __str__(self):
+        return json.dumps(self.asDict())
+
+    def __repr__(self):
+        return self.__str__()
+
 
     def __init__(
         self,
@@ -144,25 +155,50 @@ class TicketDAO:
         self.points = points
         self.estimateEndAt = estimateEndAt
 
+
+    def updatedObj(
+        self,
+        ticketId: IdentityHandler,
+        description: str | None,
+        category: TicketCategory | None,
+        typeCommit: TicketTypeCommit | None,
+        state: TicketState | None,
+        points: int | None,
+        estimateEndAt: str | None
+    ):
+        self.ticketId = ticketId
+        self.description = description
+        self.category = category
+        self.typeCommit = typeCommit
+        self.state = state
+        self.points = points
+        self.estimateEndAt = estimateEndAt
+
     @classmethod
-    def fromDict(cls, ticketId: IdentityHandler, params: dict):
-        ticket = {k: params.get(k, None) for k in cls.getFields()}
-        return cls(ticketId, **ticket)
+    def filterKeys(cls, params: dict) -> dict:
+        return ticket = {k: params.get(k, None) for k in cls.getFields()}
+
 
     @staticmethod
-    def getFields() -> list:
-        return [
-            "ticketId",
-            "description",
-            "category",
-            "typeCommit",
-            "state",
-            "points",
-            "estimateEndAt",
-        ]
+    def isValid(ref_object: dict, is_partial=True) -> tuple[bool, str]:
+        validate_funcs = {
+            "description": ValidTicket.isValidDescription,
+            "category": ValidTicket.isValidCategory,
+            "typeCommit": ValidTicket.isValidTypeCommit,
+            "state": ValidTicket.isValidState,
+            "estimateEndAt": ValidTicket.isValidEndAt,
+        }
 
-    def __str__(self):
-        return json.dumps(self.asDict())
+        errors = list()
+        for k, v in ref_object.items():
+            if is_partial and v is None:
+                continue
+            if func := validate_funcs.get(k):
+                is_ok, err = func(v)
+                if not is_ok:
+                    errors.append(err)
 
-    def __repr__(self):
-        return self.__str__()
+        if len(errors) > 0:
+            return False, "\n".join(errors)
+
+        return True, ""

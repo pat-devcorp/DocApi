@@ -1,5 +1,5 @@
 from ...application.BrokerProtocol import BrokerProtocol
-from ...application.ticket import Ticket as TicketUseCase
+from ...application.ticket import TicketApplication
 from ...domain.RepositoryProtocol import RepositoryProtocol
 from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.ticket_mongo import Ticket as TicketRepository
@@ -9,7 +9,7 @@ from ..IdentifierHandler import IdentifierHandler
 from .ExceptionHandler import exception_handler
 
 
-class Ticket:
+class TicketController:
     def __init__(
         self,
         ref_write_uid,
@@ -19,7 +19,7 @@ class Ticket:
         self._w = ref_write_uid
         _r = TicketRepository() if ref_repository is None else ref_repository
         _b = Kafka.setToDefault() if ref_broker is None else ref_broker
-        self._uc = TicketUseCase(self._w, _r, _b)
+        self._uc = TicketApplication(self._w, _r, _b)
 
     @staticmethod
     def getTemplate() -> str:
@@ -44,18 +44,22 @@ class Ticket:
             **NOTES:** The module should be developed following clean architecture principles.
             """
 
-    @classmethod
+    @staticmethod
+    def getSchema():
+        return TicketDTO.getSchema()
+
+    @staticmethod
     def prepareCreate(
-        cls, dtoId: IdentifierHandler, params: dict
+        dtoId: IdentifierHandler, params: dict
     ) -> TicketDTO | PresentationError:
-        data = cls.filterKeys(params)
+        data = TicketDTO.filterKeys(params)
         return TicketDTO(dtoId, **data)
 
-    @classmethod
+    @staticmethod
     def prepareUpdate(
-        cls, dtoId: IdentifierHandler, params: dict
+        dtoId: IdentifierHandler, params: dict
     ) -> TicketDTO | PresentationError:
-        data = cls.filterKeys(params)
+        data = TicketDTO.filterKeys(params)
         return TicketDTO.fromDict(dtoId, data)
 
     @staticmethod
@@ -87,6 +91,7 @@ class Ticket:
     def delete(self, identifier):
         objId = self.prepareIdentifier(identifier)
         self.delete(objId)
+    
 
     def doCreate(self, dto: TicketDTO) -> bool:
         return self._uc.create(

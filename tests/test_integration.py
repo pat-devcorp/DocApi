@@ -11,6 +11,17 @@ def getUser():
 
 
 def test_TaskController():
+    ```mermaid
+    classDiagram
+    JSON --> TicketDTO :toDict
+    TicketDTO --> TicketController
+    class TicketDTO{
+        str, description, Test task,
+        TicketCategory, category, TicketCategory.UNDEFINED,
+        TicketTypeCommit, typeCommit, TicketTypeCommit.UNDEFINED,
+        TicketState, state, TicketState.CREATED,
+    }
+    ```
     dto = TicketDTO.getMock()
     my_repository = RepositoryMock(dto.asDict())
     my_producer = BrokerMock()

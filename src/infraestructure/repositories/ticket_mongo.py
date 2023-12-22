@@ -4,7 +4,7 @@ from ..InfraestructureError import InfraestructureError
 from .mongo import Mongo, MongoDTO
 
 
-class Ticket:
+class TicketMongo:
     _name = "ticket"
     _pk = "ticketId"
     _fields = TicketDAO.getFields()

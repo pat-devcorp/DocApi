@@ -1,6 +1,6 @@
 import os
 
-from ..utils.singleton import singleton
+from .singleton import singleton
 
 
 @singleton

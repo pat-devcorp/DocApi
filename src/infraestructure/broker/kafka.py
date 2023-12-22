@@ -9,7 +9,7 @@ from ..config import Config
 from ..InfraestructureError import InfraestructureError
 
 
-class Kafka:
+class KafkaBroker:
     host: str
     port: int
 

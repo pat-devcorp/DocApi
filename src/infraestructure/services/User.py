@@ -2,7 +2,7 @@
 # from ..config import Config
 
 
-class UserValidator:
+class UserService:
     @staticmethod
     def isValidUserID(user_id):
         # my_config = Config()
