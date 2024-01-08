@@ -2,7 +2,7 @@ from task.src.infraestructure.repositories.RepositoryMock import RepositoryMock
 
 from src.infraestructure.broker.brokermock import BrokerMock
 from src.presentation.controller.ticket import Ticket as TicketController
-from src.presentation.dto.ticket import TicketDTO, TicketHandler
+from src.presentation.dto.ticket import TicketDto, TicketHandler
 
 
 def getTicketId():
@@ -44,7 +44,7 @@ def getTicketId():
 #         category=0,
 #         state=0,
 #     )
-#     assert isinstance(dto, TicketDTO)
+#     assert isinstance(dto, TicketDto)
 
 
 # ## Basic task methods
@@ -88,7 +88,7 @@ def getTicketId():
 #     lc = getControllerMock("9999")
 
 #     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
-#     response = lc.getByID(i)
+#     response = lc.getById(i)
 #     assert isinstance(response, dict)
 
 

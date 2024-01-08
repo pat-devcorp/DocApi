@@ -42,12 +42,12 @@ def test_mongo_repository():
     text = "It was modified"
     mongo_repository.update("test", "identifier", current_id, {"description": text})
 
-    data = mongo_repository.getByID("test", "identifier", current_id, ["description"])
+    data = mongo_repository.getById("test", "identifier", current_id, ["description"])
     assert data["description"] == text
 
     mongo_repository.delete("test", "identifier", current_id)
     assert (
-        mongo_repository.getByID("test", "identifier", current_id, ["description"])
+        mongo_repository.getById("test", "identifier", current_id, ["description"])
         == None
     )
 
