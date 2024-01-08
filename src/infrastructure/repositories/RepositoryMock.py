@@ -1,4 +1,8 @@
 class RepositoryMock:
+    _name: str
+    _pk: str
+    _fields: list
+
     def __init__(self, data):
         self.data = data
 

@@ -13,7 +13,7 @@ from ...utils.ResponseHandler import (
     ID_NOT_FOUND,
 )
 from ..config import Config
-from ..InfraestructureError import InfraestructureError
+from ..infrastructureError import infrastructureError
 
 MongoDTO = namedtuple(
     "MongoDTO", ["server_address", "port", "user", "password", "database"]
@@ -50,13 +50,13 @@ class Mongo:
         )
         return cls(con)
 
-    def startConnection(self) -> bool | InfraestructureError:
+    def startConnection(self) -> bool | infrastructureError:
         try:
             self.connection = MongoClient(self.chain_connection)
             self.client = self.connection[self.database]
             return True
         except Exception as err:
-            raise InfraestructureError(
+            raise infrastructureError(
                 DB_CONNECTION_ERROR,
                 f"{self.chain_connection}\n{str(err)}",
             )
@@ -64,14 +64,14 @@ class Mongo:
     def getCollection(self, tablename: str):
         self.startConnection()
         if self.client is None:
-            raise InfraestructureError(
+            raise infrastructureError(
                 DB_COLLECTION_NOT_FOUND, "Connection not established"
             )
         return self.client[tablename]
 
     def fetch(
         self, tablename: str, pk_name: str, attrs: List[str]
-    ) -> List[Dict] | InfraestructureError:
+    ) -> List[Dict] | infrastructureError:
         collection = self.getCollection(tablename)
         try:
             datos = list(collection.find({}, {attr: 1 for attr in attrs}))
@@ -80,11 +80,11 @@ class Mongo:
                     item[pk_name] = item.pop("_id")
             return datos
         except Exception as err:
-            raise InfraestructureError(DB_GET_FAIL, str(err))
+            raise infrastructureError(DB_GET_FAIL, str(err))
 
     def getByID(
         self, tablename: str, pk_name: str, id_val: str, attrs: List[str]
-    ) -> Dict | None | InfraestructureError:
+    ) -> Dict | None | infrastructureError:
         collection = self.getCollection(tablename)
         try:
             data = collection.find_one({"_id": id_val}, {attr: 1 for attr in attrs})
@@ -92,14 +92,14 @@ class Mongo:
                 data[pk_name] = data.pop("_id")
             return data
         except Exception as err:
-            raise InfraestructureError(ID_NOT_FOUND, str(err))
+            raise infrastructureError(ID_NOT_FOUND, str(err))
 
     def update(self, tablename: str, pk_name: str, id_val: str, kwargs: dict):
         collection = self.getCollection(tablename)
         try:
             collection.update_one({"_id": id_val}, {"$set": kwargs})
         except Exception as err:
-            raise InfraestructureError(DB_UPDATE_FAIL, str(err))
+            raise infrastructureError(DB_UPDATE_FAIL, str(err))
 
     def create(self, tablename: str, pk_name: str, kwargs: dict):
         data = kwargs
@@ -108,11 +108,11 @@ class Mongo:
         try:
             collection.insert_one(data)
         except Exception as err:
-            raise InfraestructureError(DB_CREATE_FAIL, str(err))
+            raise infrastructureError(DB_CREATE_FAIL, str(err))
 
     def delete(self, tablename: str, pk_name: str, id_val: str):
         collection = self.getCollection(tablename)
         try:
             collection.delete_one({"_id": id_val})
         except Exception as err:
-            raise InfraestructureError(DB_DELETE_FAIL, str(err))
+            raise infrastructureError(DB_DELETE_FAIL, str(err))

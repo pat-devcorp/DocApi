@@ -1,8 +1,9 @@
 import pytest
 
-from src.infraestructure.broker.kafka import Kafka
-from src.infraestructure.repositories.mongo import Mongo
-from src.infraestructure.server import createServer
+from src.domain.model.ticket import TicketDao
+from src.infrastructure.broker.kafka import Kafka
+from src.infrastructure.repositories.mongo import Mongo
+from src.web.server import createServer
 
 
 @pytest.fixture
@@ -36,8 +37,8 @@ def test_mongo_repository():
     }
     mongo_repository.create("test", "identifier", dto)
 
-    datos = mongo_repository.fetch("test", "identifier", dto.keys())
-    assert datos
+    data = mongo_repository.fetch("test", "identifier", dto.keys())
+    assert data
 
     text = "It was modified"
     mongo_repository.update("test", "identifier", current_id, {"description": text})

@@ -1,10 +1,11 @@
-from ...application.BrokerProtocol import BrokerProtocol
+from ..BrokerProtocol import BrokerProtocol
+from ..RepositoryProtocol import RepositoryProtocol
+
 from ...application.ticket import TicketApplication
-from ...domain.RepositoryProtocol import RepositoryProtocol
-from ...infraestructure.broker.kafka import Kafka
-from ...infraestructure.repositories.ticket_mongo import Ticket as TicketRepository
-from ...domain.ticket import TicketDto, TicketIdentifier
-from .ExceptionHandler import exception_handler
+from ...domain.model.ticket import TicketDto, TicketIdentifier
+from ...infrastructure.broker.kafka import Kafka
+from ...infrastructure.repositories.ticket_mongo import Ticket as TicketRepository
+from ..ExceptionHandler import exception_handler
 
 
 class TicketController:
@@ -42,7 +43,6 @@ class TicketController:
             **NOTES:** The module should be developed following clean architecture principles.
             """
 
-
     @exception_handler
     def fetch(self) -> list:
         return self._uc.fetch()
@@ -54,7 +54,7 @@ class TicketController:
 
     @exception_handler
     def getById(self, identifier):
-        objId = TicketDto.setIdentifier(identifier)
+        objId = TicketIdentifier(identifier)
         self._uc.getById(objId)
 
     @exception_handler
@@ -64,7 +64,7 @@ class TicketController:
 
     @exception_handler
     def delete(self, identifier):
-        objId = TicketDto.setIdentifier(identifier)
+        objId = TicketIdentifier(identifier)
         self.delete(objId)
 
     # def addKeyword(self, ticketId: IdentifierHandler, keyword_id: IdentifierHandler):

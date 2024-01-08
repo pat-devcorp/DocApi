@@ -8,17 +8,17 @@ class Config:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
-        self.ROUTE_PATH = "src/infraestructure/web/route"
+        self.ROUTE_PATH = "src/infrastructure/web/route"
         self.LOG_PATH = "src/log/api.log"
-        self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
+        self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
         self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
-        self.SYTEM_UID = os.getenv("SYTEM_UID", "IamBatman")
+        self.SYSTEM_UID = os.getenv("SYSTEM_UID", "IamBatman")
 
-        self.VIRUS_ANALIZER_API = os.getenv("ALLOWED_EXTENSIONS", None)
+        self.VIRUS_ANALYZER_API = os.getenv("ALLOWED_EXTENSIONS", None)
         allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")
         self.ALLOWED_EXTENSIONS = allowed_extensions.split(",")
-        self.MAX_FILE_WEIGTH = os.getenv("MAX_FILE_WEIGTH", 16000)
+        self.MAX_FILE_WEIGHT = os.getenv("MAX_FILE_WEIGHT", 16000)
         self.DATE_FORMAT = os.getenv("DATE_FORMAT", "%Y-%m-%d")
         self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")

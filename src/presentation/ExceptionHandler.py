@@ -2,11 +2,9 @@ import traceback
 
 from flask import jsonify
 
-from ...application.ApplicationError import ApplicationError
-from ...domain.DomainError import DomainError
-from ...infraestructure.InfraestructureError import InfraestructureError
-from ...presentation.PresentationError import PresentationError
-from ...utils.HandlerError import HandlerError
+from ..domain.DomainError import DomainError
+from ..infrastructure.InfrastructureError import InfrastructureError
+from ..presentation.PresentationError import PresentationError
 
 
 def exception_handler(func):
@@ -17,19 +15,13 @@ def exception_handler(func):
         try:
             response = func(*args, **kwargs) or "OK"
             status_code = 200
-        except HandlerError as he:
-            response = str(he)
-            status_code = 400
         except PresentationError as ce:
             response = str(ce)
             status_code = 422
-        except ApplicationError as ae:
-            response = str(ae)
-            status_code = 409
         except DomainError as de:
             response = str(de)
             status_code = 500
-        except InfraestructureError as fe:
+        except InfrastructureError as fe:
             response = str(fe)
             status_code = 500
         except Exception as e:

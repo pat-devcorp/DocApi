@@ -1,7 +1,7 @@
 from ..utils.ResponseHandler import ResponseDTO
 
 
-class InfraestructureError(Exception):
+class InfrastructureError(Exception):
     def __init__(self, ref_response: ResponseDTO, message=""):
         self.message = message
         self.response = ref_response

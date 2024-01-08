@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from .presentation.controller.ticket import TicketController
+from ...presentation.controller.ticket import TicketController
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
@@ -13,9 +13,9 @@ def createTicket():
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    data = lc.create()
+    item = lc.create()
 
-    return jsonify(data, 200)
+    return jsonify(item, 200)
 
 
 @ticket.get("/", defaults={"id": None})
@@ -28,11 +28,11 @@ def fetchTickets(id=None):
     lc = TicketController(params.get("write_uid"))
     if id is not None:
         params["ticketId"] = id
-        datos = lc.getById(params)
+        data = lc.getById(params)
     else:
-        datos = lc.fetch()
+        data = lc.fetch()
 
-    return jsonify(datos, 200)
+    return jsonify(data, 200)
 
 
 @ticket.put("/<id>")
@@ -43,9 +43,9 @@ def updateTicket(id):
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    data = lc.update(params)
+    item = lc.update(params)
 
-    return jsonify(data, 200)
+    return jsonify(item, 200)
 
 
 @ticket.delete("/<id>")
@@ -56,9 +56,9 @@ def deleteTicket(id):
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    data = lc.delete(params)
+    item = lc.delete(params)
 
-    return jsonify(data, 200)
+    return jsonify(item, 200)
 
 
 @ticket.get("/pending")
@@ -68,9 +68,10 @@ def fetchPendingTicket():
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    datos = lc.fetchPending(params)
+    data = lc.fetchPending(params)
 
-    return jsonify(datos, 200)
+    return jsonify(data, 200)
+
 
 @ticket.get("/pending")
 def fetchPendingTickets():
@@ -79,9 +80,10 @@ def fetchPendingTickets():
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    datos = lc.fetchPending(params)
+    data = lc.fetchPending(params)
 
-    return jsonify(datos, 200)
+    return jsonify(data, 200)
+
 
 @ticket.get("/pending")
 def fetchPendingProjectTickets():
@@ -90,9 +92,9 @@ def fetchPendingProjectTickets():
     print(params)
 
     lc = TicketController(params.get("write_uid"))
-    datos = lc.fetchPendingProject(params)
+    data = lc.fetchPendingProject(params)
 
-    return jsonify(datos, 200)
+    return jsonify(data, 200)
 
 
 # ## Keyword
@@ -104,9 +106,9 @@ def fetchPendingProjectTickets():
 #     keyword = Keyworddto.create(params.get("Keyword"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addKeyword(objId, keyword)
+#     item = lc.addKeyword(objId, keyword)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # @ticket.delete("/<id>/keyword/<keyword_id>")
@@ -116,9 +118,9 @@ def fetchPendingProjectTickets():
 #     keyword_identifier = Keyworddto.getIdentifier(keyword_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeKeyword(objId, keyword_identifier)
+#     item = lc.removeKeyword(objId, keyword_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # ## Meeting
@@ -130,9 +132,9 @@ def fetchPendingProjectTickets():
 #     meeting = Meetingdto.create(params.get("meeting_date"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(objId, meeting)
+#     item = lc.addMeeting(objId, meeting)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # @ticket.delete("/<id>/meeting/<meeting_id>")
@@ -142,9 +144,9 @@ def fetchPendingProjectTickets():
 #     meeting_identifier = Meetingdto.getIdentifier(meeting_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMeeting(objId, meeting_identifier)
+#     item = lc.removeMeeting(objId, meeting_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # ## Milestones
@@ -156,9 +158,9 @@ def fetchPendingProjectTickets():
 #     milestone = Milestonedto.create(params)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(objId, milestone)
+#     item = lc.addMeeting(objId, milestone)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # @ticket.delete("/<id>/milestone/<milestone_id>")
@@ -168,9 +170,9 @@ def fetchPendingProjectTickets():
 #     milestone_identifier = Milestonedto.getIdentifier(milestone_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMeeting(objId, milestone_identifier)
+#     item = lc.removeMeeting(objId, milestone_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # ## Add Attachment
@@ -184,9 +186,9 @@ def fetchPendingProjectTickets():
 #     file_name = uploadFile.create(uploaded_file, path)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addAttachment(objId, file_name)
+#     item = lc.addAttachment(objId, file_name)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # @ticket.delete("/<id>/attachment/<file_name>")
@@ -198,9 +200,9 @@ def fetchPendingProjectTickets():
 #     fileExists(file_name, path)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeAttachment(objId, file_name)
+#     item = lc.removeAttachment(objId, file_name)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # ## Member
@@ -212,9 +214,9 @@ def fetchPendingProjectTickets():
 #     member_identifier = Memberdto.create(params)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.addMeeting(objId, member_identifier)
+#     item = lc.addMeeting(objId, member_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # @ticket.delete("/<id>/member/<member_id>")
@@ -224,9 +226,9 @@ def fetchPendingProjectTickets():
 #     member_identifier = Memberdto.getIdentifier(member_id)
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.removeMember(objId, member_identifier)
+#     item = lc.removeMember(objId, member_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)
 
 
 # ## Assignee
@@ -238,6 +240,6 @@ def fetchPendingProjectTickets():
 #     member_identifier = Memberdto.getIdentifier(params.get("member_id"))
 
 #     lc = TicketController(params.get("write_uid"))
-#     data = lc.defineAssignee(objId, member_identifier)
+#     item = lc.defineAssignee(objId, member_identifier)
 
-#     return jsonify(data, 200)
+#     return jsonify(item, 200)

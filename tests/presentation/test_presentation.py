@@ -1,8 +1,7 @@
-from task.src.infraestructure.repositories.RepositoryMock import RepositoryMock
-
-from src.infraestructure.broker.brokermock import BrokerMock
+from infrastructure.broker.BrokerMock import BrokerMock
 from src.presentation.controller.ticket import Ticket as TicketController
 from src.presentation.dto.ticket import TicketDto, TicketHandler
+from task.src.infrastructure.repositories.RepositoryMock import RepositoryMock
 
 
 def getTicketId():

@@ -1,4 +1,4 @@
-from src.infraestructure.server import createServer
+from src.web.server import createServer
 
 app = createServer()
 

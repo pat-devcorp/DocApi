@@ -6,7 +6,7 @@ from kafka import KafkaProducer
 from ...application.BrokerTopic import BrokerTopic
 from ...utils.ResponseHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ..config import Config
-from ..InfraestructureError import InfraestructureError
+from ..InfrastructureError import InfrastructureError
 
 
 class KafkaBroker:
@@ -35,13 +35,13 @@ class KafkaBroker:
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
             )
         except Exception:
-            raise InfraestructureError(BROKER_CONNECTION_FAIL)
+            raise InfrastructureError(BROKER_CONNECTION_FAIL)
 
     def sendMessage(self, topic: BrokerTopic, message: str):
         self.startConnection()
         pattern = r"\b\w+:\d+\.\d+\.\d+\.\d+\/"
         if re.match(pattern, message):
-            raise InfraestructureError("Pattern '{pattern}' not found in {message}")
+            raise InfrastructureError("Pattern '{pattern}' not found in {message}")
         try:
             topic = self.prefix + "/" + topic.value
             self.producer.send(topic, value=message)
@@ -49,10 +49,10 @@ class KafkaBroker:
             print(f"Message sent to topic '{topic.value}': {message}")
 
         except Exception:
-            raise InfraestructureError(BROKER_SEND_FAIL)
+            raise InfrastructureError(BROKER_SEND_FAIL)
 
     def consumeMessage(self, topic: str):
         try:
             return self.consumer(topic)
         except Exception:
-            raise InfraestructureError(BROKER_SEND_FAIL)
+            raise InfrastructureError(BROKER_SEND_FAIL)

@@ -1,9 +1,8 @@
 from src.domain.DomainError import DomainError
-from src.infraestructure.broker.brokermock import BrokerMock
-from src.infraestructure.repositories.RepositoryMock import RepositoryMock
-from src.infraestructure.repositories.ticket_mongo import Ticket as TicketRepository
+from src.infrastructure.broker.BrokerMock import BrokerMock
+from src.infrastructure.repositories.RepositoryMock import RepositoryMock
 from src.presentation.controller.ticket import Ticket as TicketController
-from src.presentation.dto.ticket import TicketDto
+from src.presentation.controller.ticket import TicketController
 
 
 def getUser():
@@ -11,7 +10,7 @@ def getUser():
 
 
 def test_TaskController():
-    ```mermaid
+    """mermaid
     classDiagram
     JSON --> TicketDto :toDict
     TicketDto --> TicketController
@@ -21,7 +20,8 @@ def test_TaskController():
         TicketTypeCommit, typeCommit, TicketTypeCommit.UNDEFINED,
         TicketState, state, TicketState.CREATED,
     }
-    ```
+    """
+
     dto = TicketDto.getMock()
     my_repository = RepositoryMock(dto.asDict())
     my_producer = BrokerMock()

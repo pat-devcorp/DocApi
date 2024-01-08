@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .BrokerTopic import BrokerTopic
+from ..application.BrokerTopic import BrokerTopic
 
 
 class BrokerProtocol(Protocol):

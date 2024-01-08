@@ -4,7 +4,7 @@ import os
 import magic
 import requests
 
-from ..infraestructure.config import Config
+from ..infrastructure.config import Config
 from .HandlerError import HandlerError
 from .ResponseHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 
@@ -27,8 +27,8 @@ def isValidType(file):
 
 def isSafe(file) -> str:
     my_config = Config()
-    if my_config.VIRUS_ANALIZER_API is not None:
-        is_ok = requests.post(my_config.VIRUS_ANALIZER_API, files=file)
+    if my_config.VIRUS_ANALYZER_API is not None:
+        is_ok = requests.post(my_config.VIRUS_ANALYZER_API, files=file)
         if is_ok != 200:
             raise HandlerError(WARNING_FILE)
 

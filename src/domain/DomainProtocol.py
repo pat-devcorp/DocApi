@@ -1,54 +1,79 @@
-from typing import Protocol, Tuple
+from typing import Protocol
+
+from domain.DomainError import DomainError
+from domain.IdentifierHandler import IdentifierHandler
+from domain.RepositoryProtocol import RepositoryProtocol
+from infrastructure.InfrastructureError import InfrastructureError
 
 
-class DAOProtocol(Protocol):
-    def asDict(self) -> dict:
-        pass
+class DomainIdentifier(Protocol):
+    value: str
 
     @staticmethod
     def getIdAlgorithm():
         pass
-    
-    @staticmethod
-    def getSchema():
-        pass
-    
-    @staticmethod
-    def getFields() -> list:
-        pass
-
-    @staticmethod
-    def getMock() -> dict:
-        pass
-
 
     @classmethod
-    def isValid(cls, ref_object: dict, is_partial=True) -> Tuple[bool, str]:
+    def getIdentifier(cls, self):
         pass
 
-    def updatedObj():
-        pass
-    
 
 class DomainProtocol(Protocol):
-    def setFields(self, fields: list):
+    def _asDict() -> dict:
         pass
-    
-    def prepareIdentity(self, identifier) -> IdentityHandler | DomainError:
+
+    def _fields() -> list:
+        pass
+
+
+class DtoProtocol(Protocol):
+    @classmethod
+    def getMock(cls) -> None:
+        pass
+
+    @staticmethod
+    def getSchema() -> str:
+        pass
+
+    @classmethod
+    def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
+        pass
+
+    def fromDict(cls, params: dict) -> None | DomainError:
+        pass
+
+    def asDict(self) -> dict:
+        pass
+
+
+class DaoProtocol(Protocol):
+    @classmethod
+    def getMock(cls) -> None:
+        pass
+
+    @classmethod
+    def getById(cls, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
+        pass
+
+    @classmethod
+    def delete(cls, write_uid, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
+        pass
+
+    @classmethod
+    def fromRepository(cls, write_uid, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
+        pass
+
+    def toRepository(self) -> dict:
+        pass
+
+    def setFields(self, fields: list) -> None:
         pass
 
     def fetch(self) -> list:
         pass
 
-    
-    def doGetByid(self, daoId: IdentityHandler) -> list:
+    def create(self) -> None | InfrastructureError:
         pass
-    
-    def doDelete(self, daoId: IdentityHandler) -> bool:
-        pass
-    
-    def doCreate(self, dao: DAOProtocol) -> bool:
-        pass
-    
-    def doUpdate(self, dao: DAOProtocol) -> bool:
+
+    def update(self) -> None | InfrastructureError:
         pass

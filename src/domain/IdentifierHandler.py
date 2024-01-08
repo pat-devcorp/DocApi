@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 
-from ..infraestructure.UserValidator import UserValidator
+from ..infrastructure.providers.User import UserService
 from ..utils.ResponseHandler import ID_NOT_VALID
 
 
@@ -17,7 +17,7 @@ class IdentifierHandler:
     def __init__(self, algorithm: IdentityAlgorithm):
         self.algorithm = algorithm
 
-    def setIdentifier(self, identifier) None | ValueError:
+    def setIdentifier(self, identifier) -> None | ValueError:
         is_ok, err = self.isValid(identifier, self.algorithm)
         if not is_ok:
             raise ValueError(ID_NOT_VALID, err)
@@ -53,12 +53,12 @@ class IdentifierHandler:
             uuid_obj = UUID(identifier, version=4)
             return True, uuid_obj
         except ValueError:
-            return False, "Algorithm doesnt match"
+            return False, "Algorithm does not match"
 
     @staticmethod
     def ensureUserId(identifier) -> tuple[bool, str]:
-        if not UserValidator.isValidUserID(identifier):
-            return False, "User doesnt exists"
+        if not UserService.isValidUserId(identifier):
+            return False, "User does not exists"
         return True, ""
 
     def __str__(self):

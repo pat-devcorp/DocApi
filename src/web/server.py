@@ -5,8 +5,8 @@ from flask import Flask
 from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
-from .config import Config
-from .logger import setFormatToJson
+from ..infrastructure.config import Config
+from ..infrastructure.logger import setFormatToJson
 
 
 def registerBlueprints(app, path_ref: Path, blueprints: list):
