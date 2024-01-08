@@ -8,7 +8,7 @@ class RepositoryMock:
     def fetch(self) -> list:
         return [self.data]
 
-    def getByID(self, identity) -> list:
+    def getById(self, identity) -> list:
         return self.data
 
     def delete(self, identity) -> bool:

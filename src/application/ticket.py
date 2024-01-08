@@ -2,7 +2,6 @@ from enum import Enum
 
 from ..domain.controller.ticket import TicketDomain
 from ..domain.dao.ticket import TicketCategory, TicketState, TicketTypeCommit
-from ..domain.RepositoryProtocol import RepositoryProtocol
 from ..presentation.IdentifierHandler import IdentifierHandler
 from .BrokerProtocol import BrokerProtocol
 
@@ -14,16 +13,32 @@ class TicketEvent(Enum):
     ADD_MEMBER = 3
 
 
+class TicketRepositoryProtocol(Protocol):
+    def fetch():
+        pass
+
+    def create(ticketId, description, category, state, typeCommit):
+        pass
+
+    def update(ticketId, description, category, state, typeCommit):
+        pass
+    
+    def getById(ticketId):
+        pass
+    
+    def delete(ticketId):
+        pass
+
+
 class TicketApplication:
     def __init__(
         self,
         ref_write_uid: IdentifierHandler,
-        ref_repository: RepositoryProtocol,
+        ref_repository: TicketRepositoryProtocol,
         ref_broker: BrokerProtocol,
     ):
-        self._write_uid = ref_write_uid
+        self._w = ref_write_uid
         self._r = ref_repository
-        self._d = TicketDomain(ref_write_uid, ref_repository)
         self._b = ref_broker
 
     def fetch(self) -> list:
@@ -31,26 +46,20 @@ class TicketApplication:
 
     def create(
         self,
-        ticketId: IdentifierHandler,
-        description: str,
-        category: TicketCategory,
-        state: TicketState,
-        typeCommit: TicketTypeCommit,
+        dto: TicketDto
     ):
-        return self._d.create(ticketId, description, category, state, typeCommit)
+        _d = TicketDao(self._w, self._r, dto)
+        return _d.create()
 
     def update(
         self,
-        ticketId: IdentifierHandler,
-        description: str = None,
-        category: TicketCategory = None,
-        state: TicketState = None,
-        typeCommit: TicketTypeCommit = None,
+        dto: TicketDto
     ):
+        _d = TicketDao(self._w, self._r, dto)
         return self._d.update(ticketId, description, category, state, typeCommit)
 
-    def getByID(self, ticketId: IdentifierHandler) -> list:
-        return self._d.getByID(ticketId)
+    def getById(self, ticketId: TicketIdentifier) -> list:
+        return TicketDao.getById(self._r, ticketId)
 
-    def delete(self, ticketId: IdentifierHandler) -> bool:
-        return self._d.delete(ticketId)
+    def delete(self, ticketId: TicketIdentifier) -> bool:
+        return TicketDao.delete(self._w, self._r, ticketId)

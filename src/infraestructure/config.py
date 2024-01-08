@@ -8,7 +8,7 @@ class Config:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
-        self.ROUTE_PATH = "src/presentation/route"
+        self.ROUTE_PATH = "src/infraestructure/web/route"
         self.LOG_PATH = "src/log/api.log"
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanisBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")

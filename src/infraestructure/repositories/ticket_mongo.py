@@ -1,5 +1,5 @@
-from ...domain.dao.ticket import TicketDAO
-from ...utils.ResponseHandler import ID_NOT_FOUND
+from ...domain.dao.ticket import TicketDao
+from ...utils.ResponseHandler import id_NOT_FOUND
 from ..InfraestructureError import InfraestructureError
 from .mongo import Mongo, MongoDTO
 
@@ -7,7 +7,7 @@ from .mongo import Mongo, MongoDTO
 class TicketMongo:
     _name = "ticket"
     _pk = "ticketId"
-    _fields = TicketDAO.getFields()
+    _fields = TicketDao.getFields()
 
     def __init__(self, ref_mongodto: None | MongoDTO = None):
         self._mongo = (
@@ -15,14 +15,14 @@ class TicketMongo:
         )
 
     def entityExists(self, identifier) -> None | InfraestructureError:
-        if self._mongo.getByID(self._name, self._pk, identifier, [self._pk]) is None:
-            raise InfraestructureError(ID_NOT_FOUND, "Ticket doesnt exists")
+        if self._mongo.getById(self._name, self._pk, identifier, [self._pk]) is None:
+            raise InfraestructureError(id_NOT_FOUND, "Ticket doesnt exists")
 
     def fetch(self, fields=None) -> list:
         return self._mongo.fetch(self._name, self._pk, fields or self._fields)
 
-    def getByID(self, identity, fields=None) -> list:
-        return self._mongo.getByID(
+    def getById(self, identity, fields=None) -> list:
+        return self._mongo.getById(
             self._name, self._pk, identity, fields or self._fields
         )
 

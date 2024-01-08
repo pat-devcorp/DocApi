@@ -1,14 +1,9 @@
 from flask import Blueprint, jsonify, request
 
-from ..controller.ticket import TicketController
+from .presentation.controller.ticket import TicketController
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
-
-
-@ticket.get("/schema")
-def getTicketSchema():
-    return jsonify(TicketController.getSchema(), 200)
 
 
 @ticket.post("/")
@@ -33,7 +28,7 @@ def fetchTickets(id=None):
     lc = TicketController(params.get("write_uid"))
     if id is not None:
         params["ticketId"] = id
-        datos = lc.getByID(params)
+        datos = lc.getById(params)
     else:
         datos = lc.fetch()
 

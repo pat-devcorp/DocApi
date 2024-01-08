@@ -4,7 +4,7 @@
 
 class UserService:
     @staticmethod
-    def isValidUserID(user_id):
+    def isValidUserid(user_id):
         # my_config = Config()
         # payload = {"user_id": user_id}
         # r = requests.get(my_config.USER_API, params=payload)

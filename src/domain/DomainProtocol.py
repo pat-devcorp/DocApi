@@ -41,7 +41,7 @@ class DomainProtocol(Protocol):
         pass
 
     
-    def doGetByID(self, daoId: IdentityHandler) -> list:
+    def doGetByid(self, daoId: IdentityHandler) -> list:
         pass
     
     def doDelete(self, daoId: IdentityHandler) -> bool:

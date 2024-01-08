@@ -3,9 +3,7 @@ from ...application.ticket import TicketApplication
 from ...domain.RepositoryProtocol import RepositoryProtocol
 from ...infraestructure.broker.kafka import Kafka
 from ...infraestructure.repositories.ticket_mongo import Ticket as TicketRepository
-from ...presentation.PresentationError import PresentationError
-from ..dto.ticket import TicketDTO
-from ..IdentifierHandler import IdentifierHandler
+from ...domain.ticket import TicketDto, TicketIdentifier
 from .ExceptionHandler import exception_handler
 
 
@@ -15,7 +13,7 @@ class TicketController:
         ref_write_uid,
         ref_repository: None | RepositoryProtocol = None,
         ref_broker: None | BrokerProtocol = None,
-    ):
+    ) -> None:
         self._w = ref_write_uid
         _r = TicketRepository() if ref_repository is None else ref_repository
         _b = Kafka.setToDefault() if ref_broker is None else ref_broker
@@ -44,71 +42,30 @@ class TicketController:
             **NOTES:** The module should be developed following clean architecture principles.
             """
 
-    @staticmethod
-    def getSchema():
-        return TicketDTO.getSchema()
-
-    @staticmethod
-    def prepareCreate(
-        dtoId: IdentifierHandler, params: dict
-    ) -> TicketDTO | PresentationError:
-        data = TicketDTO.filterKeys(params)
-        return TicketDTO(dtoId, **data)
-
-    @staticmethod
-    def prepareUpdate(
-        dtoId: IdentifierHandler, params: dict
-    ) -> TicketDTO | PresentationError:
-        data = TicketDTO.filterKeys(params)
-        return TicketDTO.fromDict(dtoId, data)
-
-    @staticmethod
-    def prepareIdentifier(identifier) -> IdentifierHandler | PresentationError:
-        return TicketDTO.getIdentifier(identifier)
 
     @exception_handler
     def fetch(self) -> list:
-        datos = self._uc.fetch()
-        return [TicketDTO.filterKeys(item) for item in datos]
+        return self._uc.fetch()
 
     @exception_handler
     def create(self, params: dict):
-        objId = self.prepareIdentifier(params.get("ticketId"))
-        obj = self.prepareCreate(objId, params)
-        self.doCreate(obj)
+        obj = TicketDto(**params)
+        return self._uc.create(obj)
 
     @exception_handler
-    def getByID(self, identifier):
-        objId = self.prepareIdentifier(identifier)
-        self.doGetByID(objId)
+    def getById(self, identifier):
+        objId = TicketDto.setIdentifier(identifier)
+        self._uc.getById(objId)
 
     @exception_handler
     def update(self, params: dict):
-        obj = self.prepareUpdate(params)
+        obj = TicketDto.fromDict(params)
         self.update(obj)
 
     @exception_handler
     def delete(self, identifier):
-        objId = self.prepareIdentifier(identifier)
+        objId = TicketDto.setIdentifier(identifier)
         self.delete(objId)
-    
-
-    def doCreate(self, dto: TicketDTO) -> bool:
-        return self._uc.create(
-            dto.ticketId, dto.description, dto.category, dto.typeCommit, dto.state
-        )
-
-    def doUpdate(self, dto: TicketDTO) -> bool:
-        return self._uc.update(
-            dto.ticketId, dto.description, dto.category, dto.typeCommit, dto.state
-        )
-
-    def doGetByID(self, dtoId: IdentifierHandler) -> dict:
-        data = self._uc.getByID(dtoId)
-        return TicketDTO.filterKeys(data)
-
-    def doDelete(self, dtoId: IdentifierHandler):
-        return self._uc.delete(dtoId)
 
     # def addKeyword(self, ticketId: IdentifierHandler, keyword_id: IdentifierHandler):
     #     return self._uc.addKeyword(ticketId.value, keyword_id.value)

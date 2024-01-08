@@ -17,7 +17,7 @@ class IdentifierHandler:
     def __init__(self, algorithm: IdentityAlgorithm):
         self.algorithm = algorithm
 
-    def setIdentifier(self, identifier):
+    def setIdentifier(self, identifier) None | ValueError:
         is_ok, err = self.isValid(identifier, self.algorithm)
         if not is_ok:
             raise ValueError(ID_NOT_VALID, err)

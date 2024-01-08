@@ -1,6 +1,6 @@
 from ..infraestructure.InfraestructureError import InfraestructureError
 from ..presentation.IdentifierHandler import IdentifierHandler
-from ..utils.ResponseHandler import ID_NOT_FOUND
+from ..utils.ResponseHandler import id_NOT_FOUND
 from .DomainError import DomainError
 from .RepositoryProtocol import RepositoryProtocol
 
@@ -23,4 +23,4 @@ class IdentityHandler:
             ref_repository.entityExists(identifier.value)
             return cls(identifier.value)
         except InfraestructureError:
-            raise DomainError(ID_NOT_FOUND, "Ticket doesnt exists")
+            raise DomainError(id_NOT_FOUND, "Ticket doesnt exists")

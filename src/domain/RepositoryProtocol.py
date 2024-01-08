@@ -14,7 +14,7 @@ class RepositoryProtocol(Protocol):
     def update(self, tablename: str, pk: str, identifier: str, params: dict):
         pass
 
-    def getByID(
+    def getById(
         self, tablename: str, pk: str, identifier: str, attrs: List[str]
     ) -> Dict:
         pass
