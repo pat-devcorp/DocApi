@@ -1,3 +1,5 @@
+from utils.ResponseHandler import REQUIRED_FIELD
+from ..PresentationError import PresentationError
 from ..BrokerProtocol import BrokerProtocol
 from ..RepositoryProtocol import RepositoryProtocol
 
@@ -15,10 +17,10 @@ class TicketController:
         ref_repository: None | RepositoryProtocol = None,
         ref_broker: None | BrokerProtocol = None,
     ) -> None:
-        self._w = ref_write_uid
+        _w = ref_write_uid
         _r = TicketRepository() if ref_repository is None else ref_repository
         _b = Kafka.setToDefault() if ref_broker is None else ref_broker
-        self._uc = TicketApplication(self._w, _r, _b)
+        self._uc = TicketApplication(_w, _r, _b)
 
     @staticmethod
     def getTemplate() -> str:
@@ -46,26 +48,32 @@ class TicketController:
     @exception_handler
     def fetch(self) -> list:
         return self._uc.fetch()
-
-    @exception_handler
-    def create(self, params: dict):
-        obj = TicketDto(**params)
-        return self._uc.create(obj)
-
+    
     @exception_handler
     def getById(self, identifier):
         objId = TicketIdentifier(identifier)
         self._uc.getById(objId)
-
-    @exception_handler
-    def update(self, params: dict):
-        obj = TicketDto.fromDict(params)
-        self.update(obj)
-
+    
     @exception_handler
     def delete(self, identifier):
         objId = TicketIdentifier(identifier)
         self.delete(objId)
+
+    @exception_handler
+    def update(self, params: dict):
+        if ticketId := params.get('ticketId'):
+            raise PresentationError(REQUIRED_FIELD, "ticket id must be provided")
+        obj = TicketDto.fromDict(params)
+        self.update(obj)
+
+    @exception_handler
+    def create(self, params: dict):
+        if ticketId := params.get('ticketId'):
+            raise PresentationError(REQUIRED_FIELD, "ticket id must be provided")
+        if description := params.get('description'):
+            raise PresentationError(REQUIRED_FIELD, "description must be")
+        obj = TicketDto.newTicket(ticketId, description)
+        return self._uc.create(obj)
 
     # def addKeyword(self, ticketId: IdentifierHandler, keyword_id: IdentifierHandler):
     #     return self._uc.addKeyword(ticketId.value, keyword_id.value)

@@ -1,5 +1,4 @@
 import pytest
-
 from src.domain.model.ticket import TicketDao
 from src.infrastructure.broker.kafka import Kafka
 from src.infrastructure.repositories.mongo import Mongo

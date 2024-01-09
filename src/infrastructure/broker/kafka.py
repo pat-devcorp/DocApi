@@ -37,7 +37,7 @@ class KafkaBroker:
         except Exception:
             raise InfrastructureError(BROKER_CONNECTION_FAIL)
 
-    def sendMessage(self, topic: BrokerTopic, message: str):
+    def publish(self, topic: BrokerTopic, message: str):
         self.startConnection()
         pattern = r"\b\w+:\d+\.\d+\.\d+\.\d+\/"
         if re.match(pattern, message):
@@ -51,7 +51,7 @@ class KafkaBroker:
         except Exception:
             raise InfrastructureError(BROKER_SEND_FAIL)
 
-    def consumeMessage(self, topic: str):
+    def consume(self, topic: str):
         try:
             return self.consumer(topic)
         except Exception:

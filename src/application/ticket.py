@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Protocol
 
 from ..domain.IdentifierHandler import IdentifierHandler
-from ..domain.model.ticket import TicketDto, TicketDao, TicketIdentifier
+from ..domain.model.ticket import TicketDomain, TicketDto, TicketDao, TicketIdentifier
 
 
 class TicketEvent(Enum):
@@ -41,27 +41,20 @@ class TicketApplication:
         ref_repository: TicketRepositoryProtocol,
         ref_broker: TicketBrokerProtocol,
     ):
-        self._w = ref_write_uid
-        self.r = ref_repository
+        self._td = TicketDomain(ref_write_uid, ref_repository)
         self._b = ref_broker
 
     def fetch(self) -> list:
-        _d = TicketDao(self._w, self._r)
-        return _d.fetch()
-
-    def create(self, dto: TicketDto) -> None:
-        _d = TicketDao(self._w, self._r)
-        _d.create(dto)
-        return self._b.pub(TicketEvent.CREATED, dto.ticketId)
-
-    def update(self, dto: TicketDto) -> None:
-        _d = TicketDao(self._w, self._r)
-        _d.update(dto)
-
+        return self._td.fetch()
+    
     def getById(self, ticketId: TicketIdentifier) -> TicketDto:
-        _d = TicketDao(self._w, self._r)
-        return _d.getById(ticketId)
+        return self._td.getById(ticketId)
 
     def delete(self, ticketId: TicketIdentifier) -> None:
-        _d = TicketDao(self._w, self._r)
-        return _d.delete(ticketId)
+        return self._td.delete(ticketId)
+
+    def update(self, obj) -> None:
+        pass
+
+    def create(self, obj) -> None:
+        pass
