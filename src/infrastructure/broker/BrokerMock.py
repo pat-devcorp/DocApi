@@ -1,4 +1,4 @@
-from ...application.BrokerTopic import BrokerTopic
+from enum import Enum
 
 
 class BrokerMock:
@@ -10,5 +10,5 @@ class BrokerMock:
     def setToDefault(cls):
         pass
 
-    def sendMessage(self, topic: BrokerTopic, message: str):
+    def sendMessage(self, topic: Enum, message: str):
         pass

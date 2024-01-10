@@ -1,13 +1,12 @@
-from utils.ResponseHandler import REQUIRED_FIELD
-from ..PresentationError import PresentationError
-from ..BrokerProtocol import BrokerProtocol
-from ..RepositoryProtocol import RepositoryProtocol
-
 from ...application.ticket import TicketApplication
-from ...domain.model.ticket import TicketDto, TicketIdentifier
+from ...domain.model.ticket import Ticket, TicketIdentifier
 from ...infrastructure.broker.BrokerMock import BrokerMock
 from ...infrastructure.repositories.ticket_mongo import Ticket as TicketRepository
+from ...utils.ResponseHandler import ID_NOT_VALID
+from ..BrokerProtocol import BrokerProtocol
 from ..ExceptionHandler import exception_handler
+from ..PresentationError import PresentationError
+from ..RepositoryProtocol import RepositoryProtocol
 
 
 class TicketController:
@@ -48,22 +47,22 @@ class TicketController:
     @exception_handler
     def fetch(self) -> list:
         return self._uc.fetch()
-    
+
     @exception_handler
     def getById(self, identifier):
         try:
             ticketId = TicketIdentifier(identifier)
         except ValueError:
-            raise PresentationError(ID_NOT_VALID, err)
+            raise PresentationError(ID_NOT_VALID)
 
         self._uc.getById(ticketId)
-    
+
     @exception_handler
     def delete(self, identifier):
         try:
             ticketId = TicketIdentifier(identifier)
         except ValueError:
-            raise PresentationError(ID_NOT_VALID, err)
+            raise PresentationError(ID_NOT_VALID)
 
         self.delete(ticketId)
 
@@ -72,7 +71,7 @@ class TicketController:
         try:
             ticketId = TicketIdentifier(identifier)
         except ValueError:
-            raise PresentationError(ID_NOT_VALID, err)
+            raise PresentationError(ID_NOT_VALID)
 
         self.update(ticketId, params)
 

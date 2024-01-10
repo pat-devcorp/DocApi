@@ -1,16 +1,14 @@
-from collections import namedtuple
 import json
 from enum import Enum
 
 from pydantic import BaseModel
-from validator_collection.checkers import is_not_empty
 
-from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
-from ...utils.DatetimeHandler import checkDatetimeFormat, getDatetime
-from ..SchemaItemHandler import SchemaItemHandler
+from utils.ResponseHandler import SCHEMA_NOT_MATCH
+from utils.StrHandler import valMaxLength
+
 from ...domain.DomainError import DomainError
-from ...infrastructure.InfrastructureError import InfrastructureError
-from ...utils.AuditHandler import AuditHandler
+from ...utils.DatetimeHandler import DateTimeHandler, checkDatetimeFormat
+from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
 
 
 class TicketCategory(Enum):
@@ -42,7 +40,7 @@ class TicketState(Enum):
     END = 4
 
 
-class TicketValidator: 
+class TicketValidator:
     @classmethod
     def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
         validate_func = {
@@ -67,7 +65,6 @@ class TicketValidator:
 
         return True, ""
 
-
     @staticmethod
     def isValidState(state: int) -> tuple[bool, str]:
         for member in TicketState:
@@ -91,7 +88,7 @@ class TicketValidator:
 
     @staticmethod
     def isValidDescription(description: str) -> tuple[bool, str]:
-        if not is_not_empty(description, maximum_length=200):
+        if not valMaxLength(description, maximum_length=200):
             return False, "Max length exceeded, not allowed"
         return True, ""
 
@@ -119,30 +116,38 @@ class TicketIdentifier:
         self.value = identifier.setIdentifier(value)
 
 
-class Ticket(TicketIdentifier):
+class Ticket(BaseModel, TicketIdentifier):
     description: str
     category: TicketCategory
-    typeCommit:  TicketTypeCommit
+    typeCommit: TicketTypeCommit
     state: TicketState
     points: int
-    estimateEndAt: DatetimeHandler
+    estimateEndAt: DateTimeHandler
 
     @staticmethod
     def getFields():
-        return ["ticketId", "description", "category", "typeCommit", "state", "points", "estimateEndAt"]
+        return [
+            "ticketId",
+            "description",
+            "category",
+            "typeCommit",
+            "state",
+            "points",
+            "estimateEndAt",
+        ]
 
     def asDict(self) -> dict:
         data = dict()
         for item in self.getFields():
             val = self.__getattribute__(item)
             data[item] = val if isinstance(val, (str, int)) else val.value
-    
+
     def __str__(self):
         return json.dumps(self.asDict())
 
     def __repr__(self):
         return self.__str__()
-    
+
     @classmethod
     def newTicket(cls, ticketId, description) -> None | DomainError:
         is_ok, err = TicketValidator.isValidDescription(description)
@@ -156,7 +161,7 @@ class Ticket(TicketIdentifier):
             TicketTypeCommit.UNDEFINED,
             TicketState.CREATED,
             0,
-            DatetimeHandler.getDefault()
+            DateTimeHandler.getDefault(),
         )
 
     @classmethod
@@ -169,17 +174,18 @@ class Ticket(TicketIdentifier):
             TicketTypeCommit(item["typeCommit"]),
             TicketState(item["state"]),
             item["points"],
-            DatetimeHandler.fromStr(estimateEndAt)
+            DateTimeHandler.fromStr(item["estimateEndAt"]),
         )
 
     def __init__(
-        ticketId: str
-        description: str
-        category: TicketCategory
-        typeCommit:  TicketTypeCommit
-        state: TicketState
-        points: int
-        estimateEndAt: DatetimeHandler
+        self,
+        ticketId: str,
+        description: str,
+        category: TicketCategory,
+        typeCommit: TicketTypeCommit,
+        state: TicketState,
+        points: int,
+        estimateEndAt: DateTimeHandler,
     ) -> None:
         TicketIdentifier.__init__(ticketId)
         self.description = description

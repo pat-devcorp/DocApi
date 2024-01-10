@@ -37,7 +37,11 @@ class IdentifierHandler:
 
     @classmethod
     def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
-        identifier_functions = [cls.isValidDefault, cls.isValidUuidV4, cls.isValidUserId]
+        identifier_functions = [
+            cls.isValidDefault,
+            cls.isValidUuidV4,
+            cls.isValidUserId,
+        ]
         return identifier_functions[algorithm.value](identifier)
 
     @staticmethod

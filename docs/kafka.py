@@ -57,6 +57,7 @@ class KafkaBroker:
         except Exception:
             raise InfrastructureError(BROKER_SEND_FAIL)
 
+
 # def test_kafka_producer():
 #     print("----KAFKA PROD")
 #     kafka_producer = Kafka.setToDefault()

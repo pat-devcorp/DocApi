@@ -30,19 +30,21 @@ def getBlueprints(path_ref: Path, predicate: str = "") -> list:
 
 def createServer():
     app = Flask(__name__)
+
     my_config = Config()
+    app.config.from_object(my_config)
     print("---CONFIG")
     print(vars(my_config))
-    app.config.from_object(my_config)
-    # Import all the blueprints dynamically.
+
     blueprint_path = Path(my_config.ROUTE_PATH)
     blueprints = getBlueprints(blueprint_path)
     registerBlueprints(app, blueprint_path, blueprints)
     print("---ROUTES")
     print(blueprints)
-    # logger
+
     if my_config.IS_IN_PRODUCTION:
         setFormatToJson(my_config.LOG_PATH)
+
     # Add prometheus wsgi middleware to route /metrics requests
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})
     return app

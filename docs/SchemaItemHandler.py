@@ -1,4 +1,5 @@
 from enum import Enum
+
 from pydantic import BaseModel
 
 
@@ -10,12 +11,7 @@ class SchemaItemHandler(BaseModel):
     values: dict | list
 
     def __init__(
-        self,
-        requiredInCreate,
-        isEditable,
-        valueType,
-        default = None,
-        values = []
+        self, requiredInCreate, isEditable, valueType, default=None, values=[]
     ):
         self.requiredInCreate = requiredInCreate
         self.isEditable = isEditable

@@ -9,9 +9,7 @@ class TicketMongo:
     _pk = "ticketId"
 
     def __init__(self, ref_mongoDto: MongoDTO | None) -> None | infrastructureError:
-        self._m = (
-            Mongo.setToDefault() if ref_mongoDto is None else Mongo(ref_mongoDto)
-        )
+        self._m = Mongo.setToDefault() if ref_mongoDto is None else Mongo(ref_mongoDto)
         self._fields = Ticket._fields()
 
     def entityExists(self, identifier) -> None | infrastructureError:
@@ -22,9 +20,7 @@ class TicketMongo:
         return self._m.fetch(self._name, self._pk, fields or self._fields)
 
     def getById(self, identifier, fields=None) -> list:
-        return self._m.getById(
-            self._name, self._pk, identifier, fields or self._fields
-        )
+        return self._m.getById(self._name, self._pk, identifier, fields or self._fields)
 
     def delete(self, identifier) -> None | infrastructureError:
         self._m.delete(self._name, self._pk, identifier)

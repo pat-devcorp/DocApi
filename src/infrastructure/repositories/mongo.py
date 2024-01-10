@@ -13,12 +13,12 @@ from ...utils.ResponseHandler import (
     ID_NOT_FOUND,
 )
 from ..config import Config
-from ..infrastructureError import infrastructureError
-
+from ..InfrastructureError import infrastructureError
 
 MongoDTO = namedtuple(
     "MongoDTO", ["server_address", "port", "user", "password", "database"]
 )
+
 
 def testMongo():
     mongo_repository = Mongo.setToDefault()
@@ -44,7 +44,7 @@ def testMongo():
     mongo_repository.delete("test", "identifier", current_id)
     assert (
         mongo_repository.getById("test", "identifier", current_id, ["description"])
-        == None
+        is None
     )
 
 
@@ -102,11 +102,11 @@ class Mongo:
     ) -> List[Dict] | infrastructureError:
         collection = self.getCollection(tablename)
         try:
-            datos = list(collection.find({}, {attr: 1 for attr in attrs}))
-            for item in datos:
+            data = list(collection.find({}, {attr: 1 for attr in attrs}))
+            for item in data:
                 if item is not None:
                     item[pk_name] = item.pop("_id")
-            return datos
+            return data
         except Exception as err:
             raise infrastructureError(DB_GET_FAIL, str(err))
 

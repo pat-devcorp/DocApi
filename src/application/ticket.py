@@ -2,7 +2,10 @@ from enum import Enum
 from typing import Protocol
 
 from ..domain.IdentifierHandler import IdentifierHandler
-from ..domain.model.ticket import TicketDomain, TicketDto, TicketDao, objIdentifier
+from ..domain.model.ticket import Ticket, TicketIdentifier
+from ..utils.ResponseHandler import DB_GET_FAIL
+from .ApplicationError import ApplicationError
+from .AuditHandler import AuditHandler
 
 
 class TicketEvent(Enum):
@@ -16,16 +19,16 @@ class TicketRepositoryProtocol(Protocol):
     def fetch() -> list:
         pass
 
-    def create() -> None:
+    def getById(objId) -> dict:
+        pass
+
+    def delete(objId) -> None:
         pass
 
     def update() -> None:
         pass
 
-    def getById(objId) -> TicketDto:
-        pass
-
-    def delete(objId) -> None:
+    def create() -> None:
         pass
 
 
@@ -34,6 +37,7 @@ class TicketBrokerProtocol(Protocol):
         pass
 
 
+# TODO: Rule to manager can not have in progress more than 4 tickets
 class TicketApplication:
     def __init__(
         self,
@@ -50,10 +54,10 @@ class TicketApplication:
         self._f += AuditHandler.getFields()
 
     def fetch(self) -> list[dict]:
-        return ref_repository.fetch(self._f)
-    
+        return self._r.fetch(self._f)
+
     def getById(self, objId: TicketIdentifier) -> dict:
-        return ref_repository.getById(objId, self._f)
+        return self._r.getById(objId, self._f)
 
     def delete(self, objId: TicketIdentifier) -> None:
         if self._r.entityExists(objId):
