@@ -2,44 +2,44 @@ from ..infrastructure.providers.User import UserService
 from ..domain.IdentifierHandler import IdentifierHandler, IdentityAlgorithm
 from .DatetimeHandler import getDatetime, checkDatetimeFormat
 from .HandlerError import HandlerError
-from .ResponseHandler import FORMAT_NOT_MATCH, ID_NOT_FOUND, WRITE_UID_NOT_FOUND
+from .ResponseHandler import SCHEMA_NOT_MATCH, ID_NOT_FOUND, WRITER_NOT_FOUND
 
 
 class AuditHandler:
     @staticmethod
     def getFields():
-        return ["write_uid", "write_at", "create_uid", "create_at", "end_at"]
+        return ["writeUId", "writeAt", "createUId", "createAt", "endAt"]
 
     @staticmethod
     def getMock():
         return {
-            "write_uid": UserService.getMock(),
-            "write_at": getDatetime(),
-            "create_uid": UserService.getMock(),
-            "create_at": getDatetime(),
-            "end_at": getDatetime(),
+            "writeUId": UserService.getMock(),
+            "writeAt": getDatetime(),
+            "createUId": UserService.getMock(),
+            "createAt": getDatetime(),
+            "endAt": getDatetime(),
         }
 
     def isValid(cls, my_audit: dict) -> list:
         errors = list()
 
-        if my_audit.get("create_uid") is None:
+        if my_audit.get("createUId") is None:
             errors.append("Create User is required")
 
-        my_write_at = my_audit.get("write_at")
-        if my_write_at is not None:
-            if not checkDatetimeFormat(my_write_at):
-                errors.append(FORMAT_NOT_MATCH)
+        my_writeAt = my_audit.get("writeAt")
+        if my_writeAt is not None:
+            if not checkDatetimeFormat(my_writeAt):
+                errors.append(SCHEMA_NOT_MATCH)
 
-        my_create_at = my_audit.get("create_at")
-        if my_create_at is not None:
-            if not checkDatetimeFormat(my_create_at):
-                errors.append(FORMAT_NOT_MATCH)
+        my_createAt = my_audit.get("createAt")
+        if my_createAt is not None:
+            if not checkDatetimeFormat(my_createAt):
+                errors.append(SCHEMA_NOT_MATCH)
 
-        my_create_at = my_audit.get("end_at")
-        if my_create_at is not None:
-            if not checkDatetimeFormat(my_create_at):
-                errors.append(FORMAT_NOT_MATCH)
+        my_createAt = my_audit.get("endAt")
+        if my_createAt is not None:
+            if not checkDatetimeFormat(my_createAt):
+                errors.append(SCHEMA_NOT_MATCH)
 
         return errors
 
@@ -51,10 +51,10 @@ class AuditHandler:
 
     @classmethod
     def fromDict(cls, params: dict):
-        if params.get("write_uid") is None:
-            raise HandlerError(WRITE_UID_NOT_FOUND)
+        if params.get("writeUId") is None:
+            raise HandlerError(WRITER_NOT_FOUND)
 
-        if not UserService.isValidUserId(params.get("write_uid")):
+        if not UserService.isValidUserId(params.get("writeUId")):
             raise HandlerError(ID_NOT_FOUND)
 
         audit_dto = dict()
@@ -71,18 +71,18 @@ class AuditHandler:
     def getUpdateFields(cls, current_uid):
         if not UserService.isValidUserId(current_uid):
             raise HandlerError(ID_NOT_FOUND)
-        return {"write_uid": current_uid, "write_at": getDatetime()}
+        return {"writeUId": current_uid, "writeAt": getDatetime()}
 
     @classmethod
     def getCreateFields(cls, current_uid):
         if not UserService.isValidUserId(current_uid):
             raise HandlerError(ID_NOT_FOUND)
         return {
-            "write_uid": current_uid,
-            "write_at": getDatetime(),
-            "create_uid": current_uid,
-            "create_at": getDatetime(),
-            "end_at": None,
+            "writeUId": current_uid,
+            "writeAt": getDatetime(),
+            "createUId": current_uid,
+            "createAt": getDatetime(),
+            "endAt": None,
         }
 
     @classmethod
@@ -90,7 +90,7 @@ class AuditHandler:
         if not UserService.isValidUserId(current_uid):
             raise HandlerError(ID_NOT_FOUND)
         return {
-            "write_uid": current_uid,
-            "write_at": getDatetime(),
-            "end_at": getDatetime(),
+            "writeUId": current_uid,
+            "writeAt": getDatetime(),
+            "endAt": getDatetime(),
         }

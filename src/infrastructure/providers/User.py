@@ -2,6 +2,10 @@
 # from ..config import Config
 
 
+def testUserService():
+    pass
+
+
 class UserService:
     @staticmethod
     def isValidUserId(user_id):

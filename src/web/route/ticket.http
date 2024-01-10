@@ -1,6 +1,6 @@
 @base_url = http://localhost:5000/ticket
 @ticketId = b4b69df7-f852-4318-bc3d-1437ee5dddea
-@write_uid = b4b69df7-f852-4318-bc3d-1437ee5dddea
+@writeUId = b4b69df7-f852-4318-bc3d-1437ee5dddea
 
 ### Create Ticket
-POST {{base_url}}?write_uid={{write_uid}}&ticketId={{ticketId}}&description="I HAVE PROBLEMS WITH"
+POST {{base_url}}?writeUId={{writeUId}}&ticketId={{ticketId}}&description="I HAVE PROBLEMS WITH"

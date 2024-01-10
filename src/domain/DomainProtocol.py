@@ -56,11 +56,11 @@ class DaoProtocol(Protocol):
         pass
 
     @classmethod
-    def delete(cls, write_uid, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
+    def delete(cls, writeUId, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
         pass
 
     @classmethod
-    def fromRepository(cls, write_uid, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
+    def fromRepository(cls, writeUId, ref_repository: RepositoryProtocol, objId: IdentifierHandler):
         pass
 
     def toRepository(self) -> dict:

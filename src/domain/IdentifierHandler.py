@@ -37,15 +37,15 @@ class IdentifierHandler:
 
     @classmethod
     def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
-        identifier_functions = [cls.ensureDefault, cls.ensureUuidV4, cls.ensureUserId]
+        identifier_functions = [cls.isValidDefault, cls.isValidUuidV4, cls.isValidUserId]
         return identifier_functions[algorithm.value](identifier)
 
     @staticmethod
-    def ensureDefault(identifier):
+    def isValidDefault(identifier):
         return True, ""
 
     @staticmethod
-    def ensureUuidV4(identifier) -> tuple[bool, str]:
+    def isValidUuidV4(identifier) -> tuple[bool, str]:
         if identifier is None or len(identifier) == 0:
             return False, "Is Empty"
 
@@ -56,7 +56,7 @@ class IdentifierHandler:
             return False, "Algorithm does not match"
 
     @staticmethod
-    def ensureUserId(identifier) -> tuple[bool, str]:
+    def isValidUserId(identifier) -> tuple[bool, str]:
         if not UserService.isValidUserId(identifier):
             return False, "User does not exists"
         return True, ""

@@ -42,6 +42,66 @@ class TicketState(Enum):
     END = 4
 
 
+class TicketValidator: 
+    @classmethod
+    def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
+        validate_func = {
+            "description": cls.isValidDescription,
+            "category": cls.isValidCategory,
+            "typeCommit": cls.isValidTypeCommit,
+            "state": cls.isValidState,
+            "estimateEndAt": cls.isValidEndAt,
+        }
+
+        errors = list()
+        for k, v in ref_object.items():
+            if is_partial and v is None:
+                continue
+            if func := validate_func.get(k):
+                is_ok, err = func(v)
+                if not is_ok:
+                    errors.append(err)
+
+        if len(errors) > 0:
+            return False, "\n".join(errors)
+
+        return True, ""
+
+
+    @staticmethod
+    def isValidState(state: int) -> tuple[bool, str]:
+        for member in TicketState:
+            if member.value == state:
+                return True, ""
+        return False, "Invalid state"
+
+    @staticmethod
+    def isValidCategory(category: int) -> tuple[bool, str]:
+        for member in TicketCategory:
+            if member.value == category:
+                return True, ""
+        return False, "Invalid category"
+
+    @staticmethod
+    def isValidTypeCommit(typeCommit: int) -> tuple[bool, str]:
+        for member in TicketTypeCommit:
+            if member.value == typeCommit:
+                return True, ""
+        return False, "Invalid commit type"
+
+    @staticmethod
+    def isValidDescription(description: str) -> tuple[bool, str]:
+        if not is_not_empty(description, maximum_length=200):
+            return False, "Max length exceeded, not allowed"
+        return True, ""
+
+    @staticmethod
+    def isValidEndAt(estimateEndAt: str) -> tuple[bool, str]:
+        if not checkDatetimeFormat(estimateEndAt):
+            return False, "Date of end format not valid"
+        return True, ""
+
+
 class TicketIdentifier:
     value: str
 
@@ -59,14 +119,13 @@ class TicketIdentifier:
         self.value = identifier.setIdentifier(value)
 
 
-class Ticket:
-    ticketId: TicketIdentifier
+class Ticket(TicketIdentifier):
     description: str
     category: TicketCategory
     typeCommit:  TicketTypeCommit
     state: TicketState
     points: int
-    estimateEndAt: str
+    estimateEndAt: DatetimeHandler
 
     @staticmethod
     def getFields():
@@ -86,6 +145,10 @@ class Ticket:
     
     @classmethod
     def newTicket(cls, ticketId, description) -> None | DomainError:
+        is_ok, err = TicketValidator.isValidDescription(description)
+        if not is_ok:
+            raise DomainError(SCHEMA_NOT_MATCH, err)
+
         return cls(
             ticketId,
             description,
@@ -93,5 +156,35 @@ class Ticket:
             TicketTypeCommit.UNDEFINED,
             TicketState.CREATED,
             0,
-            getDatetime()
+            DatetimeHandler.getDefault()
         )
+
+    @classmethod
+    def fromDict(cls, item: dict):
+        TicketValidator.isValid(item, False)
+        return cls(
+            item["ticketId"],
+            item["description"],
+            TicketCategory(item["category"]),
+            TicketTypeCommit(item["typeCommit"]),
+            TicketState(item["state"]),
+            item["points"],
+            DatetimeHandler.fromStr(estimateEndAt)
+        )
+
+    def __init__(
+        ticketId: str
+        description: str
+        category: TicketCategory
+        typeCommit:  TicketTypeCommit
+        state: TicketState
+        points: int
+        estimateEndAt: DatetimeHandler
+    ) -> None:
+        TicketIdentifier.__init__(ticketId)
+        self.description = description
+        self.category = category
+        self.typeCommit = typeCommit
+        self.state = state
+        self.points = points
+        self.estimateEndAt = estimateEndAt

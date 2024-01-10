@@ -15,9 +15,37 @@ from ...utils.ResponseHandler import (
 from ..config import Config
 from ..infrastructureError import infrastructureError
 
+
 MongoDTO = namedtuple(
     "MongoDTO", ["server_address", "port", "user", "password", "database"]
 )
+
+def testMongo():
+    mongo_repository = Mongo.setToDefault()
+    print(f"CONNECTION: {mongo_repository.chain_connection}")
+    current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
+
+    dto = {
+        "writeUId": "8888",
+        "identifier": current_id,
+        "description": "This is description",
+    }
+    mongo_repository.create("test", "identifier", dto)
+
+    data = mongo_repository.fetch("test", "identifier", dto.keys())
+    assert data
+
+    text = "It was modified"
+    mongo_repository.update("test", "identifier", current_id, {"description": text})
+
+    data = mongo_repository.getById("test", "identifier", current_id, ["description"])
+    assert data["description"] == text
+
+    mongo_repository.delete("test", "identifier", current_id)
+    assert (
+        mongo_repository.getById("test", "identifier", current_id, ["description"])
+        == None
+    )
 
 
 class Mongo:
