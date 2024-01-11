@@ -1,35 +1,41 @@
 from ...domain.model.ticket import Ticket
-from ...utils.ResponseHandler import id_NOT_FOUND
-from ..InfrastructureError import infrastructureError
-from .mongo import Mongo, MongoDTO
+from ..InfrastructureError import InfrastructureError
+from .mongo import Mongo, MongoServer
 
 
 class TicketMongo:
-    _name = "ticket"
-    _pk = "ticketId"
+    tablename = "ticket"
+    pk = "ticketId"
 
-    def __init__(self, ref_mongoDto: MongoDTO | None) -> None | infrastructureError:
-        self._m = Mongo.setToDefault() if ref_mongoDto is None else Mongo(ref_mongoDto)
-        self._fields = Ticket._fields()
+    def __init__(
+        self, ref_mongo: MongoServer | None = None
+    ) -> None | InfrastructureError:
+        self._m = (
+            Mongo.setDefault(self.tablename, self.pk)
+            if ref_mongo is None
+            else Mongo(ref_mongo)
+        )
+        self._f = Ticket.getFields()
 
-    def entityExists(self, identifier) -> None | infrastructureError:
-        if self._m.getById(self._name, self._pk, identifier, [self._pk]) is None:
-            raise infrastructureError(id_NOT_FOUND, "Ticket does not exists")
+    def entityExists(self, identifier) -> None | InfrastructureError:
+        if self._m.getById(identifier, [self._pk]) is None:
+            return False
+        return True
 
     def fetch(self, fields=None) -> list:
-        return self._m.fetch(self._name, self._pk, fields or self._fields)
+        return self._m.fetch(fields or self._f)
 
     def getById(self, identifier, fields=None) -> list:
-        return self._m.getById(self._name, self._pk, identifier, fields or self._fields)
+        return self._m.getById(identifier, fields or self._f)
 
-    def delete(self, identifier) -> None | infrastructureError:
-        self._m.delete(self._name, self._pk, identifier)
+    def delete(self, identifier) -> None | InfrastructureError:
+        self._m.delete(identifier)
         return True
 
-    def create(self, data) -> None | infrastructureError:
-        self._m.create(self._name, self._pk, data)
+    def update(self, identifier, data) -> None | InfrastructureError:
+        self._m.update(identifier, data)
         return True
 
-    def update(self, data) -> None | infrastructureError:
-        self._m.update(self._name, self._pk, data[self._pk], data)
+    def create(self, data) -> None | InfrastructureError:
+        self._m.create(data)
         return True

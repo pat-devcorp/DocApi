@@ -8,7 +8,7 @@ class Config:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
-        self.ROUTE_PATH = "src/infrastructure/web/route"
+        self.ROUTE_PATH = "src/web/route"
         self.LOG_PATH = "src/log/api.log"
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
@@ -26,7 +26,7 @@ class Config:
         self.KAFKA_HOST = os.getenv("KAFKA_HOST", "172.25.0.2")
         self.KAFKA_PORT = os.getenv("KAFKA_PORT", 9092)
 
-        self.MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
+        self.MONGO_HOST = os.getenv("MONGO_HOST", "127.0.0.1")
         self.MONGO_PORT = os.getenv("MONGO_PORT", 27017)
         self.MONGO_USER = os.getenv("MONGO_USER", "mongo")
         self.MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "mongo")

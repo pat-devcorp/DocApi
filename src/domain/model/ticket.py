@@ -1,13 +1,10 @@
 import json
 from enum import Enum
 
-from pydantic import BaseModel
-
-from utils.ResponseHandler import SCHEMA_NOT_MATCH
-from utils.StrHandler import valMaxLength
-
 from ...domain.DomainError import DomainError
 from ...utils.DatetimeHandler import DateTimeHandler, checkDatetimeFormat
+from ...utils.ResponseHandler import SCHEMA_NOT_MATCH
+from ...utils.StrHandler import valMaxLength
 from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
 
 
@@ -55,7 +52,7 @@ class TicketValidator:
         for k, v in ref_object.items():
             if is_partial and v is None:
                 continue
-            if func := validate_func.get(k):
+            if (func := validate_func.get(k)) is not None:
                 is_ok, err = func(v)
                 if not is_ok:
                     errors.append(err)
@@ -116,7 +113,8 @@ class TicketIdentifier:
         self.value = identifier.setIdentifier(value)
 
 
-class Ticket(BaseModel, TicketIdentifier):
+class Ticket:
+    ticketId: TicketIdentifier
     description: str
     category: TicketCategory
     typeCommit: TicketTypeCommit
@@ -187,7 +185,7 @@ class Ticket(BaseModel, TicketIdentifier):
         points: int,
         estimateEndAt: DateTimeHandler,
     ) -> None:
-        TicketIdentifier.__init__(ticketId)
+        self.ticketId = TicketIdentifier(ticketId)
         self.description = description
         self.category = category
         self.typeCommit = typeCommit

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from ...presentation.controller.ticket import TicketController
-from ..ResponseHandler import REQUIRED_FIELD, WRITER_NOT_PROVIDED
+from ..HttpHandler import REQUIRED_FIELD, WRITER_NOT_PROVIDED
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
@@ -11,7 +11,7 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 def createTicket():
     params = request.args.to_dict()
 
-    if writeUId := params.get("writeUId"):
+    if (writeUId := params.get("writeUId")) is None:
         code, message = WRITER_NOT_PROVIDED
         return jsonify(code, message)
 
@@ -26,7 +26,7 @@ def createTicket():
 def fetchTickets(id=None):
     params = request.args.to_dict()
 
-    if writeUId := params.get("writeUId"):
+    if (writeUId := params.get("writeUId")) is None:
         code, message = WRITER_NOT_PROVIDED
         return jsonify(code, message)
 
@@ -43,10 +43,10 @@ def fetchTickets(id=None):
 def updateTicket(id):
     params = request.args.to_dict()
 
-    if writeUId := params.get("writeUId"):
+    if (writeUId := params.get("writeUId")) is None:
         code, message = WRITER_NOT_PROVIDED
         return jsonify(code, message)
-    if ticketId := params.get("ticketId"):
+    if (ticketId := params.get("ticketId")) is None:
         code, message = REQUIRED_FIELD
         return jsonify(code, message)
 
@@ -60,10 +60,10 @@ def updateTicket(id):
 def deleteTicket(id):
     params = request.args.to_dict()
 
-    if writeUId := params.get("writeUId"):
+    if (writeUId := params.get("writeUId")) is None:
         code, message = WRITER_NOT_PROVIDED
         return jsonify(code, message)
-    if ticketId := params.get("ticketId"):
+    if (ticketId := params.get("ticketId")) is None:
         code, message = REQUIRED_FIELD
         return jsonify(code, message)
 

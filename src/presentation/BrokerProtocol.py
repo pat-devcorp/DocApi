@@ -3,8 +3,8 @@ from typing import Protocol
 
 
 class BrokerProtocol(Protocol):
-    def setToDefault(self):
+    def setDefault(self):
         pass
 
-    def sendMessage(self, topic: Enum, message: str):
+    def send(self, topic: Enum, message: str):
         pass

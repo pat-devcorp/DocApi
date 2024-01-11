@@ -2,13 +2,16 @@ from enum import Enum
 
 
 class BrokerMock:
+    queue: str
+    data: dict
+
     @property
-    def chain_connection(self) -> str:
+    def getDSN(self) -> str:
         pass
 
     @classmethod
-    def setToDefault(cls):
+    def setDefault(cls):
         pass
 
-    def sendMessage(self, topic: Enum, message: str):
+    def send(self, topic: Enum, message: str):
         pass

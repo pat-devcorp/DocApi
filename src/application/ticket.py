@@ -3,7 +3,7 @@ from typing import Protocol
 
 from ..domain.IdentifierHandler import IdentifierHandler
 from ..domain.model.ticket import Ticket, TicketIdentifier
-from ..utils.ResponseHandler import DB_GET_FAIL
+from ..utils.ResponseHandler import DB_ID_NOT_FOUND
 from .ApplicationError import ApplicationError
 from .AuditHandler import AuditHandler
 
@@ -61,15 +61,15 @@ class TicketApplication:
 
     def delete(self, objId: TicketIdentifier) -> None:
         if self._r.entityExists(objId):
-            raise ApplicationError(DB_GET_FAIL, "Entity ticket not exists")
+            raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
         audit = AuditHandler.getUpdateFields(self._w)
         self.update(objId, audit)
         return self._r.delete(objId)
 
     def update(self, objId: TicketIdentifier, data) -> None:
-        if ticket := self._r.getById(objId):
-            raise ApplicationError(DB_GET_FAIL, "Entity ticket not exists")
+        if (ticket := self._r.getById(objId)) is None:
+            raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
         data.pop("ticketId")
         ticket.update(data)

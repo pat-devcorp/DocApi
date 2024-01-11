@@ -1,7 +1,7 @@
 from ...application.ticket import TicketApplication
 from ...domain.model.ticket import Ticket, TicketIdentifier
 from ...infrastructure.broker.BrokerMock import BrokerMock
-from ...infrastructure.repositories.ticket_mongo import Ticket as TicketRepository
+from ...infrastructure.repositories.ticket_mongo import TicketMongo
 from ...utils.ResponseHandler import ID_NOT_VALID
 from ..BrokerProtocol import BrokerProtocol
 from ..ExceptionHandler import exception_handler
@@ -17,8 +17,8 @@ class TicketController:
         ref_broker: None | BrokerProtocol = None,
     ) -> None:
         _w = ref_writeUId
-        _r = TicketRepository() if ref_repository is None else ref_repository
-        _b = BrokerMock.setToDefault() if ref_broker is None else ref_broker
+        _r = TicketMongo() if ref_repository is None else ref_repository
+        _b = BrokerMock.setDefault() if ref_broker is None else ref_broker
         self._uc = TicketApplication(_w, _r, _b)
 
     @staticmethod

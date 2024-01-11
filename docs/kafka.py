@@ -20,18 +20,18 @@ class KafkaBroker:
         self.prefix = my_config.KAFKA_PREFIX
 
     @property
-    def chain_connection(self):
+    def getDSN(self):
         return self.host + ":" + str(self.port)
 
     @classmethod
-    def setToDefault(cls):
+    def setDefault(cls):
         my_config = Config()
         return cls(my_config.KAFKA_HOST, my_config.KAFKA_PORT)
 
     def startConnection(self):
         try:
             self.producer = KafkaProducer(
-                bootstrap_servers=self.chain_connection,
+                bootstrap_servers=self.getDSN,
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
             )
         except Exception:
@@ -60,8 +60,8 @@ class KafkaBroker:
 
 # def test_kafka_producer():
 #     print("----KAFKA PROD")
-#     kafka_producer = Kafka.setToDefault()
-#     assert kafka_producer.chain_connection == "172.25.0.2:9092"
+#     kafka_producer = Kafka.setDefault()
+#     assert kafka_producer.getDSN == "172.25.0.2:9092"
 #     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
 #     dto = {
@@ -70,7 +70,7 @@ class KafkaBroker:
 #         "description": "This is a ticket modified",
 #     }
 #     try:
-#         kafka_producer.sendMessage("create/task", str(dto))
+#         kafka_producer.send("create/task", str(dto))
 #         assert True
 #     except Exception as e:
 #         assert False
