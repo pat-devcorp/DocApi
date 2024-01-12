@@ -71,8 +71,8 @@ class Mongo:
             server=my_config.MONGO_HOST,
             port=my_config.MONGO_PORT,
             user=my_config.MONGO_USER,
-            password=my_config.MONGO_PASSWORD,
-            collection=my_config.MONGO_COLLECTION,
+            password=my_config.MONGO_PASS,
+            collection=my_config.MONGO_DB,
             tablename=tablename,
             pk=pk,
         )

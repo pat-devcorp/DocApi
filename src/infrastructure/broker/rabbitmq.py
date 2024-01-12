@@ -1,11 +1,13 @@
 import functools
 import json
+import os
 
 import pika
 from pydantic import BaseModel
 from pydantic.networks import IPvAnyAddress
 
 from infrastructure.config import Config
+from utils.DatetimeHandler import getDatetime
 
 from ...utils.ResponseHandler import (
     BROKER_CHANNEL_ERROR,
@@ -26,10 +28,11 @@ class RabbitmqServer(BaseModel):
 
 
 class PikaPublisher:
-    def __init__(self, rabbitmq_dto: RabbitmqServer):
+    def __init__(self, rabbitmq_dto: RabbitmqServer, in_lost_save_local: bool = True):
         self.rabbitmq_dto = rabbitmq_dto
         self.client = None
         self._channel = None
+        self.in_lost_save_local = in_lost_save_local
 
     @classmethod
     def setDefault(cls, queue_name):
@@ -38,12 +41,20 @@ class PikaPublisher:
             server=my_config.RABBITMQ_HOST,
             port=my_config.RABBITMQ_PORT,
             user=my_config.RABBITMQ_USER,
-            password=my_config.RABBITMQ_PASSWORD,
+            password=my_config.RABBITMQ_PASS,
             queue_name=queue_name,
             exchange_name="message_exchange",
             exchange_type="direct",
         )
         return cls(con)
+    
+    def _saveAsFile(self, message_type, message):
+        my_config = Config()
+        file_path = my_config.BROKER_LOST_MESSAGE_PATH
+        now = getDatetime()
+
+        with open(os.path.join(file_path, self.queue_name, now), 'w', encoding='utf-8') as f:
+            json.dump({"type": message_type, "data": message, "writeAt": now}, f, ensure_ascii=False, indent=4)
 
     def startConnection(self):
         try:
@@ -95,4 +106,6 @@ class PikaPublisher:
                 body=message,
             )
         except Exception as err:
+            if self.in_lost_save_local:
+                self._saveAsFile(message_type, message)
             raise InfrastructureError(BROKER_SEND_FAIL, str(err))

@@ -12,6 +12,7 @@ class Config:
         self.LOG_PATH = "src/log/api.log"
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
+        self.NAME = "task_" + self.API_VERSION
         self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
         self.SYSTEM_UID = os.getenv("SYSTEM_UID", "IamBatman")
 
@@ -23,13 +24,21 @@ class Config:
         self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
 
-        self.KAFKA_HOST = os.getenv("KAFKA_HOST", "172.25.0.2")
-        self.KAFKA_PORT = os.getenv("KAFKA_PORT", 9092)
+        self.BROKER = os.getenv("BROKER", False)
+        self.BROKER_LOST_MESSAGE_PATH = "src/log/broker_lost/"
+        if self.BROKER == "RABBITMQ":
+            self.RABBITMQ_HOST=os.environ["RABBITMQ_HOST"]
+            self.RABBITMQ_PORT=os.environ["RABBITMQ_PORT"]
+            self.RABBITMQ_USER=os.environ["RABBITMQ_USER"]
+            self.RABBITMQ_PASS=os.environ["RABBITMQ_PASS"]
+        if self.BROKER == "KAFKA":
+            self.KAFKA_HOST = os.environ["KAFKA_HOST"]
+            self.KAFKA_PORT = os.environ["KAFKA_PORT"]
 
-        self.MONGO_HOST = os.getenv("MONGO_HOST", "127.0.0.1")
-        self.MONGO_PORT = os.getenv("MONGO_PORT", 27017)
-        self.MONGO_USER = os.getenv("MONGO_USER", "mongo")
-        self.MONGO_PASSWORD = os.getenv("MONGO_PASSWORD", "mongo")
-        self.MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "dev")
-
-        self.KAFKA_PREFIX = "task:" + self.API_VERSION
+        self.DB = os.getenv("DB", False)
+        if self.DB == "MONGO":
+            self.MONGO_HOST = os.environ["MONGO_HOST"]
+            self.MONGO_PORT = os.environ["MONGO_PORT"]
+            self.MONGO_USER = os.environ["MONGO_USER"]
+            self.MONGO_PASS = os.environ["MONGO_PASS"]
+            self.MONGO_DB = os.environ["MONGO_DB"]
