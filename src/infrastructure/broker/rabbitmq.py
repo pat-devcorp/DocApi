@@ -47,14 +47,21 @@ class PikaPublisher:
             exchange_type="direct",
         )
         return cls(con)
-    
+
     def _saveAsFile(self, message_type, message):
         my_config = Config()
         file_path = my_config.BROKER_LOST_MESSAGE_PATH
         now = getDatetime()
 
-        with open(os.path.join(file_path, self.queue_name, now), 'w', encoding='utf-8') as f:
-            json.dump({"type": message_type, "data": message, "writeAt": now}, f, ensure_ascii=False, indent=4)
+        with open(
+            os.path.join(file_path, self.queue_name, now), "w", encoding="utf-8"
+        ) as f:
+            json.dump(
+                {"type": message_type, "data": message, "writeAt": now},
+                f,
+                ensure_ascii=False,
+                indent=4,
+            )
 
     def startConnection(self):
         try:

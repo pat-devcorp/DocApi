@@ -27,10 +27,10 @@ class Config:
         self.BROKER = os.getenv("BROKER", False)
         self.BROKER_LOST_MESSAGE_PATH = "src/log/broker_lost/"
         if self.BROKER == "RABBITMQ":
-            self.RABBITMQ_HOST=os.environ["RABBITMQ_HOST"]
-            self.RABBITMQ_PORT=os.environ["RABBITMQ_PORT"]
-            self.RABBITMQ_USER=os.environ["RABBITMQ_USER"]
-            self.RABBITMQ_PASS=os.environ["RABBITMQ_PASS"]
+            self.RABBITMQ_HOST = os.environ["RABBITMQ_HOST"]
+            self.RABBITMQ_PORT = os.environ["RABBITMQ_PORT"]
+            self.RABBITMQ_USER = os.environ["RABBITMQ_USER"]
+            self.RABBITMQ_PASS = os.environ["RABBITMQ_PASS"]
         if self.BROKER == "KAFKA":
             self.KAFKA_HOST = os.environ["KAFKA_HOST"]
             self.KAFKA_PORT = os.environ["KAFKA_PORT"]

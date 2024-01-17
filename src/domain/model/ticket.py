@@ -147,7 +147,9 @@ class Ticket:
         return self.__str__()
 
     @classmethod
-    def newTicket(cls, ticketId, description) -> None | DomainError:
+    def newTicket(
+        cls, ticketId: TicketIdentifier, description: str
+    ) -> None | DomainError:
         is_ok, err = TicketValidator.isValidDescription(description)
         if not is_ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
