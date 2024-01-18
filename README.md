@@ -11,3 +11,5 @@
   - Local Variable in functions: Snake Case
   - decorators: Snake Case
   - reference to a class object: starts with ref_
+
+-States in model: use dates or state machines

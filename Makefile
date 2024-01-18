@@ -10,7 +10,7 @@
 # test:  Run pytest
 # run:  Executes the logic
 
-VENV_PATH = env/bin/activate
+VENV_PATH = .venv/bin/activate
 ENVIRONMENT_VARIABLE_FILE = .env
 DOCKER_NAME ?= my-docker-name
 DOCKER_TAG ?= latest
@@ -21,7 +21,9 @@ endef
 
 define export.functions
 	@unset $(grep -v '^#' $(ENVIRONMENT_VARIABLE_FILE) | sed -E 's/(.*)=.*/\1/' | xargs)
-	@export $(grep -v '^#' $(ENVIRONMENT_VARIABLE_FILE) | xargs)
+	# @export $(grep -v '^#' $(ENVIRONMENT_VARIABLE_FILE) | xargs)
+	@export $(cat $(ENVIRONMENT_VARIABLE_FILE) | xargs) 
+	@printenv
 endef
 
 help:
@@ -72,7 +74,8 @@ clean:
 
 test: ## Run pytest
 test:
-	pytest tests -p no:logging -p no:warnings
+	## pytest tests -p no:logging -p no:warnings
+	pytest tests -s
 
 build: ## Build docker image
 build:

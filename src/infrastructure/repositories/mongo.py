@@ -16,9 +16,9 @@ from ..InfrastructureError import InfrastructureError
 
 
 class MongoServer(BaseModel):
-    server: IPvAnyAddress
+    hostname: str
     port: int
-    user: str
+    username: str
     password: str
     collection: str
     tablename: str
@@ -53,24 +53,24 @@ def testMongo():
 class Mongo:
     def __init__(self, ref_mongo_server: MongoServer):
         self.mongo_server = ref_mongo_server
-        self.connection = None
-        self.collection = None
         self.client = None
+        self.collection = None
+        self.tablename = None
 
     @property
     def getDSN(self):
         return (
-            f"mongodb://{self.mongo_server.user}:{self.mongo_server.password}@"
-            f"{self.mongo_server.server}:{self.mongo_server.port}/?authMechanism=DEFAULT"
+            f"mongodb://{self.mongo_server.username}:{self.mongo_server.password}@"
+            f"{self.mongo_server.hostname}:{self.mongo_server.port}"
         )
 
     @classmethod
     def setDefault(cls, tablename, pk):
         my_config = Config()
         con = MongoServer(
-            server=my_config.MONGO_HOST,
+            hostname=my_config.MONGO_HOST,
             port=my_config.MONGO_PORT,
-            user=my_config.MONGO_USER,
+            username=my_config.MONGO_USER,
             password=my_config.MONGO_PASS,
             collection=my_config.MONGO_DB,
             tablename=tablename,
@@ -80,9 +80,14 @@ class Mongo:
 
     def startConnection(self) -> bool | InfrastructureError:
         try:
-            self.client = MongoClient(self.getDSN)
-            self.connection = self.client[self.mongo_server.collection]
-            self.collection = self.collection[self.mongo_server.tablename]
+            self.client = MongoClient(
+                self.mongo_server.hostname,
+                self.mongo_server.port,
+                self.mongo_server.username,
+                self.mongo_server.password,
+            )
+            self.collection = self.client[self.mongo_server.collection]
+            self.tablename = self.collection[self.mongo_server.tablename]
         except Exception as err:
             raise InfrastructureError(
                 DB_CONNECTION_FAIL,
@@ -92,7 +97,7 @@ class Mongo:
     def manage_connection(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if not self.collection or self.client:
+            if self.collection is None or self.client is None:
                 self.startConnection()
             try:
                 return func(self, *args, **kwargs)
@@ -104,32 +109,32 @@ class Mongo:
         return wrapper
 
     def fetch(self, attrs: List[str]) -> List[Dict] | InfrastructureError:
-        return list(self.collection.find({}, {attr: 1 for attr in attrs}))
+        return list(self.tablename.find({}, {attr: 1 for attr in attrs}))
 
     def getByID(
         self, identifier: str, attrs: List[str]
     ) -> Dict | None | InfrastructureError:
-        return self.collection.find_one(
+        return self.tablename.find_one(
             {self.pk: identifier}, {attr: 1 for attr in attrs}
         )
 
     @manage_connection
     def delete(self, identifier: str):
         try:
-            self.collection.delete_one({self.pk: identifier})
+            self.tablename.delete_one({self.pk: identifier})
         except Exception as err:
             raise InfrastructureError(DB_DELETE_FAIL, str(err))
 
     @manage_connection
     def update(self, identifier: str, kwargs: dict):
         try:
-            self.collection.update_one({self.pk: identifier}, {"$set": kwargs})
+            self.tablename.update_one({self.pk: identifier}, {"$set": kwargs})
         except Exception as err:
             raise InfrastructureError(DB_UPDATE_FAIL, str(err))
 
     @manage_connection
     def create(self, kwargs: dict):
         try:
-            self.collection.insert_one(kwargs)
+            self.tablename.insert_one(kwargs)
         except Exception as err:
             raise InfrastructureError(DB_CREATE_FAIL, str(err))

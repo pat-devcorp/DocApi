@@ -1,5 +1,6 @@
 import pytest
 
+from src.infrastructure.config import Config
 from src.infrastructure.repositories.mongo import testMongo
 from src.web.server import createServer
 
