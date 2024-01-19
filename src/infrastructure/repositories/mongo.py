@@ -1,12 +1,9 @@
-import functools
 from typing import Dict, List
 
 from pydantic import BaseModel
-from pydantic.networks import IPvAnyAddress
 from pymongo import MongoClient
 
 from ...utils.ResponseHandler import (
-    DB_CONNECTION_FAIL,
     DB_CREATE_FAIL,
     DB_DELETE_FAIL,
     DB_UPDATE_FAIL,
@@ -15,17 +12,7 @@ from ..config import Config
 from ..InfrastructureError import InfrastructureError
 
 
-class MongoServer(BaseModel):
-    hostname: str
-    port: int
-    username: str
-    password: str
-    collection: str
-    tablename: str
-    pk: str
-
-
-def testMongo():
+def mongoTestingInterface():
     mongo_repository = Mongo.setDefault("test", "identifier")
     print(f"CONNECTION: {mongo_repository.getDSN}")
 
@@ -43,26 +30,54 @@ def testMongo():
     text = "It was modified"
     mongo_repository.update(current_id, {"description": text})
 
-    data = mongo_repository.getById(current_id, ["description"])
-    assert data["description"] == text
+    item = mongo_repository.getById(current_id, ["description"])
+    assert item["description"] == text
 
     mongo_repository.delete(current_id)
     assert mongo_repository.getById(current_id, ["description"]) is None
 
 
+class MongoServer(BaseModel):
+    hostname: str
+    port: int
+    username: str
+    password: str
+    collection: str
+    tablename: str
+    pk: str
+
+
 class Mongo:
     def __init__(self, ref_mongo_server: MongoServer):
-        self.mongo_server = ref_mongo_server
+        self.server = ref_mongo_server
+        self.pk = ref_mongo_server.pk
         self.client = None
         self.collection = None
-        self.tablename = None
 
     @property
     def getDSN(self):
-        return (
-            f"mongodb://{self.mongo_server.username}:{self.mongo_server.password}@"
-            f"{self.mongo_server.hostname}:{self.mongo_server.port}"
-        )
+        return f"mongodb://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
+
+    def _connect(self):
+        if self.client is None:
+            self.client = MongoClient(self.getDSN)
+            self.collection = self.client[self.server.collection][
+                self.server.tablename
+            ]  # Access collection directly
+
+    @property
+    def cursor(self):
+        self._connect()
+        return self.collection  # Use collection as cursor
+
+    def __enter__(self):
+        self._connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.client:
+            self.client.close()
+            self.client = None
 
     @classmethod
     def setDefault(cls, tablename, pk):
@@ -78,63 +93,35 @@ class Mongo:
         )
         return cls(con)
 
-    def startConnection(self) -> bool | InfrastructureError:
-        try:
-            self.client = MongoClient(
-                self.mongo_server.hostname,
-                self.mongo_server.port,
-                self.mongo_server.username,
-                self.mongo_server.password,
-            )
-            self.collection = self.client[self.mongo_server.collection]
-            self.tablename = self.collection[self.mongo_server.tablename]
-        except Exception as err:
-            raise InfrastructureError(
-                DB_CONNECTION_FAIL,
-                f"{self.getDSN}\n{str(err)}",
-            )
-
-    def manage_connection(func):
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if self.collection is None or self.client is None:
-                self.startConnection()
-            try:
-                return func(self, *args, **kwargs)
-            finally:
-                # Close connection only when necessary (e.g., when encountering errors)
-                if self.client and not self.client.is_closed:
-                    self.client.close()
-
-        return wrapper
-
     def fetch(self, attrs: List[str]) -> List[Dict] | InfrastructureError:
-        return list(self.tablename.find({}, {attr: 1 for attr in attrs}))
+        data = list(self.cursor.find({}, {attr: 1 for attr in attrs}))
+        for item in data:
+            item[self.pk] = item.pop("_id")
+        return data
 
-    def getByID(
+    def getById(
         self, identifier: str, attrs: List[str]
     ) -> Dict | None | InfrastructureError:
-        return self.tablename.find_one(
-            {self.pk: identifier}, {attr: 1 for attr in attrs}
-        )
+        item = self.cursor.find_one({"_id": identifier}, {attr: 1 for attr in attrs})
+        if item:
+            item[self.pk] = item.pop("_id")
+        return item
 
-    @manage_connection
     def delete(self, identifier: str):
         try:
-            self.tablename.delete_one({self.pk: identifier})
+            self.cursor.delete_one({"_id": identifier})
         except Exception as err:
             raise InfrastructureError(DB_DELETE_FAIL, str(err))
 
-    @manage_connection
     def update(self, identifier: str, kwargs: dict):
         try:
-            self.tablename.update_one({self.pk: identifier}, {"$set": kwargs})
+            self.cursor.update_one({"_id": identifier}, {"$set": kwargs})
         except Exception as err:
             raise InfrastructureError(DB_UPDATE_FAIL, str(err))
 
-    @manage_connection
     def create(self, kwargs: dict):
         try:
-            self.tablename.insert_one(kwargs)
+            kwargs["_id"] = kwargs.pop(self.pk)
+            self.cursor.insert_one(kwargs)
         except Exception as err:
             raise InfrastructureError(DB_CREATE_FAIL, str(err))

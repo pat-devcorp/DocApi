@@ -1,46 +1,98 @@
-import functools
 import json
 import os
 
 import pika
 from pydantic import BaseModel
-from pydantic.networks import IPvAnyAddress
 
-from infrastructure.config import Config
-from utils.DatetimeHandler import getDatetime
+from ...infrastructure.config import Config
+from ...utils.DatetimeHandler import getDatetime
 
 from ...utils.ResponseHandler import (
-    BROKER_CHANNEL_ERROR,
-    BROKER_CONNECTION_FAIL,
     BROKER_SEND_FAIL,
 )
 from ..InfrastructureError import InfrastructureError
 
 
+def rabbitmqTestingInterface():
+    rabbitmq_broker = Rabbitmq.setDefault("test")
+    print(f"CONNECTION: {rabbitmq_broker.getDSN}")
+    rabbitmq_broker.send_message("testing...")
+
+
 class RabbitmqServer(BaseModel):
-    server: IPvAnyAddress
+    hostname: str
     port: int
-    user: str
+    username: str
     password: str
     queue_name: str
     exchange_name: str
     exchange_type: str
 
 
-class PikaPublisher:
-    def __init__(self, rabbitmq_dto: RabbitmqServer, in_lost_save_local: bool = True):
-        self.rabbitmq_dto = rabbitmq_dto
+class Rabbitmq:
+    def __init__(
+        self, rabbitmq_server: RabbitmqServer, in_lost_save_local: bool = True
+    ):
+        self.server = rabbitmq_server
         self.client = None
-        self._channel = None
+        self.channel = None
         self.in_lost_save_local = in_lost_save_local
+
+    @property
+    def getDSN(self):
+        return f"rabbitmq://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
+
+    def _saveAsFile(self, message_type, message):
+        my_config = Config()
+        file_path = os.path.join(my_config.BROKER_LOST_MESSAGE_PATH, self.server.queue_name)
+        # Ensure the directory structure exists
+        os.makedirs(file_path, exist_ok=True)
+
+        file_name = os.path.join(file_path, getDatetime() + ".log")
+
+        with open(file_name, "a+", encoding="utf-8") as f:
+            # Check if the file is empty (newly created) and add '['
+            f.seek(0, os.SEEK_END)
+            if f.tell() == 0:
+                f.write("[")
+            else:
+                # Move the cursor to the end of the file
+                f.seek(0, os.SEEK_END)
+                # Move one position back to overwrite the trailing ']'
+                f.seek(f.tell() - 1, os.SEEK_SET)
+                # Add a comma to separate JSON objects
+                f.write(",")
+
+            # Dump the JSON data
+            json.dump(
+                {"type": message_type, "data": message, "writeAt": getDatetime()},
+                f,
+                ensure_ascii=False,
+                indent=4,
+            )
+
+            # Add a closing square bracket
+            f.write("]")
+
+    def __enter__(self):
+        self.connection = pika.BlockingConnection(self.parameters)
+        self.channel = self.connection.channel()
+        self.channel.exchange_declare(
+            exchange=self.exchange_name, exchange_type=self.exchange_type
+        )
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.connection:
+            self.connection.close()
 
     @classmethod
     def setDefault(cls, queue_name):
         my_config = Config()
         con = RabbitmqServer(
-            server=my_config.RABBITMQ_HOST,
+            hostname=my_config.RABBITMQ_HOST,
             port=my_config.RABBITMQ_PORT,
-            user=my_config.RABBITMQ_USER,
+            username=my_config.RABBITMQ_USER,
             password=my_config.RABBITMQ_PASS,
             queue_name=queue_name,
             exchange_name="message_exchange",
@@ -48,71 +100,17 @@ class PikaPublisher:
         )
         return cls(con)
 
-    def _saveAsFile(self, message_type, message):
-        my_config = Config()
-        file_path = my_config.BROKER_LOST_MESSAGE_PATH
-        now = getDatetime()
-
-        with open(
-            os.path.join(file_path, self.queue_name, now), "w", encoding="utf-8"
-        ) as f:
-            json.dump(
-                {"type": message_type, "data": message, "writeAt": now},
-                f,
-                ensure_ascii=False,
-                indent=4,
-            )
-
-    def startConnection(self):
+    def send_message(self, message):
         try:
-            credentials = pika.PlainCredentials(
-                self.rabbitmq_dto.user, self.rabbitmq_dto.password
-            )
-            self.client = pika.BlockingConnection(
-                pika.ConnectionParameters(
-                    host=self.rabbitmq_dto.server,
-                    port=self.rabbitmq_dto.port,
-                    credentials=credentials,
-                )
-            )
-        except Exception as err:
-            raise InfrastructureError(BROKER_CONNECTION_FAIL, str(err))
-
-    def _setChannel(self):
-        if not self.client or self.client.is_closed:
-            self._start_connection()
-        try:
-            self._channel = self.client.channel()
-            self._channel.exchange_declare(
-                exchange=self.exchange_name, exchange_type=self.exchange_type
-            )
-        except Exception as err:
-            raise InfrastructureError(BROKER_CHANNEL_ERROR, str(err))
-
-    def manage_connection(func):
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            if not self._channel or self._channel.is_closed:
-                self._setChannel()
-            try:
-                return func(self, *args, **kwargs)
-            finally:
-                # Close connection only when necessary (e.g., when encountering errors)
-                if self.client and not self.client.is_closed:
-                    self.client.close()
-
-        return wrapper
-
-    @manage_connection
-    def send_message(self, message_type, message):
-        try:
-            message = json.dumps({"type": message_type, "message": message})
-            self._channel.basic_publish(
-                exchange=self.rabbitmq_dto.message_exchange,
-                routing_key=self.rabbitmq_dto.queue_name,
+            self.channel.basic_publish(
+                exchange=self.exchange_name,
+                routing_key=self.queue_name,
                 body=message,
             )
-        except Exception as err:
-            if self.in_lost_save_local:
-                self._saveAsFile(message_type, message)
-            raise InfrastructureError(BROKER_SEND_FAIL, str(err))
+            print(f"Message sent to queue: {self.queue_name}")
+        except pika.exceptions.AMQPConnectionError:
+            print("Connection to RabbitMQ failed")
+        except pika.exceptions.ChannelClosed:
+            print("Channel is closed")
+        except Exception as e:
+            print(f"Unexpected error: {e}")

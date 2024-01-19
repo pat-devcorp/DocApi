@@ -23,7 +23,7 @@ class Config:
         self.DATE_FORMAT = os.getenv("DATE_FORMAT", "%Y-%m-%d")
         self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
-        
+
         self.BROKER = os.getenv("BROKER", False)
         self.BROKER_LOST_MESSAGE_PATH = "src/log/broker_lost/"
         if self.BROKER == "RABBITMQ":

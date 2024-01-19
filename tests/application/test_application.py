@@ -35,11 +35,11 @@
 #     r = TicketRepository()
 #     lc = TicketController(current_user, r)
 #     try:
-#         lc.doGetByid(dto.ticketId)
+#         lc.dogetById(dto.ticketId)
 #     except DomainError as eu:
 #         assert True
 #     lc.doCreate(dto)
-#     data = lc.doGetByid(dto.ticketId)
+#     data = lc.dogetById(dto.ticketId)
 #     print(f"DATA: {data}")
 #     assert data
 #     dto.description = "I was updated successfully"
