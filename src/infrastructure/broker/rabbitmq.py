@@ -15,7 +15,6 @@ from ..InfrastructureError import InfrastructureError
 
 def rabbitmqTestingInterface():
     rabbitmq_broker = Rabbitmq.setDefault("test")
-    print(f"CONNECTION: {rabbitmq_broker.getDSN}")
     rabbitmq_broker.send_message("testing...")
 
 
@@ -40,7 +39,7 @@ class Rabbitmq:
 
     @property
     def getDSN(self):
-        return f"rabbitmq://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
+        return f"amqp://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}/%2F"
 
     def _saveAsFile(self, message_type, message):
         my_config = Config()
@@ -75,16 +74,19 @@ class Rabbitmq:
             f.write("]")
 
     def __enter__(self):
-        self.connection = pika.BlockingConnection(self.parameters)
-        self.channel = self.connection.channel()
-        self.channel.exchange_declare(
-            exchange=self.exchange_name, exchange_type=self.exchange_type
-        )
+        print("CONNECTING")
+        credentials = pika.PlainCredentials(self.server.username, self.server.password)
+        parameters = pika.ConnectionParameters(host=self.server.hostname, port=self.server.port, credentials=credentials)
+        self.client = pika.BlockingConnection(parameters)
+
+        self.channel = self.client.channel()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.connection:
-            self.connection.close()
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("EXIT")
+        if self.client:
+            self.client.close()
+
 
     @classmethod
     def setDefault(cls, queue_name):
@@ -101,13 +103,14 @@ class Rabbitmq:
         return cls(con)
 
     def send_message(self, message):
+        print("SENDING...")
         try:
             self.channel.basic_publish(
-                exchange=self.exchange_name,
-                routing_key=self.queue_name,
+                exchange='',
+                routing_key=self.server.queue_name,
                 body=message,
             )
-            print(f"Message sent to queue: {self.queue_name}")
+            print(f"Message sent to queue: {self.server.queue_name}")
         except pika.exceptions.AMQPConnectionError:
             print("Connection to RabbitMQ failed")
         except pika.exceptions.ChannelClosed:
