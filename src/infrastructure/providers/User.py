@@ -2,10 +2,6 @@
 # from ..config import Config
 
 
-def testUserService(userUId):
-    pass
-
-
 class UserService:
     @staticmethod
     def isValidUserId(userUId):
@@ -14,3 +10,11 @@ class UserService:
         # r = requests.get(my_config.USER_API, params=payload)
         # return True if r.status_code == 200 else False
         return True
+
+
+def getMock():
+    return "87378b40-894c-11ee-b9d1-0242ac120002"
+
+
+def testUserService(userUId):
+    pass

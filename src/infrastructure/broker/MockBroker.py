@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class BrokerMock:
+class MockBroker:
     queue: str
     data: dict
 
@@ -13,5 +13,5 @@ class BrokerMock:
     def setDefault(cls):
         pass
 
-    def send(self, topic: Enum, message: str):
+    def publish(self, topic: Enum, message: str):
         pass

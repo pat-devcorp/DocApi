@@ -24,11 +24,19 @@ class IdentifierHandler:
         self.value = identifier
 
     def getIdentifier(self):
-        identifier_functions = [self.getDefault, self.getUuidV4, self.getDefault]
+        identifier_functions = [self.getString, self.getUuidV4, self.getString]
         self.value = identifier_functions[self.algorithm]()
 
+    @classmethod
+    def getDefault(cls, algorithm: IdentityAlgorithm):
+        default = [
+            cls.getString,
+            cls.getUuidV4,
+        ]
+        return default[algorithm.value]()
+
     @staticmethod
-    def getDefault():
+    def getString():
         return "DEFAULT"
 
     @staticmethod
@@ -37,12 +45,12 @@ class IdentifierHandler:
 
     @classmethod
     def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
-        identifier_functions = [
+        validator = [
             cls.isValidDefault,
             cls.isValidUuidV4,
             cls.isValidUserId,
         ]
-        return identifier_functions[algorithm.value](identifier)
+        return validator[algorithm.value](identifier)
 
     @staticmethod
     def isValidDefault(identifier):

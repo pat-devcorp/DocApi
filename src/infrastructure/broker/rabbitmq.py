@@ -6,16 +6,12 @@ from pydantic import BaseModel
 
 from ...infrastructure.config import Config
 from ...utils.DatetimeHandler import getDatetime
-
 from ...utils.ResponseHandler import (
+    BROKER_CHANNEL_ERROR,
+    BROKER_CONNECTION_FAIL,
     BROKER_SEND_FAIL,
 )
 from ..InfrastructureError import InfrastructureError
-
-
-def rabbitmqTestingInterface():
-    rabbitmq_broker = Rabbitmq.setDefault("test")
-    rabbitmq_broker.send_message("testing...")
 
 
 class RabbitmqServer(BaseModel):
@@ -24,8 +20,6 @@ class RabbitmqServer(BaseModel):
     username: str
     password: str
     queue_name: str
-    exchange_name: str
-    exchange_type: str
 
 
 class Rabbitmq:
@@ -41,9 +35,54 @@ class Rabbitmq:
     def getDSN(self):
         return f"amqp://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}/%2F"
 
+    @classmethod
+    def setDefault(cls, queue_name):
+        my_config = Config()
+        con = RabbitmqServer(
+            hostname=my_config.RABBITMQ_HOST,
+            port=my_config.RABBITMQ_PORT,
+            username=my_config.RABBITMQ_USER,
+            password=my_config.RABBITMQ_PASS,
+            queue_name=queue_name,
+        )
+        return cls(con)
+
+    def _connect(self):
+        credentials = pika.PlainCredentials(self.server.username, self.server.password)
+        parameters = pika.ConnectionParameters(
+            host=self.server.hostname, port=self.server.port, credentials=credentials
+        )
+        self.client = pika.BlockingConnection(parameters)
+
+        self.channel = self.client.channel()
+
+    def publish(self, message):
+        try:
+            self._connect()
+            self.channel.basic_publish(
+                exchange="",
+                routing_key=self.server.queue_name,
+                body=message,
+            )
+            print(f"Message sent to queue: {self.server.queue_name}")
+        except pika.exceptions.AMQPConnectionError:
+            raise InfrastructureError(
+                BROKER_CONNECTION_FAIL, "Connection to RabbitMQ failed"
+            )
+        except pika.exceptions.ChannelClosed:
+            raise InfrastructureError(BROKER_CHANNEL_ERROR, "Channel is closed")
+        except Exception as e:
+            self._saveAsFile("json", str(e))
+            raise InfrastructureError(BROKER_SEND_FAIL, str(e))
+        finally:
+            if self.client:
+                self.client.close()
+
     def _saveAsFile(self, message_type, message):
         my_config = Config()
-        file_path = os.path.join(my_config.BROKER_LOST_MESSAGE_PATH, self.server.queue_name)
+        file_path = os.path.join(
+            my_config.BROKER_LOST_MESSAGE_PATH, self.server.queue_name
+        )
         # Ensure the directory structure exists
         os.makedirs(file_path, exist_ok=True)
 
@@ -73,47 +112,8 @@ class Rabbitmq:
             # Add a closing square bracket
             f.write("]")
 
-    def __enter__(self):
-        print("CONNECTING")
-        credentials = pika.PlainCredentials(self.server.username, self.server.password)
-        parameters = pika.ConnectionParameters(host=self.server.hostname, port=self.server.port, credentials=credentials)
-        self.client = pika.BlockingConnection(parameters)
 
-        self.channel = self.client.channel()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("EXIT")
-        if self.client:
-            self.client.close()
-
-
-    @classmethod
-    def setDefault(cls, queue_name):
-        my_config = Config()
-        con = RabbitmqServer(
-            hostname=my_config.RABBITMQ_HOST,
-            port=my_config.RABBITMQ_PORT,
-            username=my_config.RABBITMQ_USER,
-            password=my_config.RABBITMQ_PASS,
-            queue_name=queue_name,
-            exchange_name="message_exchange",
-            exchange_type="direct",
-        )
-        return cls(con)
-
-    def send_message(self, message):
-        print("SENDING...")
-        try:
-            self.channel.basic_publish(
-                exchange='',
-                routing_key=self.server.queue_name,
-                body=message,
-            )
-            print(f"Message sent to queue: {self.server.queue_name}")
-        except pika.exceptions.AMQPConnectionError:
-            print("Connection to RabbitMQ failed")
-        except pika.exceptions.ChannelClosed:
-            print("Channel is closed")
-        except Exception as e:
-            print(f"Unexpected error: {e}")
+# Test
+def rabbitmqTestingInterface():
+    rabbitmq_broker = Rabbitmq.setDefault("test")
+    rabbitmq_broker.publish("testing...")

@@ -33,7 +33,7 @@ class TicketRepositoryProtocol(Protocol):
 
 
 class TicketBrokerProtocol(Protocol):
-    def pub(subject, data):
+    def publish(subject, data):
         pass
 
 
@@ -65,6 +65,7 @@ class TicketApplication:
 
         audit = AuditHandler.getUpdateFields(self._w)
         self.update(objId, audit)
+
         return self._r.delete(objId)
 
     def update(self, objId: TicketIdentifier, data) -> None:
@@ -74,9 +75,11 @@ class TicketApplication:
         data.pop("ticketId")
         ticket.update(data)
         ticket.update(AuditHandler.getUpdateFields(self._w))
+
         return self._r.update(ticket)
 
     def create(self, obj: Ticket) -> None:
         ticket = obj.asDict()
         ticket.update(AuditHandler.getCreateFields(self._w))
+
         return self._r.create(ticket)

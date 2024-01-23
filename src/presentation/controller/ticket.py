@@ -1,6 +1,6 @@
 from ...application.ticket import TicketApplication
-from ...domain.model.ticket import Ticket, TicketIdentifier
-from ...infrastructure.broker.BrokerMock import BrokerMock
+from ...domain.model.ticket import TicketInterface
+from ...infrastructure.broker.MockBroker import BrokerMock
 from ...infrastructure.repositories.ticket_mongo import TicketMongo
 from ...utils.ResponseHandler import ID_NOT_VALID
 from ..BrokerProtocol import BrokerProtocol
@@ -51,7 +51,7 @@ class TicketController:
     @exception_handler
     def getById(self, identifier):
         try:
-            ticketId = TicketIdentifier(identifier)
+            ticketId = TicketInterface.setIdentifier(identifier)
         except ValueError:
             raise PresentationError(ID_NOT_VALID)
 
@@ -60,7 +60,7 @@ class TicketController:
     @exception_handler
     def delete(self, identifier):
         try:
-            ticketId = TicketIdentifier(identifier)
+            ticketId = TicketInterface.setIdentifier(identifier)
         except ValueError:
             raise PresentationError(ID_NOT_VALID)
 
@@ -69,7 +69,7 @@ class TicketController:
     @exception_handler
     def update(self, identifier, params: dict):
         try:
-            ticketId = TicketIdentifier(identifier)
+            ticketId = TicketInterface.setIdentifier(identifier)
         except ValueError:
             raise PresentationError(ID_NOT_VALID)
 
@@ -77,5 +77,5 @@ class TicketController:
 
     @exception_handler
     def create(self, ticketId, description):
-        obj = Ticket.newTicket(ticketId, description)
+        obj = TicketInterface.newTicket(ticketId, description)
         return self._uc.create(obj)

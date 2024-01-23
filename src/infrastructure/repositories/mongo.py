@@ -3,38 +3,9 @@ from typing import Dict, List
 from pydantic import BaseModel
 from pymongo import MongoClient
 
-from ...utils.ResponseHandler import (
-    DB_CREATE_FAIL,
-    DB_DELETE_FAIL,
-    DB_UPDATE_FAIL,
-)
+from ...utils.ResponseHandler import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
 from ..config import Config
 from ..InfrastructureError import InfrastructureError
-
-
-def mongoTestingInterface():
-    mongo_repository = Mongo.setDefault("test", "identifier")
-    print(f"CONNECTION: {mongo_repository.getDSN}")
-
-    current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
-    dto = {
-        "writeUId": "8888",
-        "identifier": current_id,
-        "description": "This is description",
-    }
-    mongo_repository.create(dto)
-
-    data = mongo_repository.fetch(dto.keys())
-    assert data
-
-    text = "It was modified"
-    mongo_repository.update(current_id, {"description": text})
-
-    item = mongo_repository.getById(current_id, ["description"])
-    assert item["description"] == text
-
-    mongo_repository.delete(current_id)
-    assert mongo_repository.getById(current_id, ["description"]) is None
 
 
 class MongoServer(BaseModel):
@@ -125,3 +96,29 @@ class Mongo:
             self.cursor.insert_one(kwargs)
         except Exception as err:
             raise InfrastructureError(DB_CREATE_FAIL, str(err))
+
+
+# Test
+def mongoTestingInterface():
+    mongo_repository = Mongo.setDefault("test", "identifier")
+    print(f"CONNECTION: {mongo_repository.getDSN}")
+
+    current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
+    dto = {
+        "writeUId": "8888",
+        "identifier": current_id,
+        "description": "This is description",
+    }
+    mongo_repository.create(dto)
+
+    data = mongo_repository.fetch(dto.keys())
+    assert data
+
+    text = "It was modified"
+    mongo_repository.update(current_id, {"description": text})
+
+    item = mongo_repository.getById(current_id, ["description"])
+    assert item["description"] == text
+
+    mongo_repository.delete(current_id)
+    assert mongo_repository.getById(current_id, ["description"]) is None

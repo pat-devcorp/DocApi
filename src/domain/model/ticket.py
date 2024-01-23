@@ -1,11 +1,26 @@
-import json
+from collections import namedtuple
 from enum import Enum
 
 from ...domain.DomainError import DomainError
 from ...utils.DatetimeHandler import DateTimeHandler, checkDatetimeFormat
-from ...utils.ResponseHandler import SCHEMA_NOT_MATCH
+from ...utils.ResponseHandler import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ...utils.StrHandler import valMaxLength
 from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
+
+
+TicketIdentifier = namedtuple("TicketIdentifier", "value")
+Ticket = namedtuple(
+    "Ticket",
+    [
+        "ticketId",
+        "description",
+        "category",
+        "typeCommit",
+        "state",
+        "points",
+        "estimateEndAt",
+    ],
+)
 
 
 class TicketCategory(Enum):
@@ -41,6 +56,7 @@ class TicketValidator:
     @classmethod
     def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
         validate_func = {
+            "ticketId": cls.isValidIdentifier,
             "description": cls.isValidDescription,
             "category": cls.isValidCategory,
             "typeCommit": cls.isValidTypeCommit,
@@ -61,6 +77,14 @@ class TicketValidator:
             return False, "\n".join(errors)
 
         return True, ""
+
+    @staticmethod
+    def isValidIdentifier(identifier: str):
+        try:
+            TicketInterface.setIdentifier(identifier)
+            return True, ""
+        except DomainError:
+            return False, "Invalid identifier"
 
     @staticmethod
     def isValidState(state: int) -> tuple[bool, str]:
@@ -96,78 +120,31 @@ class TicketValidator:
         return True, ""
 
 
-class TicketIdentifier:
-    value: str
-
-    @staticmethod
+class TicketInterface:
+    @property
     def getIdAlgorithm():
         return IdentityAlgorithm.UUid_V4
 
     @classmethod
     def getIdentifier(cls):
-        identifier = IdentifierHandler(cls.getIdAlgorithm())
-        return cls(identifier.getDefault())
-
-    def __init__(self, value) -> None | ValueError:
-        identifier = IdentifierHandler(self.getIdAlgorithm())
-        self.value = identifier.setIdentifier(value)
-
-
-class Ticket:
-    ticketId: TicketIdentifier
-    description: str
-    category: TicketCategory
-    typeCommit: TicketTypeCommit
-    state: TicketState
-    points: int
-    estimateEndAt: DateTimeHandler
-
-    @staticmethod
-    def getFields():
-        return [
-            "ticketId",
-            "description",
-            "category",
-            "typeCommit",
-            "state",
-            "points",
-            "estimateEndAt",
-        ]
-
-    def asDict(self) -> dict:
-        data = dict()
-        for item in self.getFields():
-            val = self.__getattribute__(item)
-            data[item] = val if isinstance(val, (str, int)) else val.value
-
-    def __str__(self):
-        return json.dumps(self.asDict())
-
-    def __repr__(self):
-        return self.__str__()
+        ic = IdentifierHandler.getDefault(cls.getIdAlgorithm)
+        return TicketIdentifier(ic)
 
     @classmethod
-    def newTicket(
-        cls, ticketId: TicketIdentifier, description: str
-    ) -> None | DomainError:
-        is_ok, err = TicketValidator.isValidDescription(description)
-        if not is_ok:
-            raise DomainError(SCHEMA_NOT_MATCH, err)
-
-        return cls(
-            ticketId,
-            description,
-            TicketCategory.PENDENTS,
-            TicketTypeCommit.UNDEFINED,
-            TicketState.CREATED,
-            0,
-            DateTimeHandler.getDefault(),
+    def setIdentifier(cls, identifier):
+        is_ok, err = IdentifierHandler.isValid(
+            identifier, TicketInterface.getIdAlgorithm
         )
+        if not is_ok:
+            raise DomainError(ID_NOT_VALID, err)
+        return TicketIdentifier(identifier)
 
     @classmethod
     def fromDict(cls, item: dict):
-        TicketValidator.isValid(item, False)
-        return cls(
+        ok, err = TicketValidator.isValid(item, False)
+        if not ok:
+            raise DomainError(SCHEMA_NOT_MATCH, err)
+        return Ticket(
             item["ticketId"],
             item["description"],
             TicketCategory(item["category"]),
@@ -177,20 +154,20 @@ class Ticket:
             DateTimeHandler.fromStr(item["estimateEndAt"]),
         )
 
-    def __init__(
-        self,
-        ticketId: str,
-        description: str,
-        category: TicketCategory,
-        typeCommit: TicketTypeCommit,
-        state: TicketState,
-        points: int,
-        estimateEndAt: DateTimeHandler,
-    ) -> None:
-        self.ticketId = TicketIdentifier(ticketId)
-        self.description = description
-        self.category = category
-        self.typeCommit = typeCommit
-        self.state = state
-        self.points = points
-        self.estimateEndAt = estimateEndAt
+    @classmethod
+    def newTicket(
+        cls, identifier: TicketIdentifier, description: str
+    ) -> None | DomainError:
+        is_ok, err = TicketValidator.isValidDescription(description)
+        if not is_ok:
+            raise DomainError(SCHEMA_NOT_MATCH, err)
+
+        return Ticket(
+            identifier.value,
+            description,
+            TicketCategory.PENDENTS,
+            TicketTypeCommit.UNDEFINED,
+            TicketState.CREATED,
+            0,
+            DateTimeHandler.getDefault(),
+        )

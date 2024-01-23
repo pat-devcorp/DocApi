@@ -1,6 +1,6 @@
 from task.src.infrastructure.repositories.RepositoryMock import RepositoryMock
 
-from infrastructure.broker.BrokerMock import BrokerMock
+from infrastructure.broker.MockBroker import BrokerMock
 from src.presentation.controller.ticket import Ticket as TicketController
 from src.presentation.dto.ticket import TicketDto, TicketHandler
 
