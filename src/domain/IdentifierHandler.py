@@ -2,7 +2,6 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 from ..infrastructure.providers.User import UserService
-from ..utils.ResponseHandler import ID_NOT_VALID
 
 
 class IdentityAlgorithm(Enum):
@@ -12,20 +11,8 @@ class IdentityAlgorithm(Enum):
 
 
 class IdentifierHandler:
-    value = None
-
     def __init__(self, algorithm: IdentityAlgorithm):
         self.algorithm = algorithm
-
-    def setIdentifier(self, identifier) -> None | ValueError:
-        is_ok, err = self.isValid(identifier, self.algorithm)
-        if not is_ok:
-            raise ValueError(ID_NOT_VALID, err)
-        self.value = identifier
-
-    def getIdentifier(self):
-        identifier_functions = [self.getString, self.getUuidV4, self.getString]
-        self.value = identifier_functions[self.algorithm]()
 
     @classmethod
     def getDefault(cls, algorithm: IdentityAlgorithm):
@@ -41,7 +28,7 @@ class IdentifierHandler:
 
     @staticmethod
     def getUuidV4():
-        return uuid4()
+        return str(uuid4())
 
     @classmethod
     def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
@@ -72,6 +59,3 @@ class IdentifierHandler:
         if not UserService.isValidUserId(identifier):
             return False, "User does not exists"
         return True, ""
-
-    def __str__(self):
-        return str(self.value)

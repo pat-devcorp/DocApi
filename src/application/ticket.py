@@ -2,7 +2,8 @@ from enum import Enum
 from typing import Protocol
 
 from ..domain.IdentifierHandler import IdentifierHandler
-from ..domain.model.ticket import Ticket, TicketIdentifier
+from ..domain.model.ticket import Ticket, TicketIdentifier, TicketInterface
+from ..presentation.RepositoryProtocol import RepositoryProtocol
 from ..utils.ResponseHandler import DB_ID_NOT_FOUND
 from .ApplicationError import ApplicationError
 from .AuditHandler import AuditHandler
@@ -15,23 +16,6 @@ class TicketEvent(Enum):
     ADD_MEMBER = 3
 
 
-class TicketRepositoryProtocol(Protocol):
-    def fetch() -> list:
-        pass
-
-    def getById(objId) -> dict:
-        pass
-
-    def delete(objId) -> None:
-        pass
-
-    def update() -> None:
-        pass
-
-    def create() -> None:
-        pass
-
-
 class TicketBrokerProtocol(Protocol):
     def publish(subject, data):
         pass
@@ -42,44 +26,43 @@ class TicketApplication:
     def __init__(
         self,
         ref_writeUId: IdentifierHandler,
-        ref_repository: TicketRepositoryProtocol,
+        ref_repository: RepositoryProtocol,
         ref_broker: TicketBrokerProtocol,
     ):
         self._w = ref_writeUId
         self._r = ref_repository
         self._b = ref_broker
-        self._f = Ticket.getFields()
+        self._f = Ticket._fields
 
     def addAuditFields(self):
-        self._f += AuditHandler.getFields()
+        self._f += AuditHandler._fields
 
     def fetch(self) -> list[dict]:
         return self._r.fetch(self._f)
 
-    def getById(self, objId: TicketIdentifier) -> dict:
-        return self._r.getById(objId, self._f)
+    def getById(self, obj_id: TicketIdentifier) -> dict:
+        return self._r.getById(obj_id.value, self._f)
 
-    def delete(self, objId: TicketIdentifier) -> None:
-        if self._r.entityExists(objId):
+    def delete(self, obj_id: TicketIdentifier) -> None:
+        if not self._r.entityExists(obj_id):
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
         audit = AuditHandler.getUpdateFields(self._w)
-        self.update(objId, audit)
+        self.update(obj_id, audit)
 
-        return self._r.delete(objId)
+        return self._r.delete(obj_id.value)
 
-    def update(self, objId: TicketIdentifier, data) -> None:
-        if (ticket := self._r.getById(objId)) is None:
+    def update(self, obj_id: TicketIdentifier, data: dict) -> None:
+        if not self._r.entityExists(obj_id.value):
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
-        data.pop("ticketId")
-        ticket.update(data)
-        ticket.update(AuditHandler.getUpdateFields(self._w))
+        item = TicketInterface.validDict(data)
+        item = AuditHandler.getUpdateFields(self._w)
 
-        return self._r.update(ticket)
+        return self._r.update(obj_id.value, item)
 
     def create(self, obj: Ticket) -> None:
-        ticket = obj.asDict()
+        ticket = obj._asdict()
         ticket.update(AuditHandler.getCreateFields(self._w))
 
         return self._r.create(ticket)

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from ...presentation.controller.ticket import TicketController
+from ..ExceptionHandler import exception_handler
 from ..HttpHandler import REQUIRED_FIELD, WRITER_NOT_PROVIDED
 
 TICKET_PATH = "/ticket/%s/"
@@ -8,6 +9,7 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 
 
 @ticket.post("/")
+@exception_handler
 def createTicket():
     params = request.args.to_dict()
 
@@ -23,6 +25,7 @@ def createTicket():
 
 @ticket.get("/", defaults={"id": None})
 @ticket.get("/<id>")
+@exception_handler
 def fetchTickets(id=None):
     params = request.args.to_dict()
 
@@ -40,6 +43,7 @@ def fetchTickets(id=None):
 
 
 @ticket.put("/<id>")
+@exception_handler
 def updateTicket(id):
     params = request.args.to_dict()
 
@@ -57,6 +61,7 @@ def updateTicket(id):
 
 
 @ticket.delete("/<id>")
+@exception_handler
 def deleteTicket(id):
     params = request.args.to_dict()
 

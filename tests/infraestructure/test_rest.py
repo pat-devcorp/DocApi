@@ -1,5 +1,4 @@
 import pytest
-
 from src.web.server import createServer
 
 

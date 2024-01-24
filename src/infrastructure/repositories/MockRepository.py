@@ -1,19 +1,16 @@
-class RepositoryMock:
+class MockRepository:
     _name: str
     _pk: str
     _fields: list
 
-    def __init__(self, data):
-        self.data = data
-
     def entityExists(self, identifier):
-        return None
+        return dict()
 
     def fetch(self) -> list:
-        return [self.data]
+        return list()
 
     def getById(self, identity) -> list:
-        return self.data
+        return dict()
 
     def delete(self, identity) -> bool:
         return True

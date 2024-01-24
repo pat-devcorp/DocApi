@@ -1,10 +1,9 @@
 from ...application.ticket import TicketApplication
 from ...domain.model.ticket import TicketInterface
-from ...infrastructure.broker.MockBroker import BrokerMock
+from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.repositories.ticket_mongo import TicketMongo
-from ...utils.ResponseHandler import ID_NOT_VALID
+from ...utils.ResponseHandler import DEFAULT
 from ..BrokerProtocol import BrokerProtocol
-from ..ExceptionHandler import exception_handler
 from ..PresentationError import PresentationError
 from ..RepositoryProtocol import RepositoryProtocol
 
@@ -18,7 +17,7 @@ class TicketController:
     ) -> None:
         _w = ref_writeUId
         _r = TicketMongo() if ref_repository is None else ref_repository
-        _b = BrokerMock.setDefault() if ref_broker is None else ref_broker
+        _b = MockBroker.setDefault() if ref_broker is None else ref_broker
         self._uc = TicketApplication(_w, _r, _b)
 
     @staticmethod
@@ -44,38 +43,30 @@ class TicketController:
             **NOTES:** The module should be developed following clean architecture principles.
             """
 
-    @exception_handler
     def fetch(self) -> list:
         return self._uc.fetch()
 
-    @exception_handler
-    def getById(self, identifier):
-        try:
-            ticketId = TicketInterface.setIdentifier(identifier)
-        except ValueError:
-            raise PresentationError(ID_NOT_VALID)
-
+    def getById(self, obj_id):
+        ticketId = TicketInterface.setIdentifier(obj_id)
         self._uc.getById(ticketId)
 
-    @exception_handler
-    def delete(self, identifier):
-        try:
-            ticketId = TicketInterface.setIdentifier(identifier)
-        except ValueError:
-            raise PresentationError(ID_NOT_VALID)
-
+    def delete(self, obj_id):
+        ticketId = TicketInterface.setIdentifier(obj_id)
         self.delete(ticketId)
 
-    @exception_handler
-    def update(self, identifier, params: dict):
-        try:
-            ticketId = TicketInterface.setIdentifier(identifier)
-        except ValueError:
-            raise PresentationError(ID_NOT_VALID)
+    def update(self, obj_id, params: dict):
+        if params.get("ticketId") is not None:
+            PresentationError(
+                DEFAULT,
+                "Id is not need in the params because you send as obj_id to the function",
+            )
+        print(f"ID: {type(obj_id), {obj_id}}")
+        ticketId = TicketInterface.setIdentifier(obj_id)
 
         self.update(ticketId, params)
 
-    @exception_handler
-    def create(self, ticketId, description):
+    def create(self, obj_id, description):
+        ticketId = TicketInterface.setIdentifier(obj_id)
         obj = TicketInterface.newTicket(ticketId, description)
+
         return self._uc.create(obj)

@@ -1,6 +1,6 @@
-from task.src.infrastructure.repositories.RepositoryMock import RepositoryMock
+from task.src.infrastructure.repositories.MockRepository import MockRepository
 
-from infrastructure.broker.MockBroker import BrokerMock
+from infrastructure.broker.MockBroker import MockBroker
 from src.presentation.controller.ticket import Ticket as TicketController
 from src.presentation.dto.ticket import TicketDto, TicketHandler
 
@@ -49,8 +49,8 @@ def getTicketId():
 
 # ## Basic task methods
 # def getControllerMock(writeUId):
-#     my_repository = RepositoryMock()
-#     my_producer = BrokerMock()
+#     my_repository = MockRepository()
+#     my_producer = MockBroker()
 #     return TicketController(writeUId, my_repository, my_producer)
 
 

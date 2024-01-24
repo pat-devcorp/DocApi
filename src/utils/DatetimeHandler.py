@@ -31,7 +31,7 @@ class DateHandler(datetime):
     value: str
 
     @classmethod
-    def getDefault(cls):
+    def now(cls):
         dt_obj = datetime.now()
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
@@ -52,7 +52,7 @@ class DateTimeHandler(datetime):
     value: str
 
     @classmethod
-    def getDefault(cls):
+    def now(cls):
         dt_obj = datetime.now()
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 

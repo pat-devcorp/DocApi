@@ -1,6 +1,5 @@
+import json
 import traceback
-
-from flask import jsonify
 
 from ..domain.DomainError import DomainError
 from ..infrastructure.InfrastructureError import InfrastructureError
@@ -15,23 +14,23 @@ def exception_handler(func):
         try:
             response = func(*args, **kwargs) or "OK"
             status_code = 200
-        except PresentationError as ce:
-            response = str(ce)
+        except PresentationError as p_err:
+            response = str(p_err)
             status_code = 422
-        except DomainError as de:
-            response = str(de)
+        except DomainError as d_err:
+            response = str(d_err)
             status_code = 500
-        except InfrastructureError as fe:
-            response = str(fe)
+        except InfrastructureError as i_err:
+            response = str(i_err)
             status_code = 500
-        except Exception as e:
+        except Exception as err:
             error = {
-                "message": str(e),
+                "message": str(err),
                 "traceback": traceback.format_exc(),
             }
             response = str(error)
 
         finally:
-            return jsonify({"data": response, "status_code": status_code})
+            return json.dumps({"data": response, "statusCode": status_code})
 
     return wrapper
