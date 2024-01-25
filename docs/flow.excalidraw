@@ -1040,11 +1040,11 @@
       "locked": false,
       "fontSize": 20,
       "fontFamily": 1,
-      "text": "fromdict()",
+      "text": "from_dict()",
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": "PAr93hTQuYHNcQ8InNtEL",
-      "originalText": "fromdict()",
+      "originalText": "from_dict()",
       "lineHeight": 1.25,
       "baseline": 18
     },

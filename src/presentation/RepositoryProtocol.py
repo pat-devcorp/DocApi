@@ -2,7 +2,7 @@ from typing import Dict, List, Protocol
 
 
 class RepositoryProtocol(Protocol):
-    def entityExists(self, identifier):
+    def entity_exists(self, identifier):
         pass
 
     def fetch(self, tablename: str, attrs: List[str]) -> List[Dict]:
@@ -14,7 +14,7 @@ class RepositoryProtocol(Protocol):
     def update(self, tablename: str, pk: str, identifier: str, params: dict):
         pass
 
-    def getById(
+    def get_by_id(
         self, tablename: str, pk: str, identifier: str, attrs: List[str]
     ) -> Dict:
         pass

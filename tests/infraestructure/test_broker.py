@@ -1,5 +1,5 @@
-from src.infrastructure.broker.rabbitmq import rabbitmqTestingInterface
+from src.infrastructure.broker.rabbitmq import rabbitmq_interface_test
 
 
 def test_rabbitmq():
-    rabbitmqTestingInterface()
+    rabbitmq_interface_test()

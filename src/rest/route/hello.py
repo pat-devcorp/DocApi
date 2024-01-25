@@ -4,5 +4,5 @@ hello = Blueprint("hello", __name__)
 
 
 @hello.get("/")
-def sayHello():
+def say_hello():
     return jsonify("Hello", 200)

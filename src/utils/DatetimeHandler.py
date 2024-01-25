@@ -11,7 +11,7 @@ def hasValidFormat(obj_date, format) -> bool:
         return False
 
 
-def checkDatetimeFormat(obj_date) -> bool:
+def check_datetime_format(obj_date) -> bool:
     my_config = Config()
     return hasValidFormat(obj_date, my_config.DATETIME_FORMAT)
 
@@ -21,7 +21,7 @@ def checkDateFormat(obj_date) -> bool:
     return hasValidFormat(obj_date, my_config.DATE_FORMAT)
 
 
-def getDatetime() -> str:
+def get_datetime() -> str:
     my_config = Config()
     current_datetime = datetime.now()
     return current_datetime.strftime(my_config.DATETIME_FORMAT)
@@ -36,7 +36,7 @@ class DateHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def fromStr(cls, date_str):
+    def from_string(cls, date_str):
         my_config = Config()
         dt_obj = datetime.strptime(date_str, my_config.DATE_FORMAT)
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
@@ -57,7 +57,7 @@ class DateTimeHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def fromStr(cls, date_str):
+    def from_string(cls, date_str):
         my_config = Config()
         dt_obj = datetime.strptime(date_str, my_config.DATETIME_FORMAT)
         return cls(

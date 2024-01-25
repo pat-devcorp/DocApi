@@ -4,7 +4,7 @@
 
 class UserService:
     @staticmethod
-    def isValidUserId(userUId):
+    def is_valid_user_id(userUId):
         # my_config = Config()
         # payload = {"user_id": user_id}
         # r = requests.get(my_config.USER_API, params=payload)
@@ -12,9 +12,9 @@ class UserService:
         return True
 
 
-def getMock():
+def get_mock():
     return "87378b40-894c-11ee-b9d1-0242ac120002"
 
 
-def testUserService(userUId):
+def test_user_service(userUId):
     pass

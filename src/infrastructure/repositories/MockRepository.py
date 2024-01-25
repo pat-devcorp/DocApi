@@ -1,22 +1,27 @@
+from typing import Dict, List
+
+from ..InfrastructureError import InfrastructureError
+
+
 class MockRepository:
     _name: str
     _pk: str
     _fields: list
 
-    def entityExists(self, identifier):
-        return dict()
+    def entity_exists(self, identifier):
+        return True
 
-    def fetch(self) -> list:
+    def fetch(self, fields: list, matching: dict) -> List[Dict[str, any]]:
         return list()
 
-    def getById(self, identity) -> list:
+    def get_by_id(self, identifier, fields: list) -> dict:
         return dict()
 
-    def delete(self, identity) -> bool:
-        return True
+    def delete(self, identifier) -> None | InfrastructureError:
+        return None
 
-    def create(self, data) -> bool:
-        return True
+    def create(self, data) -> None | InfrastructureError:
+        return None
 
-    def update(self, data) -> bool:
-        return True
+    def update(self, identifier, data) -> None | InfrastructureError:
+        return None

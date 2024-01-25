@@ -1,5 +1,5 @@
-from src.infrastructure.repositories.mongo import mongoTestingInterface
+from src.infrastructure.repositories.mongo import mongo_interface_test
 
 
 def test_mongo():
-    mongoTestingInterface()
+    mongo_interface_test()

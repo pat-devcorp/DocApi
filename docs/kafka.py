@@ -20,18 +20,18 @@ class KafkaBroker:
         self.prefix = my_config.KAFKA_PREFIX
 
     @property
-    def getDSN(self):
+    def dsn(self):
         return self.host + ":" + str(self.port)
 
     @classmethod
-    def setDefault(cls):
+    def set_default(cls):
         my_config = Config()
         return cls(my_config.KAFKA_HOST, my_config.KAFKA_PORT)
 
     def startConnection(self):
         try:
             self.producer = KafkaProducer(
-                bootstrap_servers=self.getDSN,
+                bootstrap_servers=self.dsn,
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
             )
         except Exception:
@@ -60,8 +60,8 @@ class KafkaBroker:
 
 # def test_kafka_producer():
 #     print("----KAFKA PROD")
-#     kafka_producer = Kafka.setDefault()
-#     assert kafka_producer.getDSN == "172.25.0.2:9092"
+#     kafka_producer = Kafka.set_default()
+#     assert kafka_producer.dsn == "172.25.0.2:9092"
 #     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
 #     dto = {

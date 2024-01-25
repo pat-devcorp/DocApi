@@ -42,7 +42,7 @@
 # def addTicketKeyword(id):
 #     writeUId = request.args.get("writeUId")
 #     params = request.args.to_dict()
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 #     keyword = Keyworddto.create(params.get("Keyword"))
 
 #     lc = TicketController(writeUId)
@@ -54,8 +54,8 @@
 # @ticket.delete("/<id>/keyword/<keyword_id>")
 # def removeTicketKeyword(id, keyword_id):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
-#     keyword_identifier = Keyworddto.getIdentifier(keyword_id)
+#     objId = TicketHandler.get_identifier(id)
+#     keyword_identifier = Keyworddto.get_identifier(keyword_id)
 
 #     lc = TicketController(writeUId)
 #     item = lc.removeKeyword(objId, keyword_identifier)
@@ -68,7 +68,7 @@
 # def addTicketMeeting(id):
 #     writeUId = request.args.get("writeUId")
 #     params = request.args.to_dict()
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 #     meeting = Meetingdto.create(params.get("meeting_date"))
 
 #     lc = TicketController(writeUId)
@@ -80,8 +80,8 @@
 # @ticket.delete("/<id>/meeting/<meeting_id>")
 # def removeTicketMeeting(id, meeting_id):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
-#     meeting_identifier = Meetingdto.getIdentifier(meeting_id)
+#     objId = TicketHandler.get_identifier(id)
+#     meeting_identifier = Meetingdto.get_identifier(meeting_id)
 
 #     lc = TicketController(writeUId)
 #     item = lc.removeMeeting(objId, meeting_identifier)
@@ -94,7 +94,7 @@
 # def addTicketMilestone(id):
 #     writeUId = request.args.get("writeUId")
 #     params = request.args.to_dict()
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 #     milestone = Milestonedto.create(params)
 
 #     lc = TicketController(writeUId)
@@ -106,8 +106,8 @@
 # @ticket.delete("/<id>/milestone/<milestone_id>")
 # def removeTicketMilestone(id, milestone_id):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
-#     milestone_identifier = Milestonedto.getIdentifier(milestone_id)
+#     objId = TicketHandler.get_identifier(id)
+#     milestone_identifier = Milestonedto.get_identifier(milestone_id)
 
 #     lc = TicketController(writeUId)
 #     item = lc.removeMeeting(objId, milestone_identifier)
@@ -119,11 +119,11 @@
 # @ticket.post("/<id>/attachment")
 # def addAttachment(id):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 #     uploaded_file = request.files["attachment"]
 
 #     path = TICKET_PATH.format(str(id))
-#     file_name = uploadFile.create(uploaded_file, path)
+#     file_name = upload_file.create(uploaded_file, path)
 
 #     lc = TicketController(writeUId)
 #     item = lc.addAttachment(objId, file_name)
@@ -134,10 +134,10 @@
 # @ticket.delete("/<id>/attachment/<file_name>")
 # def removeAttachment(id, file_name):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 
 #     path = TICKET_PATH.format(str(id))
-#     fileExists(file_name, path)
+#     file_exists(file_name, path)
 
 #     lc = TicketController(writeUId)
 #     item = lc.removeAttachment(objId, file_name)
@@ -150,7 +150,7 @@
 # def addTicketMember(id):
 #     writeUId = request.args.get("writeUId")
 #     params = request.args.to_dict()
-#     objId = TicketHandler.getIdentifier(id)
+#     objId = TicketHandler.get_identifier(id)
 #     member_identifier = Memberdto.create(params)
 
 #     lc = TicketController(writeUId)
@@ -162,8 +162,8 @@
 # @ticket.delete("/<id>/member/<member_id>")
 # def removeTicketMember(id, member_id):
 #     writeUId = request.args.get("writeUId")
-#     objId = TicketHandler.getIdentifier(id)
-#     member_identifier = Memberdto.getIdentifier(member_id)
+#     objId = TicketHandler.get_identifier(id)
+#     member_identifier = Memberdto.get_identifier(member_id)
 
 #     lc = TicketController(writeUId)
 #     item = lc.removeMember(objId, member_identifier)
@@ -176,8 +176,8 @@
 # def setTicketAssignee(id):
 #     writeUId = request.args.get("writeUId")
 #     params = request.args.to_dict()
-#     objId = TicketHandler.getIdentifier(id)
-#     member_identifier = Memberdto.getIdentifier(params.get("member_id"))
+#     objId = TicketHandler.get_identifier(id)
+#     member_identifier = Memberdto.get_identifier(params.get("member_id"))
 
 #     lc = TicketController(writeUId)
 #     item = lc.defineAssignee(objId, member_identifier)

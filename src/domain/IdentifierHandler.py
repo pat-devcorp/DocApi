@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 
-from ..infrastructure.providers.User import UserService
+from ..infrastructure.services.User import UserService
 
 
 class IdentityAlgorithm(Enum):
@@ -15,36 +15,36 @@ class IdentifierHandler:
         self.algorithm = algorithm
 
     @classmethod
-    def getDefault(cls, algorithm: IdentityAlgorithm):
+    def get_default(cls, algorithm: IdentityAlgorithm):
         default = [
-            cls.getString,
-            cls.getUuidV4,
+            cls.get_string,
+            cls.get_uuid_v4,
         ]
         return default[algorithm.value]()
 
     @staticmethod
-    def getString():
+    def get_string():
         return "DEFAULT"
 
     @staticmethod
-    def getUuidV4():
+    def get_uuid_v4():
         return str(uuid4())
 
     @classmethod
-    def isValid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
+    def is_valid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
         validator = [
-            cls.isValidDefault,
-            cls.isValidUuidV4,
-            cls.isValidUserId,
+            cls.is_valid_default,
+            cls.is_valid_uuid_v4,
+            cls.is_valid_user_id,
         ]
         return validator[algorithm.value](identifier)
 
     @staticmethod
-    def isValidDefault(identifier):
+    def is_valid_default(identifier):
         return True, ""
 
     @staticmethod
-    def isValidUuidV4(identifier) -> tuple[bool, str]:
+    def is_valid_uuid_v4(identifier) -> tuple[bool, str]:
         if identifier is None or len(identifier) == 0:
             return False, "Is Empty"
 
@@ -55,7 +55,7 @@ class IdentifierHandler:
             return False, "Algorithm does not match"
 
     @staticmethod
-    def isValidUserId(identifier) -> tuple[bool, str]:
-        if not UserService.isValidUserId(identifier):
+    def is_valid_user_id(identifier) -> tuple[bool, str]:
+        if not UserService.is_valid_user_id(identifier):
             return False, "User does not exists"
         return True, ""

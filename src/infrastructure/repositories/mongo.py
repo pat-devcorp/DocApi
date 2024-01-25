@@ -26,12 +26,12 @@ class Mongo:
         self.collection = None
 
     @property
-    def getDSN(self):
+    def dsn(self):
         return f"mongodb://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
 
     def _connect(self):
         if self.client is None:
-            self.client = MongoClient(self.getDSN)
+            self.client = MongoClient(self.dsn)
             self.collection = self.client[self.server.collection][
                 self.server.tablename
             ]  # Access collection directly
@@ -51,7 +51,7 @@ class Mongo:
             self.client = None
 
     @classmethod
-    def setDefault(cls, tablename, pk):
+    def set_default(cls, tablename, pk):
         my_config = Config()
         con = MongoServer(
             hostname=my_config.MONGO_HOST,
@@ -64,13 +64,15 @@ class Mongo:
         )
         return cls(con)
 
-    def fetch(self, attrs: List[str]) -> List[Dict] | InfrastructureError:
-        data = list(self.cursor.find({}, {attr: 1 for attr in attrs}))
+    def fetch(
+        self, attrs: List[str], matching: dict
+    ) -> List[Dict] | InfrastructureError:
+        data = list(self.cursor.find(matching, {attr: 1 for attr in attrs}))
         for item in data:
             item[self.pk] = item.pop("_id")
         return data
 
-    def getById(
+    def get_by_id(
         self, identifier: str, attrs: List[str]
     ) -> Dict | None | InfrastructureError:
         item = self.cursor.find_one({"_id": identifier}, {attr: 1 for attr in attrs})
@@ -78,19 +80,19 @@ class Mongo:
             item[self.pk] = item.pop("_id")
         return item
 
-    def delete(self, identifier: str):
+    def delete(self, identifier: str) -> None | InfrastructureError:
         try:
             self.cursor.delete_one({"_id": identifier})
         except Exception as err:
             raise InfrastructureError(DB_DELETE_FAIL, str(err))
 
-    def update(self, identifier: str, kwargs: dict):
+    def update(self, identifier: str, kwargs: dict) -> None | InfrastructureError:
         try:
             self.cursor.update_one({"_id": identifier}, {"$set": kwargs})
         except Exception as err:
             raise InfrastructureError(DB_UPDATE_FAIL, str(err))
 
-    def create(self, kwargs: dict):
+    def create(self, kwargs: dict) -> None | InfrastructureError:
         try:
             kwargs["_id"] = kwargs.pop(self.pk)
             self.cursor.insert_one(kwargs)
@@ -99,9 +101,9 @@ class Mongo:
 
 
 # Test
-def mongoTestingInterface():
-    mongo_repository = Mongo.setDefault("test", "identifier")
-    print(f"CONNECTION: {mongo_repository.getDSN}")
+def mongo_interface_test():
+    mongo_repository = Mongo.set_default("test", "identifier")
+    print(f"CONNECTION: {mongo_repository.dsn}")
 
     current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
     dto = {
@@ -111,14 +113,14 @@ def mongoTestingInterface():
     }
     mongo_repository.create(dto)
 
-    data = mongo_repository.fetch(dto.keys())
+    data = mongo_repository.fetch(dto.keys(), dict())
     assert data
 
     text = "It was modified"
     mongo_repository.update(current_id, {"description": text})
 
-    item = mongo_repository.getById(current_id, ["description"])
+    item = mongo_repository.get_by_id(current_id, ["description"])
     assert item["description"] == text
 
     mongo_repository.delete(current_id)
-    assert mongo_repository.getById(current_id, ["description"]) is None
+    assert mongo_repository.get_by_id(current_id, ["description"]) is None

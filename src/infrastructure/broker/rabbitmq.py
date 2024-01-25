@@ -5,7 +5,7 @@ import pika
 from pydantic import BaseModel
 
 from ...infrastructure.config import Config
-from ...utils.DatetimeHandler import getDatetime
+from ...utils.DatetimeHandler import get_datetime
 from ...utils.ResponseHandler import (
     BROKER_CHANNEL_ERROR,
     BROKER_CONNECTION_FAIL,
@@ -32,11 +32,11 @@ class Rabbitmq:
         self.in_lost_save_local = in_lost_save_local
 
     @property
-    def getDSN(self):
+    def dsn(self):
         return f"amqp://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}/%2F"
 
     @classmethod
-    def setDefault(cls, queue_name):
+    def set_default(cls, queue_name):
         my_config = Config()
         con = RabbitmqServer(
             hostname=my_config.RABBITMQ_HOST,
@@ -86,7 +86,7 @@ class Rabbitmq:
         # Ensure the directory structure exists
         os.makedirs(file_path, exist_ok=True)
 
-        file_name = os.path.join(file_path, getDatetime() + ".log")
+        file_name = os.path.join(file_path, get_datetime() + ".log")
 
         with open(file_name, "a+", encoding="utf-8") as f:
             # Check if the file is empty (newly created) and add '['
@@ -103,7 +103,7 @@ class Rabbitmq:
 
             # Dump the JSON data
             json.dump(
-                {"type": message_type, "data": message, "writeAt": getDatetime()},
+                {"type": message_type, "data": message, "writeAt": get_datetime()},
                 f,
                 ensure_ascii=False,
                 indent=4,
@@ -114,6 +114,6 @@ class Rabbitmq:
 
 
 # Test
-def rabbitmqTestingInterface():
-    rabbitmq_broker = Rabbitmq.setDefault("test")
+def rabbitmq_interface_test():
+    rabbitmq_broker = Rabbitmq.set_default("test")
     rabbitmq_broker.publish("testing...")

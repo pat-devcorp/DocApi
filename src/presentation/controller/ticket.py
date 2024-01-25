@@ -2,23 +2,21 @@ from ...application.ticket import TicketApplication
 from ...domain.model.ticket import TicketInterface
 from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.repositories.ticket_mongo import TicketMongo
-from ...utils.ResponseHandler import DEFAULT
 from ..BrokerProtocol import BrokerProtocol
-from ..PresentationError import PresentationError
 from ..RepositoryProtocol import RepositoryProtocol
 
 
 class TicketController:
     def __init__(
         self,
-        ref_writeUId,
+        ref_write_uid,
         ref_repository: None | RepositoryProtocol = None,
         ref_broker: None | BrokerProtocol = None,
     ) -> None:
-        _w = ref_writeUId
+        _w = ref_write_uid
         _r = TicketMongo() if ref_repository is None else ref_repository
-        _b = MockBroker.setDefault() if ref_broker is None else ref_broker
-        self._uc = TicketApplication(_w, _r, _b)
+        _b = MockBroker.set_default() if ref_broker is None else ref_broker
+        self._app = TicketApplication(_w, _r, _b)
 
     @staticmethod
     def getTemplate() -> str:
@@ -44,29 +42,23 @@ class TicketController:
             """
 
     def fetch(self) -> list:
-        return self._uc.fetch()
+        return self._app.fetch()
 
-    def getById(self, obj_id):
-        ticketId = TicketInterface.setIdentifier(obj_id)
-        self._uc.getById(ticketId)
+    def get_by_id(self, obj_id):
+        ticketId = TicketInterface.set_identifier(obj_id)
+        self._app.get_by_id(ticketId)
 
     def delete(self, obj_id):
-        ticketId = TicketInterface.setIdentifier(obj_id)
-        self.delete(ticketId)
+        ticketId = TicketInterface.set_identifier(obj_id)
+        self._app.delete(ticketId)
 
     def update(self, obj_id, params: dict):
-        if params.get("ticketId") is not None:
-            PresentationError(
-                DEFAULT,
-                "Id is not need in the params because you send as obj_id to the function",
-            )
-        print(f"ID: {type(obj_id), {obj_id}}")
-        ticketId = TicketInterface.setIdentifier(obj_id)
-
-        self.update(ticketId, params)
+        ticketId = TicketInterface.set_identifier(obj_id)
+        obj = TicketInterface.partial_ticket(ticketId, params)
+        self._app.update(obj)
 
     def create(self, obj_id, description):
-        ticketId = TicketInterface.setIdentifier(obj_id)
-        obj = TicketInterface.newTicket(ticketId, description)
+        ticketId = TicketInterface.set_identifier(obj_id)
+        obj = TicketInterface.new_ticket(ticketId, description)
 
-        return self._uc.create(obj)
+        return self._app.create(obj)

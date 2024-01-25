@@ -1,4 +1,3 @@
-from ...domain.model.ticket import Ticket
 from ..InfrastructureError import InfrastructureError
 from .mongo import Mongo, MongoServer
 
@@ -11,31 +10,30 @@ class TicketMongo:
         self, ref_mongo: MongoServer | None = None
     ) -> None | InfrastructureError:
         self._m = (
-            Mongo.setDefault(self.tablename, self.pk)
+            Mongo.set_default(self.tablename, self.pk)
             if ref_mongo is None
             else Mongo(ref_mongo)
         )
-        self._f = Ticket.getFields()
 
-    def entityExists(self, identifier) -> None | InfrastructureError:
-        if self._m.getById(identifier, [self._pk]) is None:
+    def entity_exists(self, identifier) -> bool:
+        if self._m.get_by_id(identifier, [self._pk]) is None:
             return False
         return True
 
-    def fetch(self, fields=None) -> list:
-        return self._m.fetch(fields or self._f)
+    def fetch(self, fields: list, matching) -> list:
+        return self._m.fetch(fields, matching)
 
-    def getById(self, identifier, fields=None) -> list:
-        return self._m.getById(identifier, fields or self._f)
+    def get_by_id(self, identifier, fields: list) -> dict:
+        return self._m.get_by_id(identifier, fields)
 
     def delete(self, identifier) -> None | InfrastructureError:
         self._m.delete(identifier)
-        return True
+        return None
 
     def update(self, identifier, data) -> None | InfrastructureError:
         self._m.update(identifier, data)
-        return True
+        return None
 
     def create(self, data) -> None | InfrastructureError:
         self._m.create(data)
-        return True
+        return None

@@ -11,7 +11,7 @@ def getTicketId():
 
 # def test_fail_interface_identifier():
 #     try:
-#         TicketHandler.getIdentifier("XXXXXX")
+#         TicketHandler.get_identifier("XXXXXX")
 #         assert False
 #     except Exception:
 #         assert True
@@ -19,20 +19,20 @@ def getTicketId():
 
 # def test_interface_identifier():
 #     try:
-#         TicketHandler.getIdentifier(getTicketId())
+#         TicketHandler.get_identifier(getTicketId())
 #         assert True
 #     except Exception:
 #         assert False
 
 
-# def test_interface_fromDict():
+# def test_interface_from_dict():
 #     try:
 #         dto = {
 #             "description": "Test task",
 #             "category": 0,
 #             "state": 0,
 #         }
-#         TicketHandler.fromDict(dto)
+#         TicketHandler.from_dict(dto)
 #         assert False
 #     except Exception:
 #         assert True
@@ -78,7 +78,7 @@ def getTicketId():
 #         "ticketId": identifier,
 #         "description": "This is a ticket modified",
 #     }
-#     dto = TicketHandler.fromDict(data)
+#     dto = TicketHandler.from_dict(data)
 #     identifier = lc.prepareIdentifier(identifier)
 #     response = lc.update(identifier, dto)
 #     assert response
@@ -87,15 +87,15 @@ def getTicketId():
 # def test_controller_get_by_id():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
-#     response = lc.getById(i)
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     response = lc.get_by_id(i)
 #     assert isinstance(response, dict)
 
 
 # def test_controller_delete():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     response = lc.delete(i)
 #     assert response
 
@@ -103,7 +103,7 @@ def getTicketId():
 # def test_task_member():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_member = Memberdto.create("8888", 0)
 #     response = lc.addMember(i, my_member)
 #     assert response
@@ -113,7 +113,7 @@ def getTicketId():
 # def test_task_keyword():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_keyword = Keyworddto.create("test")
 #     response = lc.addKeyword(i, my_keyword)
 #     assert response
@@ -122,7 +122,7 @@ def getTicketId():
 # def test_task_meeting():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_meeting = meetingdto.create(
 #         subject="Dealing with bugs",
 #         meeting_date="03/10/2023 16:30",
@@ -141,7 +141,7 @@ def getTicketId():
 #             "generate documentation for project",
 #         ],
 #     }
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_milestone = Milestonedto.create(milestone)
 #     response = lc.addKeyword(i, my_milestone)
 #     assert response
@@ -150,7 +150,7 @@ def getTicketId():
 # def test_task_attachment():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_attachment = Attachmentdto.create("/media/test.md")
 #     response = lc.addKeyword(i, my_attachment)
 #     assert response
@@ -159,7 +159,7 @@ def getTicketId():
 # def test_task_assignee():
 #     lc = getControllerMock("9999")
 
-#     i = TicketHandler.getIdentifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
+#     i = TicketHandler.get_identifier("3ca3d2c3-01bb-443e-afb8-7aac10d40f9c")
 #     my_assignee = Memberdto.setAssignee(
 #         "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c", "240"
 #     )

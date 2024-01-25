@@ -6,11 +6,11 @@ class MockBroker:
     data: dict
 
     @property
-    def getDSN(self) -> str:
+    def dsn(self) -> str:
         pass
 
     @classmethod
-    def setDefault(cls):
+    def set_default(cls):
         pass
 
     def publish(self, topic: Enum, message: str):

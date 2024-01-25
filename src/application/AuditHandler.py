@@ -1,26 +1,24 @@
 from ..domain.IdentifierHandler import IdentifierHandler, IdentityAlgorithm
-from ..infrastructure.providers.User import UserService
-from ..utils.DatetimeHandler import checkDatetimeFormat, getDatetime
+from ..infrastructure.services.User import UserService
+from ..utils.DatetimeHandler import check_datetime_format, get_datetime
 from ..utils.HandlerError import HandlerError
 from ..utils.ResponseHandler import ID_NOT_FOUND, SCHEMA_NOT_MATCH, WRITER_NOT_FOUND
 
 
 class AuditHandler:
-    @staticmethod
-    def getFields():
-        return ["writeUId", "writeAt", "createUId", "createAt", "endAt"]
+    _fields = ["writeUId", "writeAt", "createUId", "createAt", "endAt"]
 
     @staticmethod
-    def getMock():
+    def get_mock() -> dict:
         return {
-            "writeUId": UserService.getMock(),
-            "writeAt": getDatetime(),
-            "createUId": UserService.getMock(),
-            "createAt": getDatetime(),
-            "endAt": getDatetime(),
+            "writeUId": UserService.get_mock(),
+            "writeAt": get_datetime(),
+            "createUId": UserService.get_mock(),
+            "createAt": get_datetime(),
+            "endAt": get_datetime(),
         }
 
-    def isValid(cls, my_audit: dict) -> list:
+    def is_valid(cls, my_audit: dict) -> list:
         errors = list()
 
         if my_audit.get("createUId") is None:
@@ -28,69 +26,69 @@ class AuditHandler:
 
         my_writeAt = my_audit.get("writeAt")
         if my_writeAt is not None:
-            if not checkDatetimeFormat(my_writeAt):
+            if not check_datetime_format(my_writeAt):
                 errors.append(SCHEMA_NOT_MATCH)
 
         my_createAt = my_audit.get("createAt")
         if my_createAt is not None:
-            if not checkDatetimeFormat(my_createAt):
+            if not check_datetime_format(my_createAt):
                 errors.append(SCHEMA_NOT_MATCH)
 
         my_createAt = my_audit.get("endAt")
         if my_createAt is not None:
-            if not checkDatetimeFormat(my_createAt):
+            if not check_datetime_format(my_createAt):
                 errors.append(SCHEMA_NOT_MATCH)
 
         return errors
 
     @classmethod
-    def getIdentifier(cls, user_id):
-        if not UserService.isValidUserId(user_id):
+    def get_identifier(cls, user_id) -> IdentifierHandler | HandlerError:
+        if not UserService.is_valid_user_id(user_id):
             raise HandlerError(ID_NOT_FOUND)
         return IdentifierHandler(IdentityAlgorithm.DEFAULT, user_id)
 
     @classmethod
-    def fromDict(cls, params: dict):
+    def from_dict(cls, params: dict) -> dict | HandlerError:
         if params.get("writeUId") is None:
             raise HandlerError(WRITER_NOT_FOUND)
 
-        if not UserService.isValidUserId(params.get("writeUId")):
+        if not UserService.is_valid_user_id(params.get("writeUId")):
             raise HandlerError(ID_NOT_FOUND)
 
         audit_dto = dict()
-        for k in cls.getFields():
+        for k in cls._fields:
             audit_dto[k] = params[k] if params.get(k) is not None else None
 
-        errors = cls.isValid(params)
+        errors = cls.is_valid(params)
         if len(errors) > 0:
             raise HandlerError("\n".join(errors))
 
         return audit_dto
 
     @classmethod
-    def getUpdateFields(cls, current_uid):
-        if not UserService.isValidUserId(current_uid):
+    def get_update_fields(cls, current_uid) -> dict | HandlerError:
+        if not UserService.is_valid_user_id(current_uid):
             raise HandlerError(ID_NOT_FOUND)
-        return {"writeUId": current_uid, "writeAt": getDatetime()}
+        return {"writeUId": current_uid, "writeAt": get_datetime()}
 
     @classmethod
-    def getCreateFields(cls, current_uid):
-        if not UserService.isValidUserId(current_uid):
+    def get_create_fields(cls, current_uid) -> dict | HandlerError:
+        if not UserService.is_valid_user_id(current_uid):
             raise HandlerError(ID_NOT_FOUND)
         return {
             "writeUId": current_uid,
-            "writeAt": getDatetime(),
+            "writeAt": get_datetime(),
             "createUId": current_uid,
-            "createAt": getDatetime(),
+            "createAt": get_datetime(),
             "endAt": None,
         }
 
     @classmethod
-    def getEndFields(cls, current_uid):
-        if not UserService.isValidUserId(current_uid):
+    def get_end_fields(cls, current_uid) -> dict | HandlerError:
+        if not UserService.is_valid_user_id(current_uid):
             raise HandlerError(ID_NOT_FOUND)
         return {
             "writeUId": current_uid,
-            "writeAt": getDatetime(),
-            "endAt": getDatetime(),
+            "writeAt": get_datetime(),
+            "endAt": get_datetime(),
         }

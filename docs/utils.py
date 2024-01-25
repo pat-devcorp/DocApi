@@ -24,7 +24,7 @@ def getParamsInfo(class_obj, method_name):
         return None
 
 
-def test_getParamsInfo():
+def testingGetParamsInfo():
     # Example usage
     class MyClass:
         def __init__(self, param1: int = 10, param2: str = "default"):
@@ -52,7 +52,7 @@ def findTextInFiles(start_string, folder_directory, exclude_types=[]):
     return result_text
 
 
-def test_findTextInFiles():
+def testingFindTextInFiles():
     # Example usage
     search_string = "Hello"
     directory_path = "/home/pat/web/TaskApi/src"

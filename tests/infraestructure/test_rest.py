@@ -1,10 +1,11 @@
 import pytest
-from src.web.server import createServer
+
+from src.rest.server import create_server
 
 
 @pytest.fixture
 def client():
-    app = createServer()
+    app = create_server()
     with app.test_client() as client:
         yield client
 

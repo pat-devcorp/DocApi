@@ -2,7 +2,7 @@ from collections import namedtuple
 from enum import Enum
 
 from ...domain.DomainError import DomainError
-from ...utils.DatetimeHandler import DateTimeHandler, checkDatetimeFormat
+from ...utils.DatetimeHandler import DateTimeHandler, check_datetime_format
 from ...utils.ResponseHandler import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
 
@@ -18,6 +18,9 @@ Ticket = namedtuple(
         "points",
         "estimateEndAt",
     ],
+)
+PartialTicket = namedtuple(
+    "PartialTicket", Ticket._fields, defaults=[None] * (len(Ticket._fields) - 1)
 )
 
 
@@ -52,15 +55,15 @@ class TicketState(Enum):
 
 class TicketValidator:
     @classmethod
-    def isValid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
+    def is_valid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
         validate_func = {
-            "ticketId": cls.isValidIdentifier,
-            "description": cls.isValidDescription,
-            "category": cls.isValidCategory,
-            "typeCommit": cls.isValidTypeCommit,
-            "state": cls.isValidState,
-            "points": cls.isValidPoints,
-            "estimateEndAt": cls.isValidEndAt,
+            "ticketId": cls.is_valid_identifier,
+            "description": cls.is_valid_description,
+            "category": cls.is_valid_category,
+            "typeCommit": cls.is_valid_typeCommit,
+            "state": cls.is_valid_state,
+            "points": cls.is_valid_points,
+            "estimateEndAt": cls.is_valid_endAt,
         }
 
         errors = list()
@@ -78,42 +81,42 @@ class TicketValidator:
         return True, ""
 
     @staticmethod
-    def isValidIdentifier(identifier: str):
+    def is_valid_identifier(identifier: str):
         try:
-            TicketInterface.setIdentifier(identifier)
+            TicketInterface.set_identifier(identifier)
             return True, ""
         except DomainError:
             return False, "Invalid identifier"
 
     @staticmethod
-    def isValidState(state: int) -> tuple[bool, str]:
+    def is_valid_state(state: int) -> tuple[bool, str]:
         for member in TicketState:
             if member.value == state:
                 return True, ""
         return False, "Invalid state"
 
     @staticmethod
-    def isValidPoints(points: int):
+    def is_valid_points(points: int):
         if points > 0 and points < 11:
             return False, "Invalid points, be more than 0 and less than ten"
         return True, ""
 
     @staticmethod
-    def isValidCategory(category: int) -> tuple[bool, str]:
+    def is_valid_category(category: int) -> tuple[bool, str]:
         for member in TicketCategory:
             if member.value == category:
                 return True, ""
         return False, "Invalid category"
 
     @staticmethod
-    def isValidTypeCommit(typeCommit: int) -> tuple[bool, str]:
+    def is_valid_typeCommit(typeCommit: int) -> tuple[bool, str]:
         for member in TicketTypeCommit:
             if member.value == typeCommit:
                 return True, ""
         return False, "Invalid commit type"
 
     @staticmethod
-    def isValidDescription(description: str) -> tuple[bool, str]:
+    def is_valid_description(description: str) -> tuple[bool, str]:
         maximum_length = 200
         if isinstance(description, str) and (
             maximum_length is None or len(description) <= maximum_length
@@ -122,8 +125,8 @@ class TicketValidator:
         return False, "is empty or max length exceeded, not allowed"
 
     @staticmethod
-    def isValidEndAt(estimateEndAt: str) -> tuple[bool, str]:
-        if not checkDatetimeFormat(estimateEndAt):
+    def is_valid_endAt(estimateEndAt: str) -> tuple[bool, str]:
+        if not check_datetime_format(estimateEndAt):
             return False, "Date of end format not valid"
         return True, ""
 
@@ -132,21 +135,21 @@ class TicketInterface:
     _idAlgorithm = IdentityAlgorithm.UUID_V4
 
     @classmethod
-    def getIdentifier(cls) -> TicketIdentifier:
-        ic = IdentifierHandler.getDefault(cls._idAlgorithm)
+    def get_identifier(cls) -> TicketIdentifier:
+        ic = IdentifierHandler.get_default(cls._idAlgorithm)
         return TicketIdentifier(ic)
 
     @classmethod
-    def setIdentifier(cls, identifier) -> TicketIdentifier | DomainError:
-        is_ok, err = IdentifierHandler.isValid(identifier, cls._idAlgorithm)
+    def set_identifier(cls, identifier) -> TicketIdentifier | DomainError:
+        is_ok, err = IdentifierHandler.is_valid(identifier, cls._idAlgorithm)
         if not is_ok:
             raise DomainError(ID_NOT_VALID, err)
         return TicketIdentifier(identifier)
 
     @classmethod
-    def fromDict(cls, data: dict) -> Ticket | DomainError:
-        item = {k: v for k, v in data if k in Ticket._fields}
-        ok, err = TicketValidator.isValid(item, False)
+    def from_dict(cls, data: dict) -> Ticket | DomainError:
+        item = {k: v for k, v in data.items() if k in Ticket._fields}
+        ok, err = TicketValidator.is_valid(item, False)
         if not ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
         return Ticket(
@@ -160,18 +163,20 @@ class TicketInterface:
         )
 
     @classmethod
-    def validDict(cls, data: dict) -> dict | DomainError:
-        item = {k: v for k, v in data if k in Ticket._fields}
-        ok, err = TicketValidator.isValid(item)
+    def partial_ticket(
+        cls, identifier: TicketIdentifier, data: dict
+    ) -> dict | DomainError:
+        item = {k: v for k, v in data.items() if k in Ticket._fields}
+        ok, err = TicketValidator.is_valid(item)
         if not ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
-        return item
+        return PartialTicket(identifier.value, **item)
 
     @classmethod
-    def newTicket(
+    def new_ticket(
         cls, identifier: TicketIdentifier, description: str
     ) -> Ticket | DomainError:
-        is_ok, err = TicketValidator.isValidDescription(description)
+        is_ok, err = TicketValidator.is_valid_description(description)
         if not is_ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
 
@@ -186,7 +191,7 @@ class TicketInterface:
         )
 
     @staticmethod
-    def badTicket() -> Ticket:
+    def bad_ticket() -> Ticket:
         return Ticket(
             "a",
             "a" * 201,

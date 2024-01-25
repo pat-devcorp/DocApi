@@ -33,4 +33,7 @@ def exception_handler(func):
         finally:
             return json.dumps({"data": response, "statusCode": status_code})
 
+    # Renaming the function name:
+    wrapper.__name__ = func.__name__
+
     return wrapper
