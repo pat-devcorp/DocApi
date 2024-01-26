@@ -42,7 +42,7 @@ def test_application_ticket():
     ta.add_audit_fields()
     assert set(AuditHandler._fields).issubset(set(ta._f))
     assert ta.create(obj) is None
-    assert ta.fetch() == list()
+    assert ta.fetch(0) == list()
     assert ta.update(partial_obj) is None
     assert ta.get_by_id(obj_id) == dict()
     assert ta.delete(obj_id) is None

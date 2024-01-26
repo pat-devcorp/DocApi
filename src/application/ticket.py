@@ -12,6 +12,7 @@ from ..presentation.RepositoryProtocol import RepositoryProtocol
 from ..utils.ResponseHandler import DB_ID_NOT_FOUND
 from .ApplicationError import ApplicationError
 from .AuditHandler import AuditHandler
+from .Criteria import Criteria
 
 
 class TicketEvent(Enum):
@@ -42,8 +43,11 @@ class TicketApplication:
     def add_audit_fields(self) -> None:
         self._f += AuditHandler._fields
 
-    def fetch(self) -> list[dict]:
-        return self._r.fetch(self._f, dict())
+    def fetch(self, limit: int) -> list[dict]:
+        matching = Criteria(self._f)
+        matching._limit(limit)
+
+        return self._r.fetch(self._f, matching)
 
     def get_by_id(self, obj_id: TicketIdentifier) -> dict:
         return self._r.get_by_id(obj_id.value, self._f)

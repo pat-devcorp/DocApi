@@ -1,4 +1,5 @@
 import importlib.util
+import logging
 from pathlib import Path
 
 from flask import Flask
@@ -6,7 +7,7 @@ from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from ..infrastructure.config import Config
-from ..infrastructure.logger import set_format_to_json
+from ..infrastructure.mylogger import setup_logging
 
 
 def register_blueprints(app, path_ref: Path, blueprints: list):
@@ -43,7 +44,9 @@ def create_server():
     print(blueprints)
 
     if my_config.IS_IN_PRODUCTION:
-        set_format_to_json(my_config.LOG_PATH)
+        logging.getLogger("rest_app")
+        setup_logging(my_config.LOG_PATH)
+        logging.basicConfig(level="INFO")
 
     # Add prometheus wsgi middleware to route /metrics requests
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {"/metrics": make_wsgi_app()})

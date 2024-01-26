@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Protocol
 
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -18,6 +18,10 @@ class MongoServer(BaseModel):
     pk: str
 
 
+class CriteriaProtocol(Protocol):
+    clauses: list
+
+
 class Mongo:
     def __init__(self, ref_mongo_server: MongoServer):
         self.server = ref_mongo_server
@@ -28,6 +32,9 @@ class Mongo:
     @property
     def dsn(self):
         return f"mongodb://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
+
+    def decoder_criteria(matching) -> None:
+        pass
 
     def _connect(self):
         if self.client is None:
@@ -65,9 +72,10 @@ class Mongo:
         return cls(con)
 
     def fetch(
-        self, attrs: List[str], matching: dict
+        self, attrs: List[str], matching: CriteriaProtocol
     ) -> List[Dict] | InfrastructureError:
-        data = list(self.cursor.find(matching, {attr: 1 for attr in attrs}))
+        self.decoder_criteria(matching.clauses)
+        data = list(self.cursor.find({}, {attr: 1 for attr in attrs}))
         for item in data:
             item[self.pk] = item.pop("_id")
         return data
@@ -113,7 +121,7 @@ def mongo_interface_test():
     }
     mongo_repository.create(dto)
 
-    data = mongo_repository.fetch(dto.keys(), dict())
+    data = mongo_repository.fetch(dto.keys(), list())
     assert data
 
     text = "It was modified"

@@ -42,7 +42,7 @@ class TicketController:
             """
 
     def fetch(self) -> list:
-        return self._app.fetch()
+        return self._app.fetch(0)
 
     def get_by_id(self, obj_id):
         ticketId = TicketInterface.set_identifier(obj_id)
