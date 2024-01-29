@@ -1,10 +1,11 @@
-import atexit
+# import atexit
 import datetime as dt
 import json
-import logging
+import logging.config
+import logging.handlers
 import pathlib
 
-# from typing import override
+from ..config import Config
 
 LOG_RECORD_BUILTIN_ATTRS = {
     "args",
@@ -87,7 +88,25 @@ def setup_logging(file_path):
         config = json.load(f_in)
 
     logging.config.dictConfig(config)
-    queue_handler = logging.getHandlerByName("queue_handler")
-    if queue_handler is not None:
-        queue_handler.listener.start()
-        atexit.register(queue_handler.listener.stop)
+    # queue_handler = logging.getHandlerByName("queue_handler")
+    # if queue_handler is not None:
+    #     queue_handler.listener.start()
+    #     atexit.register(queue_handler.listener.stop)
+
+
+def logger_interface_test():
+    logger = logging.getLogger("my_app")
+
+    my_config = Config()
+    setup_logging(my_config.LOG_CONFIG)
+
+    logging.basicConfig(level="INFO")
+    logger.debug("debug message", extra={"x": "hello"})
+    logger.info("info message")
+    logger.warning("warning message")
+    logger.error("error message")
+    logger.critical("critical message")
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        logger.exception("exception message")

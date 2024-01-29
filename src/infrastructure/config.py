@@ -8,8 +8,11 @@ class Config:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
-        self.ROUTE_PATH = "src/rest/route"
-        self.LOG_PATH = "src/log/api.log"
+        self.ROUTE_PATH = os.path.join("src", "rest", "route")
+        self.LOG_PATH = os.path.join("src", "log", "api", "api.log")
+        self.LOG_CONFIG = os.path.join(
+            self.PROJECT_PATH, "infrastructure", "logger", "logging_config.json"
+        )
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
         self.NAME = "task_" + self.API_VERSION
@@ -25,7 +28,9 @@ class Config:
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
 
         self.BROKER = os.getenv("BROKER", False)
-        self.BROKER_LOST_MESSAGE_PATH = "src/log/broker_lost/"
+        self.BROKER_LOST_MESSAGE_PATH = os.path.join(
+            "src", "log", "broker_lost"
+        )
         if self.BROKER == "RABBITMQ":
             self.RABBITMQ_HOST = os.environ["RABBITMQ_HOST"]
             self.RABBITMQ_PORT = os.environ["RABBITMQ_PORT"]

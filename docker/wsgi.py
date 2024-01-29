@@ -1,4 +1,4 @@
-from src.web.server import create_server
+from src.rest.server import create_server
 
 app = create_server()
 

@@ -7,13 +7,14 @@ from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from ..infrastructure.config import Config
-from ..infrastructure.mylogger import setup_logging
+from ..infrastructure.logger.mylogger import setup_logging
 
 
 def register_blueprints(app, path_ref: Path, blueprints: list):
     local_path = ".".join(path_ref.parts)
     for route in blueprints:
         module_name = f"{local_path}.{route}"
+        print(module_name)
         module = importlib.import_module(module_name)
         app.register_blueprint(getattr(module, route.split(".")[-1]))
 
@@ -39,13 +40,14 @@ def create_server():
 
     blueprint_path = Path(my_config.ROUTE_PATH)
     blueprints = get_blueprints(blueprint_path)
-    register_blueprints(app, blueprint_path, blueprints)
     print("---ROUTES")
     print(blueprints)
+    register_blueprints(app, blueprint_path, blueprints)
+    print("---END REGISTERING")
 
     if my_config.IS_IN_PRODUCTION:
         logging.getLogger("rest_app")
-        setup_logging(my_config.LOG_PATH)
+        setup_logging(my_config.LOG_CONFIG)
         logging.basicConfig(level="INFO")
 
     # Add prometheus wsgi middleware to route /metrics requests

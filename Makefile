@@ -10,8 +10,8 @@
 # test:  Run pytest
 # run:  Executes the logic
 
-VENV_PATH = .venv/bin/activate
-ENVIRONMENT_VARIABLE_FILE = .env
+VENV_PATH = /.venv/bin/activate
+ENVIRONMENT_VARIABLE_FILE = ./.env
 DOCKER_NAME ?= my-docker-name
 DOCKER_TAG ?= latest
 
@@ -20,9 +20,7 @@ define find.functions
 endef
 
 define export.functions
-	@unset $(grep -v '^#' $(ENVIRONMENT_VARIABLE_FILE) | sed -E 's/(.*)=.*/\1/' | xargs)
-	@export $(cat $(ENVIRONMENT_VARIABLE_FILE) | xargs) 
-	@printenv
+	@eval $$(cat $(ENVIRONMENT_VARIABLE_FILE) | xargs | tr '\n' ' ') && export
 endef
 
 help:
@@ -77,9 +75,9 @@ test:
 
 build: ## Build docker image
 build:
-	sed -i 's/\r/\n/g' ./init/entrypoint.sh
+	sed -i 's/\r/\n/g' ./docker/entrypoint.sh
 	@docker image rm -f $(DOCKER_NAME):$(API_VERSION) || true
-	docker build -t $(DOCKER_NAME):$(API_VERSION) --file Dockerfile.prod .
+	docker build -t $(DOCKER_NAME):$(API_VERSION) --file ./docker/Dockerfile.prod .
 
 run: ## Run docker container
 run:
