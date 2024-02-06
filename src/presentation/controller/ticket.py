@@ -1,7 +1,8 @@
 from ...application.ticket import TicketApplication
 from ...domain.model.ticket import TicketInterface
 from ...infrastructure.broker.MockBroker import MockBroker
-from ...infrastructure.repositories.ticket_mongo import TicketMongo
+from ...infrastructure.config import Config
+from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 from ..BrokerProtocol import BrokerProtocol
 from ..RepositoryProtocol import RepositoryProtocol
 
@@ -14,8 +15,9 @@ class TicketController:
         ref_broker: None | BrokerProtocol = None,
     ) -> None:
         _w = ref_write_uid
-        _r = TicketMongo() if ref_repository is None else ref_repository
-        _b = MockBroker.set_default() if ref_broker is None else ref_broker
+        my_config = Config()
+        _r = TicketMongo(my_config) if ref_repository is None else ref_repository
+        _b = MockBroker.set_default(my_config) if ref_broker is None else ref_broker
         self._app = TicketApplication(_w, _r, _b)
 
     @staticmethod

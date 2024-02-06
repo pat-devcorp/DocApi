@@ -28,8 +28,8 @@ class Config:
         self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
 
         self.BROKER = os.getenv("BROKER", False)
-        self.BROKER_LOST_MESSAGE_PATH = os.path.join(
-            "src", "log", "broker_lost"
+        self.BROKER_LOST_MESSAGE_PATH = os.getenv(
+            "BROKER_LOST_MESSAGE_PATH", os.path.join("src", "log", "broker", "lost")
         )
         if self.BROKER == "RABBITMQ":
             self.RABBITMQ_HOST = os.environ["RABBITMQ_HOST"]

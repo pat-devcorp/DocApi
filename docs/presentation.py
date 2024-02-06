@@ -1,4 +1,4 @@
-from task.src.infrastructure.repositories.MockRepository import MockRepository
+from task.src.infrastructure.mongo.MockRepository import MockRepository
 
 from infrastructure.broker.MockBroker import MockBroker
 from src.presentation.controller.ticket import Ticket as TicketController

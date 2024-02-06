@@ -4,8 +4,15 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 
 from ...utils.ResponseHandler import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
-from ..config import Config
 from ..InfrastructureError import InfrastructureError
+
+
+class MongoConfig(Protocol):
+    MONGO_HOST: str
+    MONGO_PORT: int
+    MONGO_USER: str
+    MONGO_PASS: str
+    MONGO_DB: str
 
 
 class MongoServer(BaseModel):
@@ -58,8 +65,7 @@ class Mongo:
             self.client = None
 
     @classmethod
-    def set_default(cls, tablename, pk):
-        my_config = Config()
+    def set_default(cls, my_config: MongoConfig, tablename: str, pk: str):
         con = MongoServer(
             hostname=my_config.MONGO_HOST,
             port=my_config.MONGO_PORT,
@@ -109,8 +115,8 @@ class Mongo:
 
 
 # Test
-def mongo_interface_test():
-    mongo_repository = Mongo.set_default("test", "identifier")
+def mongo_interface_test(my_config):
+    mongo_repository = Mongo.set_default(my_config, "test", "identifier")
     print(f"CONNECTION: {mongo_repository.dsn}")
 
     current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"

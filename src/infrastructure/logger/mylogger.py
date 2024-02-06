@@ -3,9 +3,8 @@ import datetime as dt
 import json
 import logging.config
 import logging.handlers
+import os
 import pathlib
-
-from ..config import Config
 
 LOG_RECORD_BUILTIN_ATTRS = {
     "args",
@@ -96,9 +95,8 @@ def setup_logging(file_path):
 
 def logger_interface_test():
     logger = logging.getLogger("my_app")
-
-    my_config = Config()
-    setup_logging(my_config.LOG_CONFIG)
+    log_config_path = os.path.join(os.path.abspath(os.getcwd()), "logging_config.json")
+    setup_logging(log_config_path)
 
     logging.basicConfig(level="INFO")
     logger.debug("debug message", extra={"x": "hello"})

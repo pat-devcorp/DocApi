@@ -1,32 +1,36 @@
 import json
 import re
+from typing import Protocol
 
 from kafka import KafkaProducer
 
 from ...application.BrokerTopic import BrokerTopic
 from ...utils.ResponseHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
-from ..config import Config
 from ..InfrastructureError import InfrastructureError
+
+
+class KafkaConfig(Protocol):
+    KAFKA_HOST: str
+    KAFKA_PORT: int
+    KAFKA_PREFIX: str
 
 
 class KafkaBroker:
     host: str
     port: int
 
-    def __init__(self, host: str = None, port: int = None):
+    def __init__(self, host: str, port: int, prefix: str):
         self.host = host
         self.port = port
-        my_config = Config()
-        self.prefix = my_config.KAFKA_PREFIX
+        self.prefix = prefix
 
     @property
     def dsn(self):
         return self.host + ":" + str(self.port)
 
     @classmethod
-    def set_default(cls):
-        my_config = Config()
-        return cls(my_config.KAFKA_HOST, my_config.KAFKA_PORT)
+    def set_default(cls, my_config: KafkaConfig):
+        return cls(my_config.KAFKA_HOST, my_config.KAFKA_PORT, my_config.KAFKA_PREFIX)
 
     def startConnection(self):
         try:

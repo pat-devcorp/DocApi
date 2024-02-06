@@ -4,7 +4,7 @@ from src.application.AuditHandler import AuditHandler
 from src.application.ticket import TicketApplication
 from src.domain.model.ticket import TicketInterface
 from src.infrastructure.broker.MockBroker import MockBroker
-from src.infrastructure.repositories.MockRepository import MockRepository
+from src.infrastructure.mongo.MockRepository import MockRepository
 from src.infrastructure.services.User import get_mock
 
 

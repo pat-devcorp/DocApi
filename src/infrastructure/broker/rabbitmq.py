@@ -1,10 +1,10 @@
 import json
 import os
+from typing import Protocol
 
 import pika
 from pydantic import BaseModel
 
-from ...infrastructure.config import Config
 from ...utils.DatetimeHandler import get_datetime
 from ...utils.ResponseHandler import (
     BROKER_CHANNEL_ERROR,
@@ -14,12 +14,21 @@ from ...utils.ResponseHandler import (
 from ..InfrastructureError import InfrastructureError
 
 
+class RabbitmqConfig(Protocol):
+    RABBITMQ_HOST: str
+    RABBITMQ_PORT: int
+    RABBITMQ_USER: str
+    RABBITMQ_PASS: str
+    BROKER_LOST_MESSAGE_PATH: str
+
+
 class RabbitmqServer(BaseModel):
     hostname: str
     port: int
     username: str
     password: str
     queue_name: str
+    lost_message_path: str
 
 
 class Rabbitmq:
@@ -36,13 +45,13 @@ class Rabbitmq:
         return f"amqp://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}/%2F"
 
     @classmethod
-    def set_default(cls, queue_name):
-        my_config = Config()
+    def set_default(cls, my_config: RabbitmqConfig, queue_name: str):
         con = RabbitmqServer(
             hostname=my_config.RABBITMQ_HOST,
             port=my_config.RABBITMQ_PORT,
             username=my_config.RABBITMQ_USER,
             password=my_config.RABBITMQ_PASS,
+            lost_message_path=my_config.BROKER_LOST_MESSAGE_PATH,
             queue_name=queue_name,
         )
         return cls(con)
@@ -79,10 +88,7 @@ class Rabbitmq:
                 self.client.close()
 
     def _saveAsFile(self, message_type, message):
-        my_config = Config()
-        file_path = os.path.join(
-            my_config.BROKER_LOST_MESSAGE_PATH, self.server.queue_name
-        )
+        file_path = os.path.join(self.server.lost_message_path, self.server.queue_name)
         # Ensure the directory structure exists
         os.makedirs(file_path, exist_ok=True)
 
@@ -114,6 +120,6 @@ class Rabbitmq:
 
 
 # Test
-def rabbitmq_interface_test():
-    rabbitmq_broker = Rabbitmq.set_default("test")
+def rabbitmq_interface_test(my_config):
+    rabbitmq_broker = Rabbitmq.set_default(my_config, "test")
     rabbitmq_broker.publish("testing...")

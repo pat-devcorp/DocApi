@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from ..infrastructure.config import Config
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT = "%Y-%m-%d"
 
 
 def hasValidFormat(obj_date, format) -> bool:
@@ -11,20 +12,17 @@ def hasValidFormat(obj_date, format) -> bool:
         return False
 
 
-def check_datetime_format(obj_date) -> bool:
-    my_config = Config()
-    return hasValidFormat(obj_date, my_config.DATETIME_FORMAT)
+def check_datetime_format(obj_date, datetime_format=DATETIME_FORMAT) -> bool:
+    return hasValidFormat(obj_date, datetime_format)
 
 
-def checkDateFormat(obj_date) -> bool:
-    my_config = Config()
-    return hasValidFormat(obj_date, my_config.DATE_FORMAT)
+def checkDateFormat(obj_date, date_format=DATE_FORMAT) -> bool:
+    return hasValidFormat(obj_date, date_format)
 
 
-def get_datetime() -> str:
-    my_config = Config()
+def get_datetime(datetime_format=DATETIME_FORMAT) -> str:
     current_datetime = datetime.now()
-    return current_datetime.strftime(my_config.DATETIME_FORMAT)
+    return current_datetime.strftime(datetime_format)
 
 
 class DateHandler(datetime):
@@ -36,15 +34,13 @@ class DateHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def from_string(cls, date_str):
-        my_config = Config()
-        dt_obj = datetime.strptime(date_str, my_config.DATE_FORMAT)
+    def from_string(cls, date_str, date_format=DATE_FORMAT):
+        dt_obj = datetime.strptime(date_str, date_format)
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
-        my_config = Config()
-        obj.value = obj.strftime(my_config.DATE_FORMAT)
+        obj.value = obj.strftime(DATE_FORMAT)
         return obj
 
 
@@ -57,9 +53,8 @@ class DateTimeHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def from_string(cls, date_str):
-        my_config = Config()
-        dt_obj = datetime.strptime(date_str, my_config.DATETIME_FORMAT)
+    def from_string(cls, date_str, datetime_format=DATETIME_FORMAT):
+        dt_obj = datetime.strptime(date_str, datetime_format)
         return cls(
             dt_obj.year,
             dt_obj.month,
@@ -71,6 +66,5 @@ class DateTimeHandler(datetime):
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
-        my_config = Config()
-        obj.value = obj.strftime(my_config.DATETIME_FORMAT)
+        obj.value = obj.strftime(DATETIME_FORMAT)
         return obj
