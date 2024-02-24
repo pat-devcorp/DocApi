@@ -2,7 +2,7 @@ import pytest
 
 from src.application.AuditHandler import AuditHandler
 from src.application.ticket import TicketApplication
-from src.domain.model.ticket import TicketInterface
+from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.MockBroker import MockBroker
 from src.infrastructure.mongo.MockRepository import MockRepository
 from src.infrastructure.services.User import get_mock
@@ -16,11 +16,11 @@ def get_mock_application():
 
 
 def get_objs():
-    obj_id = TicketInterface.get_identifier()
+    obj_id = TicketDomain.get_identifier()
     print(f"ID:{obj_id}")
-    obj = TicketInterface.new_ticket(obj_id, "ready")
+    obj = TicketDomain.new_ticket(obj_id, "ready")
     print(f"OBJECT:{obj}")
-    partial_obj = TicketInterface.partial_ticket(obj_id, {"description": "steady"})
+    partial_obj = TicketDomain.partial_ticket(obj_id, {"description": "steady"})
     return obj_id, obj, partial_obj
 
 

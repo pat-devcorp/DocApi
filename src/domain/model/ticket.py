@@ -54,36 +54,10 @@ class TicketState(Enum):
 
 
 class TicketValidator:
-    @classmethod
-    def is_valid(cls, ref_object: dict, is_partial=True) -> tuple[bool, str]:
-        validate_func = {
-            "ticketId": cls.is_valid_identifier,
-            "description": cls.is_valid_description,
-            "category": cls.is_valid_category,
-            "typeCommit": cls.is_valid_typeCommit,
-            "state": cls.is_valid_state,
-            "points": cls.is_valid_points,
-            "estimateEndAt": cls.is_valid_endAt,
-        }
-
-        errors = list()
-        for k, v in ref_object.items():
-            if is_partial and v is None:
-                continue
-            if (func := validate_func.get(k)) is not None:
-                is_ok, err = func(v)
-                if not is_ok:
-                    errors.append(err)
-
-        if len(errors) > 0:
-            return False, "\n".join(errors)
-
-        return True, ""
-
     @staticmethod
     def is_valid_identifier(identifier: str):
         try:
-            TicketInterface.set_identifier(identifier)
+            TicketDomain.set_identifier(identifier)
             return True, ""
         except DomainError:
             return False, "Invalid identifier"
@@ -116,22 +90,22 @@ class TicketValidator:
         return False, "Invalid commit type"
 
     @staticmethod
-    def is_valid_description(description: str) -> tuple[bool, str]:
-        maximum_length = 200
-        if isinstance(description, str) and (
-            maximum_length is None or len(description) <= maximum_length
-        ):
-            return True, ""
-        return False, "is empty or max length exceeded, not allowed"
-
-    @staticmethod
     def is_valid_endAt(estimateEndAt: str) -> tuple[bool, str]:
         if not check_datetime_format(estimateEndAt):
             return False, "Date of end format not valid"
         return True, ""
 
 
-class TicketInterface:
+class TicketSanitizer:
+    @staticmethod
+    def sanitary_description(description: str) -> str:
+        try:
+            return description.decode("utf8")
+        except UnicodeDecodeError as u:
+            raise DomainError(u)
+
+
+class TicketDomain:
     _idAlgorithm = IdentityAlgorithm.UUID_V4
 
     @classmethod
@@ -146,20 +120,57 @@ class TicketInterface:
             raise DomainError(ID_NOT_VALID, err)
         return TicketIdentifier(identifier)
 
+    @staticmethod
+    def is_valid(ref_object: dict, is_partial=True) -> tuple[bool, str]:
+        validate_func = {
+            "ticketId": TicketValidator.is_valid_identifier,
+            "category": TicketValidator.is_valid_category,
+            "typeCommit": TicketValidator.is_valid_typeCommit,
+            "state": TicketValidator.is_valid_state,
+            "points": TicketValidator.is_valid_points,
+            "estimateEndAt": TicketValidator.is_valid_endAt,
+        }
+
+        errors = list()
+        for k, v in ref_object.items():
+            if is_partial and v is None:
+                continue
+            if (func := validate_func.get(k)) is not None:
+                is_ok, err = func(v)
+                if not is_ok:
+                    errors.append(err)
+
+        if len(errors) > 0:
+            return False, "\n".join(errors)
+
+        return True, ""
+
+    @staticmethod
+    def sanitize(data: dict) -> dict:
+        sanitize_data = data
+
+        if (description := sanitize_data.get("description")) is not None:
+            sanitize_data["description"] = TicketSanitizer.sanitary_description(description)
+
+        return sanitize_data
+
     @classmethod
     def from_dict(cls, data: dict) -> Ticket | DomainError:
         item = {k: v for k, v in data.items() if k in Ticket._fields}
         ok, err = TicketValidator.is_valid(item, False)
         if not ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
+
+        sanitize_item =  cls.sanitize(item)
+
         return Ticket(
-            item["ticketId"],
-            item["description"],
-            item["category"],
-            item["typeCommit"],
-            item["state"],
-            item["points"],
-            item["estimateEndAt"],
+            sanitize_item["ticketId"],
+            sanitize_item["description"],
+            sanitize_item["category"],
+            sanitize_item["typeCommit"],
+            sanitize_item["state"],
+            sanitize_item["points"],
+            sanitize_item["estimateEndAt"],
         )
 
     @classmethod
@@ -170,6 +181,7 @@ class TicketInterface:
         ok, err = TicketValidator.is_valid(item)
         if not ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
+        
         return PartialTicket(identifier.value, **item)
 
     @classmethod
@@ -179,10 +191,12 @@ class TicketInterface:
         is_ok, err = TicketValidator.is_valid_description(description)
         if not is_ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
+        
+        sanitize_description =  TicketSanitizer.sanitary_description(description)
 
         return Ticket(
             identifier.value,
-            description,
+            sanitize_description,
             TicketCategory.PENDENTS.value,
             TicketTypeCommit.UNDEFINED.value,
             TicketState.CREATED.value,

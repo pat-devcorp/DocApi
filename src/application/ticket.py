@@ -6,7 +6,7 @@ from ..domain.model.ticket import (
     PartialTicket,
     Ticket,
     TicketIdentifier,
-    TicketInterface,
+    TicketDomain,
 )
 from ..presentation.RepositoryProtocol import RepositoryProtocol
 from ..utils.ResponseHandler import DB_ID_NOT_FOUND
@@ -57,7 +57,7 @@ class TicketApplication:
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
         audit = AuditHandler.get_update_fields(self._w)
-        data = TicketInterface.partial_ticket(obj_id, audit)
+        data = TicketDomain.partial_ticket(obj_id, audit)
         self.update(data)
 
         return self._r.delete(obj_id.value)

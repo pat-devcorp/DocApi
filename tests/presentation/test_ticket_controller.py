@@ -1,7 +1,7 @@
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.ticket import TicketInterface
+from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.MockBroker import MockBroker
 from src.infrastructure.mongo.MockRepository import MockRepository
 from src.infrastructure.services.User import get_mock
@@ -17,15 +17,15 @@ def get_mock_controller():
 
 
 def get_obj():
-    obj_id = TicketInterface.get_identifier()
+    obj_id = TicketDomain.get_identifier()
     print(f"ID:{obj_id}")
-    obj = TicketInterface.new_ticket(obj_id, "ready")
+    obj = TicketDomain.new_ticket(obj_id, "ready")
     print(f"OBJECT:{obj}")
     return obj
 
 
 def get_invalid_obj():
-    invalid_obj = TicketInterface.bad_ticket()
+    invalid_obj = TicketDomain.bad_ticket()
     print(f"INVALID OBJECT:{invalid_obj}")
     return invalid_obj
 

@@ -1,5 +1,5 @@
 from ...application.ticket import TicketApplication
-from ...domain.model.ticket import TicketInterface
+from ...domain.model.ticket import TicketDomain
 from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.config import Config
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
@@ -47,20 +47,20 @@ class TicketController:
         return self._app.fetch(0)
 
     def get_by_id(self, obj_id):
-        ticketId = TicketInterface.set_identifier(obj_id)
+        ticketId = TicketDomain.set_identifier(obj_id)
         self._app.get_by_id(ticketId)
 
     def delete(self, obj_id):
-        ticketId = TicketInterface.set_identifier(obj_id)
+        ticketId = TicketDomain.set_identifier(obj_id)
         self._app.delete(ticketId)
 
     def update(self, obj_id, params: dict):
-        ticketId = TicketInterface.set_identifier(obj_id)
-        obj = TicketInterface.partial_ticket(ticketId, params)
+        ticketId = TicketDomain.set_identifier(obj_id)
+        obj = TicketDomain.partial_ticket(ticketId, params)
         self._app.update(obj)
 
     def create(self, obj_id, description):
-        ticketId = TicketInterface.set_identifier(obj_id)
-        obj = TicketInterface.new_ticket(ticketId, description)
+        ticketId = TicketDomain.set_identifier(obj_id)
+        obj = TicketDomain.new_ticket(ticketId, description)
 
         return self._app.create(obj)
