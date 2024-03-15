@@ -5,7 +5,7 @@ import magic
 import requests
 
 from .HandlerError import HandlerError
-from .ResponseHandler import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
+from .response_code import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 
 ALLOWED_EXTENSIONS = ["pdf"]
 VIRUS_ANALYZER_API = "https://www.virustotal.com/gui/home/upload"

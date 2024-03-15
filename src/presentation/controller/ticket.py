@@ -1,4 +1,4 @@
-from ...application.ticket import TicketApplication
+from ...application.use_case.ticket import TicketApplication
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.config import Config

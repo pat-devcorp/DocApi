@@ -3,7 +3,7 @@ from typing import Dict, List, Protocol
 from pydantic import BaseModel
 from pymongo import MongoClient
 
-from ...utils.ResponseHandler import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
+from ...utils.response_code import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
 from ..InfrastructureError import InfrastructureError
 
 

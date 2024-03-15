@@ -1,7 +1,7 @@
 import pytest
 
-from src.application.AuditHandler import AuditHandler
-from src.application.ticket import TicketApplication
+from src.application.audit_handler import AuditHandler
+from src.application.use_case.ticket import TicketApplication
 from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.MockBroker import MockBroker
 from src.infrastructure.mongo.MockRepository import MockRepository

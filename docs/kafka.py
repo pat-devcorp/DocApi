@@ -5,7 +5,7 @@ from typing import Protocol
 from kafka import KafkaProducer
 
 from ...application.BrokerTopic import BrokerTopic
-from ...utils.ResponseHandler import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
+from ...utils.response_code import BROKER_CONNECTION_FAIL, BROKER_SEND_FAIL
 from ..InfrastructureError import InfrastructureError
 
 

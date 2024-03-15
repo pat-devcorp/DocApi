@@ -9,7 +9,7 @@ from ..domain.model.ticket import (
     TicketDomain,
 )
 from ..presentation.RepositoryProtocol import RepositoryProtocol
-from ..utils.ResponseHandler import DB_ID_NOT_FOUND
+from ..utils.response_code import DB_ID_NOT_FOUND
 from .ApplicationError import ApplicationError
 from .audit_handler import AuditHandler
 from .Criteria import Criteria

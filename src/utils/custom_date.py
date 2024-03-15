@@ -1,10 +1,7 @@
 from datetime import datetime
 
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
-DATE_FORMAT = "%Y-%m-%d"
 
-
-def hasValidFormat(obj_date, format) -> bool:
+def has_valid_format(obj_date, format) -> bool:
     try:
         datetime.strptime(obj_date, format)
         return True
@@ -12,21 +9,13 @@ def hasValidFormat(obj_date, format) -> bool:
         return False
 
 
-def check_datetime_format(obj_date, datetime_format=DATETIME_FORMAT) -> bool:
-    return hasValidFormat(obj_date, datetime_format)
-
-
-def checkDateFormat(obj_date, date_format=DATE_FORMAT) -> bool:
-    return hasValidFormat(obj_date, date_format)
-
-
-def get_datetime(datetime_format=DATETIME_FORMAT) -> str:
-    current_datetime = datetime.now()
-    return current_datetime.strftime(datetime_format)
-
-
-class DateHandler(datetime):
+class CustomDate(datetime):
     value: str
+    date_format = "%Y-%m-%d"
+
+    @classmethod
+    def check_format(value):
+        return has_valid_format(value, cls.date_format)
 
     @classmethod
     def now(cls):
@@ -34,18 +23,27 @@ class DateHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def from_string(cls, date_str, date_format=DATE_FORMAT):
-        dt_obj = datetime.strptime(date_str, date_format)
-        return cls(dt_obj.year, dt_obj.month, dt_obj.day)
+    def from_string(cls, date_str):
+        dt_obj = datetime.strptime(date_str, cls.date_format)
+        return cls(
+            dt_obj.year,
+            dt_obj.month,
+            dt_obj.day
+        )
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
-        obj.value = obj.strftime(DATE_FORMAT)
+        obj.value = obj.strftime(cls.date_format)
         return obj
 
 
-class DateTimeHandler(datetime):
+class CustomDatetime(datetime):
     value: str
+    datetime_format = "%Y-%m-%d %H:%M:%S"
+
+    @classmethod
+    def check_format(value):
+        return has_valid_format(value, cls.datetime_format)
 
     @classmethod
     def now(cls):
@@ -53,8 +51,8 @@ class DateTimeHandler(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def from_string(cls, date_str, datetime_format=DATETIME_FORMAT):
-        dt_obj = datetime.strptime(date_str, datetime_format)
+    def from_string(cls, date_str):
+        dt_obj = datetime.strptime(date_str, cls.datetime_format)
         return cls(
             dt_obj.year,
             dt_obj.month,

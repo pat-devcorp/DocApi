@@ -6,7 +6,7 @@ from src.infrastructure.broker.MockBroker import MockBroker
 from src.infrastructure.mongo.MockRepository import MockRepository
 from src.infrastructure.services.User import get_mock
 from src.presentation.controller.ticket import TicketController
-from src.utils.ResponseHandler import ID_NOT_VALID, SCHEMA_NOT_MATCH
+from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 def get_mock_controller():
