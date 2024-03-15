@@ -3,6 +3,7 @@ from ...domain.model.ticket import TicketDomain
 from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.config import Config
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
+from ...utils.timeout import timeout_function, TimeoutError
 from ..BrokerProtocol import BrokerProtocol
 from ..RepositoryProtocol import RepositoryProtocol
 
@@ -44,23 +45,26 @@ class TicketController:
             """
 
     def fetch(self) -> list:
-        return self._app.fetch(0)
+        return timeout_function(self._app.fetch, args=(0), seconds=600)
 
     def get_by_id(self, obj_id):
         ticketId = TicketDomain.set_identifier(obj_id)
-        self._app.get_by_id(ticketId)
+
+        return timeout_function(self._app.get_by_id, args=(ticketId), seconds=600)
 
     def delete(self, obj_id):
         ticketId = TicketDomain.set_identifier(obj_id)
-        self._app.delete(ticketId)
+
+        return timeout_function(self._app.delete, args=(ticketId), seconds=600)
 
     def update(self, obj_id, params: dict):
         ticketId = TicketDomain.set_identifier(obj_id)
         obj = TicketDomain.partial_ticket(ticketId, params)
-        self._app.update(obj)
+        
+        return timeout_function(self._app.update, args=(obj), seconds=600)
 
     def create(self, obj_id, description):
         ticketId = TicketDomain.set_identifier(obj_id)
         obj = TicketDomain.new_ticket(ticketId, description)
 
-        return self._app.create(obj)
+        return timeout_function(self._app.create, args=(obj), seconds=600)

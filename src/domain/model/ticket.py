@@ -2,7 +2,7 @@ from collections import namedtuple
 from enum import Enum
 
 from ...domain.DomainError import DomainError
-from ...utils.DatetimeHandler import DateTimeHandler, check_datetime_format
+from ...utils.datetime_handler import DateTimeHandler, check_datetime_format
 from ...utils.ResponseHandler import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..IdentifierHandler import IdentifierHandler, IdentityAlgorithm
 

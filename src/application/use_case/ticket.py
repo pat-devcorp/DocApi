@@ -11,7 +11,7 @@ from ..domain.model.ticket import (
 from ..presentation.RepositoryProtocol import RepositoryProtocol
 from ..utils.ResponseHandler import DB_ID_NOT_FOUND
 from .ApplicationError import ApplicationError
-from .AuditHandler import AuditHandler
+from .audit_handler import AuditHandler
 from .Criteria import Criteria
 
 
@@ -42,6 +42,9 @@ class TicketApplication:
 
     def add_audit_fields(self) -> None:
         self._f += AuditHandler._fields
+    
+    def from_list(self, keys: list, data: list) -> Ticket | PartialTicket:
+        return [TicketDomain.from_repo(item) for item in zip(keys, data)]]
 
     def fetch(self, limit: int) -> list[dict]:
         matching = Criteria(self._f)
@@ -62,19 +65,19 @@ class TicketApplication:
 
         return self._r.delete(obj_id.value)
 
-    def update(self, data: PartialTicket) -> None | ApplicationError:
-        identifier = data.ticketId
+    def update(self, obj: Ticket | PartialTicket) -> None | ApplicationError:
+        identifier = obj.ticketId
         if not self._r.entity_exists(identifier):
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
-        item = data._asdict()
+        item = TicketDomain.asdict(obj)
         item.pop("ticketId")
-        item = AuditHandler.get_update_fields(self._w)
+        item.update(AuditHandler.get_update_fields(self._w))
 
         return self._r.update(identifier, item)
 
     def create(self, obj: Ticket) -> None:
-        ticket = obj._asdict()
-        ticket.update(AuditHandler.get_create_fields(self._w))
+        item = TicketDomain.asdict(obj)
+        item.update(AuditHandler.get_create_fields(self._w))
 
         return self._r.create(ticket)
