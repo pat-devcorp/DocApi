@@ -20,7 +20,7 @@ def get_objs():
     print(f"ID:{obj_id}")
     obj = TicketDomain.new_ticket(obj_id, "ready")
     print(f"OBJECT:{obj}")
-    partial_obj = TicketDomain.partial_ticket(obj_id, {"description": "steady"})
+    partial_obj = TicketDomain.from_dict(obj_id, {"description": "steady"})
     return obj_id, obj, partial_obj
 
 

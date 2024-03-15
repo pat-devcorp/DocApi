@@ -1,5 +1,5 @@
-from ..InfrastructureError import InfrastructureError
-from .mongo import Mongo, MongoConfig
+from ...InfrastructureError import InfrastructureError
+from ..mongo import Mongo, MongoConfig
 
 
 class TicketMongo:
@@ -14,7 +14,7 @@ class TicketMongo:
             return False
         return True
 
-    def fetch(self, fields: list, matching: list) -> list:
+    def fetch(self, fields: list, matching) -> list:
         return self._m.fetch(fields, matching)
 
     def get_by_id(self, identifier, fields: list) -> dict:

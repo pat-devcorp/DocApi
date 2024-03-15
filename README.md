@@ -13,3 +13,5 @@
   - reference to a class object: starts with ref_
 
 -States in model: use dates or state machines
+
+export $(cat .env | xargs) 

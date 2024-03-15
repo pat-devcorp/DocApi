@@ -9,13 +9,12 @@ def has_valid_format(obj_date, format) -> bool:
         return False
 
 
-class CustomDate(datetime):
+class BaseDatetime(datetime):
     value: str
-    date_format = "%Y-%m-%d"
 
     @classmethod
-    def check_format(value):
-        return has_valid_format(value, cls.date_format)
+    def check_format(cls, value):
+        return has_valid_format(value, cls.str_format)
 
     @classmethod
     def now(cls):
@@ -23,46 +22,24 @@ class CustomDate(datetime):
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
     @classmethod
-    def from_string(cls, date_str):
-        dt_obj = datetime.strptime(date_str, cls.date_format)
-        return cls(
-            dt_obj.year,
-            dt_obj.month,
-            dt_obj.day
-        )
-
-    def __new__(cls, *args, **kwargs):
-        obj = super().__new__(cls, *args, **kwargs)
-        obj.value = obj.strftime(cls.date_format)
-        return obj
-
-
-class CustomDatetime(datetime):
-    value: str
-    datetime_format = "%Y-%m-%d %H:%M:%S"
-
-    @classmethod
-    def check_format(value):
-        return has_valid_format(value, cls.datetime_format)
-
-    @classmethod
-    def now(cls):
+    def str_now(cls):
         dt_obj = datetime.now()
+        return dt_obj.strftime(cls.str_format)
+
+    @classmethod
+    def from_string(cls, date_str):
+        dt_obj = datetime.strptime(date_str, cls.str_format)
         return cls(dt_obj.year, dt_obj.month, dt_obj.day)
 
-    @classmethod
-    def from_string(cls, date_str):
-        dt_obj = datetime.strptime(date_str, cls.datetime_format)
-        return cls(
-            dt_obj.year,
-            dt_obj.month,
-            dt_obj.day,
-            dt_obj.hour,
-            dt_obj.minute,
-            dt_obj.second,
-        )
-
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
-        obj.value = obj.strftime(DATETIME_FORMAT)
+        obj.value = obj.strftime(cls.str_format)
         return obj
+
+
+class CustomDate(BaseDatetime):
+    str_format = "%Y-%m-%d"
+
+
+class CustomDatetime(BaseDatetime):
+    str_format = "%Y-%m-%d %H:%M:%S"

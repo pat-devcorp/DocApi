@@ -7,7 +7,7 @@ from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 from ..infrastructure.config import Config
-from ..infrastructure.logger.mylogger import setup_logging
+from ..infrastructure.logger.logger import setup_logging
 
 
 def register_blueprints(app, path_ref: Path, blueprints: list):

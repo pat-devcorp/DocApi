@@ -37,7 +37,7 @@ export-env:
 	
 init: ## sets up environment and installs requirements
 init:
-	pip install -r /init/requirements.txt
+	pip install -r /requirements.txt
 	# Used for packaging and publishing
 	pip install setuptools wheel twine
 	# Used for linting and formatting
@@ -75,9 +75,9 @@ test:
 
 build: ## Build docker image
 build:
-	sed -i 's/\r/\n/g' ./docker/entrypoint.sh
+	sed -i 's/\r/\n/g' ./entrypoint.sh
 	@docker image rm -f $(DOCKER_NAME):$(API_VERSION) || true
-	docker build -t $(DOCKER_NAME):$(API_VERSION) --file ./docker/Dockerfile.prod .
+	docker build -t $(DOCKER_NAME):$(API_VERSION) --file ./Dockerfile .
 
 run: ## Run docker container
 run:

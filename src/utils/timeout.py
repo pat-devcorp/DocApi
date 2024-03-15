@@ -6,7 +6,7 @@ class TimeoutError(Exception):
     pass
 
 
-def timeout_function(func, args=(), kwargs={}, timeout_seconds=1):
+def timeout_function(func, args=(), kwargs={}, seconds=1):
     class InterruptableThread(threading.Thread):
         def __init__(self):
             threading.Thread.__init__(self)
@@ -22,11 +22,11 @@ def timeout_function(func, args=(), kwargs={}, timeout_seconds=1):
     thread = InterruptableThread()
     thread.daemon = True
     thread.start()
-    thread.join(timeout_seconds)
-    
+    thread.join(seconds)
+
     if thread.is_alive():
         raise TimeoutError("Function execution timed out")
     if thread.exc:
         raise thread.exc
-    
+
     return thread.result

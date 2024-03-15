@@ -11,7 +11,7 @@ class Config:
         self.ROUTE_PATH = os.path.join("src", "rest", "route")
         self.LOG_PATH = os.path.join("src", "log", "api", "api.log")
         self.LOG_CONFIG = os.path.join(
-            self.PROJECT_PATH, "infrastructure", "logger", "logging_config.json"
+            self.PROJECT_PATH, "infrastructure", "logger", "config.json"
         )
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")

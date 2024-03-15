@@ -1,18 +1,13 @@
 from enum import Enum
 from typing import Protocol
 
-from ..domain.IdentifierHandler import IdentifierHandler
-from ..domain.model.ticket import (
-    PartialTicket,
-    Ticket,
-    TicketIdentifier,
-    TicketDomain,
-)
-from ..presentation.RepositoryProtocol import RepositoryProtocol
-from ..utils.response_code import DB_ID_NOT_FOUND
-from .ApplicationError import ApplicationError
-from .audit_handler import AuditHandler
-from .Criteria import Criteria
+from ...domain.identifier_handler import IdentifierHandler
+from ...domain.model.ticket import PartialTicket, Ticket, TicketDomain, TicketIdentifier
+from ...presentation.RepositoryProtocol import RepositoryProtocol
+from ...utils.response_code import DB_ID_NOT_FOUND
+from ..ApplicationError import ApplicationError
+from ..audit_handler import AuditHandler
+from ..criteria import Criteria
 
 
 class TicketEvent(Enum):
@@ -42,9 +37,9 @@ class TicketApplication:
 
     def add_audit_fields(self) -> None:
         self._f += AuditHandler._fields
-    
+
     def from_list(self, keys: list, data: list) -> Ticket | PartialTicket:
-        return [TicketDomain.from_repo(item) for item in zip(keys, data)]]
+        return [TicketDomain.from_repo(item) for item in zip(keys, data)]
 
     def fetch(self, limit: int) -> list[dict]:
         matching = Criteria(self._f)
@@ -60,7 +55,7 @@ class TicketApplication:
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
         audit = AuditHandler.get_update_fields(self._w)
-        data = TicketDomain.partial_ticket(obj_id, audit)
+        data = TicketDomain.from_dict(obj_id, audit)
         self.update(data)
 
         return self._r.delete(obj_id.value)
@@ -80,4 +75,4 @@ class TicketApplication:
         item = TicketDomain.asdict(obj)
         item.update(AuditHandler.get_create_fields(self._w))
 
-        return self._r.create(ticket)
+        return self._r.create(item)

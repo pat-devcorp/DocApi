@@ -5,7 +5,7 @@ from typing import Protocol
 import pika
 from pydantic import BaseModel
 
-from ...utils.custom_date import get_datetime
+from ...utils.custom_date import CustomDatetime
 from ...utils.response_code import (
     BROKER_CHANNEL_ERROR,
     BROKER_CONNECTION_FAIL,
@@ -92,7 +92,8 @@ class Rabbitmq:
         # Ensure the directory structure exists
         os.makedirs(file_path, exist_ok=True)
 
-        file_name = os.path.join(file_path, get_datetime() + ".log")
+        now = CustomDatetime.str_now()
+        file_name = os.path.join(file_path, +".log")
 
         with open(file_name, "a+", encoding="utf-8") as f:
             # Check if the file is empty (newly created) and add '['
@@ -109,7 +110,7 @@ class Rabbitmq:
 
             # Dump the JSON data
             json.dump(
-                {"type": message_type, "data": message, "writeAt": get_datetime()},
+                {"type": message_type, "data": message, "writeAt": now},
                 f,
                 ensure_ascii=False,
                 indent=4,

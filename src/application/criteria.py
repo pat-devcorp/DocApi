@@ -13,7 +13,7 @@ class Criteria:
         self.fields = fields
         self.clauses = []
 
-    def add(self, clause):
+    def add(self, clause: tuple):
         if clause[0] not in self.fields:
             raise ValueError(f"Invalid field: {clause[0]}")
         self.clauses.append(clause)

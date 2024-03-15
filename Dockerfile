@@ -19,7 +19,7 @@ RUN apt-get update && \
 RUN pip install --upgrade pip
 
 # install dependencies
-COPY ./docker/requirements.txt .
+COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/wheels -r requirements.txt
 
 #########
@@ -35,7 +35,8 @@ FROM python:3.11-slim
 # create the appropriate directories
 ENV APP_HOME=/home/app
 RUN mkdir -p $APP_HOME
-COPY ./docker/ $APP_HOME
+COPY ./entrypoint.sh / $APP_HOME
+COPY ./wsgi.py / $APP_HOME
 COPY ./pytest.ini $APP_HOME
 COPY ./src $APP_HOME/src
 RUN chmod -R 777 $APP_HOME

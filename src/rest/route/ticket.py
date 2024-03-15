@@ -2,7 +2,7 @@ from flask import Blueprint, request
 
 from ...presentation.controller.ticket import TicketController
 from ..ExceptionHandler import exception_handler
-from ..HttpHandler import REQUIRED_FIELD, WRITER_NOT_PROVIDED
+from ..http_code import REQUIRED_FIELD, WRITER_NOT_PROVIDED
 
 TICKET_PATH = "/ticket/%s/"
 ticket = Blueprint("ticket", __name__, url_prefix="/ticket")

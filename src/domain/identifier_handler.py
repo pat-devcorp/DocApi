@@ -49,8 +49,8 @@ class IdentifierHandler:
             return False, "Is Empty"
 
         try:
-            uuid_obj = UUID(identifier, version=4)
-            return True, uuid_obj
+            UUID(identifier, version=4)
+            return True, ""
         except ValueError:
             return False, "Algorithm does not match"
 

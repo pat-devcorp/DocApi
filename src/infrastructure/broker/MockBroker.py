@@ -10,7 +10,7 @@ class MockBroker:
         pass
 
     @classmethod
-    def set_default(cls):
+    def set_default(cls, config):
         pass
 
     def publish(self, topic: Enum, message: str):
