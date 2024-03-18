@@ -30,9 +30,10 @@ class CriteriaProtocol(Protocol):
 
 
 class Mongo:
-    def __init__(self, ref_mongo_server: MongoServer):
+    def __init__(self, ref_mongo_server: MongoServer, tablename: str, pk: str):
         self.server = ref_mongo_server
-        self.pk = ref_mongo_server.pk
+        self.tablename = tablename
+        self.pk = pk
         self.client = None
         self.collection = None
 
@@ -47,7 +48,7 @@ class Mongo:
         if self.client is None:
             self.client = MongoClient(self.dsn)
             self.collection = self.client[self.server.collection][
-                self.server.tablename
+                self.tablename
             ]  # Access collection directly
 
     @property
@@ -72,10 +73,8 @@ class Mongo:
             username=my_config.MONGO_USER,
             password=my_config.MONGO_PASS,
             collection=my_config.MONGO_DB,
-            tablename=tablename,
-            pk=pk,
         )
-        return cls(con)
+        return cls(con, tablename, pk)
 
     def fetch(
         self, attrs: List[str], matching: CriteriaProtocol
@@ -117,7 +116,14 @@ class Mongo:
 
 # Test
 def mongo_interface_test(my_config):
-    mongo_repository = Mongo.set_default(my_config, "test", "identifier")
+    server = MongoServer (
+        hostname=my_config.MONGO_HOST,
+        port=my_config.MONGO_PORT,
+        username=my_config.MONGO_USER,
+        password=my_config.MONGO_PASS,
+        collection=my_config.MONGO_DB,
+    )
+    mongo_repository = Mongo(server, "test", "identifier")
     print(f"CONNECTION: {mongo_repository.dsn}")
 
     current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
