@@ -1,69 +1,46 @@
-from ...application.use_case.ticket import TicketApplication
+from ...application.use_case.ticket import TicketUseCase
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.config import Config
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
-from ..BrokerProtocol import BrokerProtocol
-from ..RepositoryProtocol import RepositoryProtocol
+from ...infrastructure.services.User import UserService
 
 
 class TicketController:
     def __init__(
         self,
         ref_write_uid,
-        ref_repository: None | RepositoryProtocol = None,
-        ref_broker: None | BrokerProtocol = None,
+        ref_repository=None,
+        ref_broker=None,
     ) -> None:
         _w = ref_write_uid
         my_config = Config()
         _r = TicketMongo(my_config) if ref_repository is None else ref_repository
         _b = MockBroker.set_default(my_config) if ref_broker is None else ref_broker
-        self._app = TicketApplication(_w, _r, _b)
-
-    @staticmethod
-    def getTemplate() -> str:
-        return """
-            **I:** Patrick Alonso Fuentes Carpio
-
-            **AS:** A developer, I need a task module.
-
-            **I WANT TO:** Create a new task, associate users with different roles to the task, add meetings, link related words to the task for searching, conduct surveys, and maintain a list of milestones related to the task.
-
-            **BECAUSE**: I want to enhance traceability and provide accurate statistics.
-
-            **MILESTONES:**
-            - Create, edit, and delete tasks.
-            - Add team members.
-            - Send notifications to team members based on task-related events.
-            - Create surveys.
-            - Schedule meetings.
-            - Associate keywords with the task for searching.
-            - Generate a task document.
-
-            **NOTES:** The module should be developed following clean architecture principles.
-            """
+        self._uc = TicketUseCase(_w, _r, _b)
 
     def fetch(self) -> list:
-        return self._app.fetch(0)
+        return self._uc.fetch(0)
 
     def get_by_id(self, obj_id):
         ticketId = TicketDomain.set_identifier(obj_id)
 
-        return self._app.get_by_id(ticketId)
+        return self._uc.get_by_id(ticketId)
 
     def delete(self, obj_id):
         ticketId = TicketDomain.set_identifier(obj_id)
 
-        return self._app.delete(ticketId)
+        return self._uc.delete(ticketId)
 
     def update(self, obj_id, params: dict):
         ticketId = TicketDomain.set_identifier(obj_id)
         obj = TicketDomain.from_dict(ticketId, params)
 
-        return self._app.update(obj)
+        return self._uc.update(obj)
 
-    def create(self, obj_id, description):
+    def create(self, obj_id, where, requirement, because):
         ticketId = TicketDomain.set_identifier(obj_id)
-        obj = TicketDomain.new_ticket(ticketId, description)
+        authorId = UserService.set_identifier(self._w)
+        obj = TicketDomain.new(ticketId, authorId, where, requirement, because)
 
-        return self._app.create(obj)
+        return self._uc.create(obj)

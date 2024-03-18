@@ -1,13 +1,13 @@
 from enum import Enum
-from typing import Protocol
 
-from ...domain.identifier_handler import IdentifierHandler
+from ...domain.identifier_handler import Identifier
 from ...domain.model.ticket import PartialTicket, Ticket, TicketDomain, TicketIdentifier
-from ...presentation.RepositoryProtocol import RepositoryProtocol
 from ...utils.response_code import DB_ID_NOT_FOUND
 from ..ApplicationError import ApplicationError
 from ..audit_handler import AuditHandler
+from ..BrokerProtocol import BrokerProtocol
 from ..criteria import Criteria
+from ..RepositoryProtocol import RepositoryProtocol
 
 
 class TicketEvent(Enum):
@@ -17,18 +17,13 @@ class TicketEvent(Enum):
     ADD_MEMBER = 3
 
 
-class TicketBrokerProtocol(Protocol):
-    def publish(subject, data):
-        pass
-
-
 # TODO: Rule to manager can not have in progress more than 4 tickets
-class TicketApplication:
+class TicketUseCase:
     def __init__(
         self,
-        ref_write_uid: IdentifierHandler,
+        ref_write_uid: Identifier,
         ref_repository: RepositoryProtocol,
-        ref_broker: TicketBrokerProtocol,
+        ref_broker: BrokerProtocol,
     ):
         self._w = ref_write_uid
         self._r = ref_repository
@@ -65,14 +60,13 @@ class TicketApplication:
         if not self._r.entity_exists(identifier):
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 
-        item = TicketDomain.asdict(obj)
-        item.pop("ticketId")
+        item = TicketDomain.as_dict(obj)
         item.update(AuditHandler.get_update_fields(self._w))
 
         return self._r.update(identifier, item)
 
     def create(self, obj: Ticket) -> None:
-        item = TicketDomain.asdict(obj)
+        item = TicketDomain.as_dict(obj)
         item.update(AuditHandler.get_create_fields(self._w))
 
         return self._r.create(item)

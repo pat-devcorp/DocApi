@@ -3,4 +3,4 @@
 @writeUId = b4b69df7-f852-4318-bc3d-1437ee5dddea
 
 ### Create Ticket
-POST {{base_url}}?writeUId={{writeUId}}&ticketId={{ticketId}}&description="I HAVE PROBLEMS WITH"
+POST {{base_url}}?writeUId={{writeUId}}&ticketId={{ticketId}}&requirement="I HAVE PROBLEMS WITH"

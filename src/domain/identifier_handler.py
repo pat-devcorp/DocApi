@@ -1,7 +1,10 @@
+from collections import namedtuple
 from enum import Enum
 from uuid import UUID, uuid4
 
 from ..infrastructure.services.User import UserService
+
+Identifier = namedtuple("Identifier", "value", "algorithm", "key")
 
 
 class IdentityAlgorithm(Enum):

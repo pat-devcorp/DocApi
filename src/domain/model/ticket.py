@@ -1,48 +1,25 @@
 from collections import namedtuple
 
-from ...utils.custom_date import CustomDate
 from ...utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..custom_enum import CustomEnum
 from ..DomainError import DomainError
-from ..identifier_handler import IdentifierHandler, IdentityAlgorithm
+from ..identifier_handler import Identifier, IdentifierHandler, IdentityAlgorithm
 
-TicketIdentifier = namedtuple("TicketIdentifier", "value")
+
 Ticket = namedtuple(
     "Ticket",
     [
         "ticketId",
-        "description",
-        "category",
-        "typeCommit",
+        "authorId",
+        "where",
+        "requirement",
+        "because",
         "state",
-        "points",
-        "estimateEndAt",
     ],
 )
 PartialTicket = namedtuple(
     "PartialTicket", Ticket._fields, defaults=[None] * (len(Ticket._fields) - 1)
 )
-
-
-class TicketCategory(CustomEnum):
-    UNDEFINED = 0
-    PENDENTS = 1
-    SUPPORT = 2
-    TICKET = 3
-
-
-class TicketTypeCommit(CustomEnum):
-    UNDEFINED = 0
-    FEAT = 1
-    FIX = 2
-    BUILD = 3
-    CI = 4
-    DOCS = 5
-    CHORE = 6
-    PERFORMANCE = 6
-    REFACTOR = 7
-    LINTER = 8
-    TEST = 9
 
 
 class TicketState(CustomEnum):
@@ -55,11 +32,12 @@ class TicketState(CustomEnum):
 
 class TicketDomain:
     _idAlgorithm = IdentityAlgorithm.UUID_V4
+    _pk = "ticketId"
 
     @classmethod
-    def get_identifier(cls) -> TicketIdentifier:
-        ic = IdentifierHandler.get_default(cls._idAlgorithm)
-        return TicketIdentifier(ic)
+    def get_identifier(cls) -> Identifier:
+        identifier = IdentifierHandler.get_default(cls._idAlgorithm)
+        return Identifier(identifier, cls._idAlgorithm, cls._pk)
 
     @classmethod
     def is_valid_identifier(cls, identifier) -> None | DomainError:
@@ -68,25 +46,15 @@ class TicketDomain:
             raise DomainError(ID_NOT_VALID, err)
 
     @classmethod
-    def set_identifier(cls, identifier) -> TicketIdentifier | DomainError:
+    def set_identifier(cls, identifier) -> Identifier | DomainError:
         cls.is_valid_identifier(identifier)
-        return TicketIdentifier(identifier)
-
-    @staticmethod
-    def is_valid_points(value: int) -> tuple[bool, str]:
-        if 0 <= value <= 10:
-            return True, ""
-        return False, "Points must be between 0 and 10"
+        return Identifier(identifier, cls._idAlgorithm, cls._pk)
 
     @classmethod
     def is_valid(cls, data: dict, is_partial=True) -> tuple[bool, str]:
         validate_func = {
             "ticketId": [cls.is_valid_identifier],
-            "category": [TicketCategory.has_value],
-            "typeCommit": [TicketTypeCommit.has_value],
             "state": [TicketState.has_value],
-            "points": [cls.is_valid_points],
-            "estimateEndAt": [CustomDate.check_format],
         }
 
         errors = list()
@@ -105,10 +73,10 @@ class TicketDomain:
 
     @classmethod
     def from_dict(
-        cls, identifier: TicketIdentifier, data: list
+        cls, identifier: Identifier, data: list
     ) -> Ticket | PartialTicket | DomainError:
         item = {k: v for k, v in data.items() if k in Ticket._fields}
-        item["ticketId"] = identifier
+        item[cls._pk] = identifier.value
 
         is_ok, err = cls.is_valid(item)
         if not is_ok:
@@ -127,30 +95,34 @@ class TicketDomain:
         return PartialTicket(**item)
 
     @classmethod
-    def new_ticket(
-        cls, identifier: TicketIdentifier, description: str
+    def new(
+        cls,
+        identifier: Identifier,
+        authorId,
+        where,
+        requirement: str,
+        because: str,
     ) -> Ticket | DomainError:
         item = {
             "ticketId": identifier.value,
-            "description": description,
-            "category": TicketCategory.PENDENTS.value,
-            "typeCommit": TicketTypeCommit.UNDEFINED.value,
+            "authorId": authorId.value,
+            "where": where.value,
+            "requirement": requirement,
+            "because": because,
             "state": TicketState.CREATED.value,
-            "points": 1,
-            "estimateEndAt": CustomDate.str_now(),
         }
 
         return Ticket(**item)
 
     @staticmethod
-    def asdict(ticket: Ticket | PartialTicket) -> dict:
+    def as_dict(ticket: Ticket | PartialTicket) -> dict:
         if isinstance(ticket, Ticket):
             return ticket._asdict()
         return {k: v for k, v in ticket._asdict().items() if k is not None}
 
     # Test
     @staticmethod
-    def bad_ticket() -> Ticket:
+    def bad_ticket():
         return Ticket(
             "a",
             "a" * 201,

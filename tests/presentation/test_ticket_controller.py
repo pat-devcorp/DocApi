@@ -47,7 +47,7 @@ def test_interface_invalid_params():
     invalid_obj = get_invalid_obj()
 
     with pytest.raises(DomainError) as error:
-        tc.create(invalid_obj.ticketId, invalid_obj.description)
+        tc.create(invalid_obj.ticketId, invalid_obj.requirement)
     assert str(error.value) == ID_NOT_VALID[1]
 
     with pytest.raises(DomainError) as error:
@@ -59,7 +59,7 @@ def test_interface_invalid_params():
     assert str(error.value) == ID_NOT_VALID[1]
 
     with pytest.raises(DomainError) as error:
-        tc.create(obj.ticketId, invalid_obj.description)
+        tc.create(obj.ticketId, invalid_obj.requirement)
     assert str(error.value) == SCHEMA_NOT_MATCH[1]
 
     with pytest.raises(DomainError) as error:

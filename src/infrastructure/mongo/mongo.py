@@ -102,6 +102,7 @@ class Mongo:
 
     def update(self, identifier: str, kwargs: dict) -> None | InfrastructureError:
         try:
+            kwargs.pop(self.pk)
             self.cursor.update_one({"_id": identifier}, {"$set": kwargs})
         except Exception as err:
             raise InfrastructureError(DB_UPDATE_FAIL, str(err))
@@ -123,7 +124,7 @@ def mongo_interface_test(my_config):
     dto = {
         "writeUId": "8888",
         "identifier": current_id,
-        "description": "This is description",
+        "requirement": "This is requirement",
     }
     mongo_repository.create(dto)
 
@@ -131,10 +132,10 @@ def mongo_interface_test(my_config):
     assert data
 
     text = "It was modified"
-    mongo_repository.update(current_id, {"description": text})
+    mongo_repository.update(current_id, {"requirement": text})
 
-    item = mongo_repository.get_by_id(current_id, ["description"])
-    assert item["description"] == text
+    item = mongo_repository.get_by_id(current_id, ["requirement"])
+    assert item["requirement"] == text
 
     mongo_repository.delete(current_id)
-    assert mongo_repository.get_by_id(current_id, ["description"]) is None
+    assert mongo_repository.get_by_id(current_id, ["requirement"]) is None

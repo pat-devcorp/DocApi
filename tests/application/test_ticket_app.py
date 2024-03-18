@@ -1,7 +1,7 @@
 import pytest
 
 from src.application.audit_handler import AuditHandler
-from src.application.use_case.ticket import TicketApplication
+from src.application.use_case.ticket import TicketUseCase
 from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.MockBroker import MockBroker
 from src.infrastructure.mongo.MockRepository import MockRepository
@@ -12,7 +12,7 @@ def get_mock_application():
     u = get_mock()
     r = MockRepository()
     b = MockBroker()
-    return TicketApplication(u, r, b)
+    return TicketUseCase(u, r, b)
 
 
 def get_objs():
@@ -20,7 +20,7 @@ def get_objs():
     print(f"ID:{obj_id}")
     obj = TicketDomain.new_ticket(obj_id, "ready")
     print(f"OBJECT:{obj}")
-    partial_obj = TicketDomain.from_dict(obj_id, {"description": "steady"})
+    partial_obj = TicketDomain.from_dict(obj_id, {"requirement": "steady"})
     return obj_id, obj, partial_obj
 
 
