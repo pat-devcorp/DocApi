@@ -1,9 +1,7 @@
 from ...application.use_case.ticket import TicketUseCase
 from ...domain.model.ticket import TicketDomain
-from ...infrastructure.broker.MockBroker import MockBroker
 from ...infrastructure.config import Config
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
-from ...infrastructure.services.User import UserService
 
 
 class TicketController:
@@ -16,7 +14,7 @@ class TicketController:
         _w = ref_write_uid
         my_config = Config()
         _r = TicketMongo(my_config) if ref_repository is None else ref_repository
-        _b = MockBroker.set_default(my_config) if ref_broker is None else ref_broker
+        _b = ref_broker
         self._uc = TicketUseCase(_w, _r, _b)
 
     def fetch(self) -> list:
@@ -40,7 +38,6 @@ class TicketController:
 
     def create(self, obj_id, where, requirement, because):
         ticketId = TicketDomain.set_identifier(obj_id)
-        authorId = UserService.set_identifier(self._w)
-        obj = TicketDomain.new(ticketId, authorId, where, requirement, because)
+        obj = TicketDomain.new(ticketId, where, requirement, because)
 
         return self._uc.create(obj)

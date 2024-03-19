@@ -116,7 +116,7 @@ class Mongo:
 
 # Test
 def mongo_interface_test(my_config):
-    server = MongoServer (
+    server = MongoServer(
         hostname=my_config.MONGO_HOST,
         port=my_config.MONGO_PORT,
         username=my_config.MONGO_USER,
