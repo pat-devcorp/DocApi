@@ -1,9 +1,9 @@
 import os
 
-from .singleton import singleton
+from ..infrastructure.broker.rabbitmq import RabbitmqServer
+from ..infrastructure.mongo.mongo import MongoServer
 
 
-@singleton
 class Config:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -13,6 +13,9 @@ class Config:
         self.LOG_CONFIG = os.path.join(
             self.PROJECT_PATH, "infrastructure", "logger", "config.json"
         )
+        self.BROKER_PATH = os.path.join("src", "log", "broker")
+        self.IMAGE_FOLDER = os.path.join("src", "media", "img")
+
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
         self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
         self.NAME = "task_" + self.API_VERSION
@@ -32,18 +35,23 @@ class Config:
             "BROKER_LOST_MESSAGE_PATH", os.path.join("src", "log", "broker", "lost")
         )
         if self.BROKER == "RABBITMQ":
-            self.RABBITMQ_HOST = os.environ["RABBITMQ_HOST"]
-            self.RABBITMQ_PORT = os.environ["RABBITMQ_PORT"]
-            self.RABBITMQ_USER = os.environ["RABBITMQ_USER"]
-            self.RABBITMQ_PASS = os.environ["RABBITMQ_PASS"]
+            self.RABBITMQ_SERVER = RabbitmqServer(
+                os.environ["RABBITMQ_HOST"],
+                os.environ["RABBITMQ_PORT"],
+                os.environ["RABBITMQ_USER"],
+                os.environ["RABBITMQ_PASS"],
+                self.BROKER_PATH,
+            )
         if self.BROKER == "KAFKA":
             self.KAFKA_HOST = os.environ["KAFKA_HOST"]
             self.KAFKA_PORT = os.environ["KAFKA_PORT"]
 
         self.DB = os.getenv("DB", False)
         if self.DB == "MONGO":
-            self.MONGO_HOST = os.environ["MONGO_HOST"]
-            self.MONGO_PORT = os.environ["MONGO_PORT"]
-            self.MONGO_USER = os.environ["MONGO_USER"]
-            self.MONGO_PASS = os.environ["MONGO_PASS"]
-            self.MONGO_DB = os.environ["MONGO_DB"]
+            self.MONGO_SERVER = MongoServer(
+                os.environ["MONGO_HOST"],
+                os.environ["MONGO_PORT"],
+                os.environ["MONGO_USER"],
+                os.environ["MONGO_PASS"],
+                os.environ["MONGO_DB"],
+            )

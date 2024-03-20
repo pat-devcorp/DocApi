@@ -1,9 +1,9 @@
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.ticket import TicketDomain
-from src.infrastructure.broker.MockBroker import MockBroker
-from src.infrastructure.mongo.MockRepository import MockRepository
+from src.domain.model.ticket import Ticket, TicketDomain
+from src.infrastructure.broker.mock_broker import MockBrokerClient
+from src.infrastructure.mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import get_mock
 from src.presentation.controller.ticket import TicketController
 from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
@@ -11,8 +11,8 @@ from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 def get_mock_controller():
     u = get_mock()
-    r = MockRepository()
-    b = MockBroker()
+    r = MockRepositoryClient()
+    b = MockBrokerClient()
     return TicketController(u, r, b)
 
 
@@ -25,9 +25,15 @@ def get_obj():
 
 
 def get_invalid_obj():
-    invalid_obj = TicketDomain.bad_ticket()
-    print(f"INVALID OBJECT:{invalid_obj}")
-    return invalid_obj
+    return Ticket(
+        "a",
+        "a" * 201,
+        100,
+        100,
+        100,
+        100,
+        "20/20/20",
+    )
 
 
 def test_interface_with_out_parameters():

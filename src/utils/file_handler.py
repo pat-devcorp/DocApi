@@ -32,7 +32,7 @@ def is_safe(file, virus_api=VIRUS_ANALYZER_API) -> str:
             raise HandlerError(WARNING_FILE)
 
 
-class FileHanlder:
+class FileHandler:
     file_id = None
 
     def __init__(self, media_path) -> None:

@@ -1,13 +1,13 @@
 from ...InfrastructureError import InfrastructureError
-from ..mongo import Mongo, MongoConfig
+from ..mongo import MongoClient, MongoServer
 
 
 class TicketMongo:
     tablename = "ticket"
     pk = "ticketId"
 
-    def __init__(self, my_config: MongoConfig) -> None | InfrastructureError:
-        self._m = Mongo.set_default(my_config, self.tablename, self.pk)
+    def __init__(self, ref_server: MongoServer) -> None | InfrastructureError:
+        self._m = MongoClient.set_default(ref_server, self.tablename, self.pk)
 
     def entity_exists(self, identifier) -> bool:
         if self._m.get_by_id(identifier, [self._pk]) is None:

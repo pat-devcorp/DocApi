@@ -1,6 +1,8 @@
 REQUIRED_FIELD = ("Required param was not send", "417")
 OPERATION_FAIL = ("Operation fail", "417")
 WRITER_NOT_PROVIDED = ("Writer is not present in the requests", "417")
+FILE_NOT_PROVIDED = ("File not provided", "417")
+CODE_CREATED = ("Code created", "201")
 
 # # CODE STATUS
 # CODE_CONTINUE = 100

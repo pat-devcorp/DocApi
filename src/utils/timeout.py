@@ -6,7 +6,7 @@ class TimeoutError(Exception):
     pass
 
 
-def timeout_function(func, args=(), kwargs={}, seconds=1):
+def timeout_function(func, args=(), kwargs={}, seconds=600):
     class InterruptableThread(threading.Thread):
         def __init__(self):
             threading.Thread.__init__(self)

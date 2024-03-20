@@ -27,11 +27,11 @@ def get_objs():
 def test_interface_with_out_parameters():
     ta = get_mock_application()
 
-    with pytest.raises(TypeError) as error:
+    with pytest.raises(TypeError):
         ta.create()
-    with pytest.raises(TypeError) as error:
+    with pytest.raises(TypeError):
         ta.update()
-    with pytest.raises(TypeError) as error:
+    with pytest.raises(TypeError):
         ta.delete()
 
 

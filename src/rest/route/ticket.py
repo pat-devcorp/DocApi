@@ -17,7 +17,9 @@ def create_ticket():
         code, message = WRITER_NOT_PROVIDED
         return (code, message)
 
-    lc = TicketController(writeUId)
+    lc = TicketController(
+        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+    )
     item = lc.create()
 
     return (200, item)
@@ -33,7 +35,9 @@ def fetch_tickets(id=None):
         code, message = WRITER_NOT_PROVIDED
         return code, message
 
-    lc = TicketController(writeUId)
+    lc = TicketController(
+        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+    )
     if id is not None:
         data = lc.get_by_id(id)
     else:
@@ -54,7 +58,9 @@ def update_ticket(id):
         code, message = REQUIRED_FIELD
         return (code, message)
 
-    lc = TicketController(writeUId)
+    lc = TicketController(
+        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+    )
     item = lc.update(ticketId, params)
 
     return (200, item)
@@ -72,7 +78,9 @@ def delete_ticket(id):
         code, message = REQUIRED_FIELD
         return (code, message)
 
-    lc = TicketController(writeUId)
+    lc = TicketController(
+        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+    )
     item = lc.delete(ticketId)
 
     return (200, item)

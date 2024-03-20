@@ -1,6 +1,5 @@
 from ...application.use_case.ticket import TicketUseCase
 from ...domain.model.ticket import TicketDomain
-from ...infrastructure.config import Config
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 
 
@@ -8,12 +7,11 @@ class TicketController:
     def __init__(
         self,
         ref_write_uid,
-        ref_repository=None,
-        ref_broker=None,
+        ref_repository,
+        ref_broker,
     ) -> None:
         _w = ref_write_uid
-        my_config = Config()
-        _r = TicketMongo(my_config) if ref_repository is None else ref_repository
+        _r = ref_repository
         _b = ref_broker
         self._uc = TicketUseCase(_w, _r, _b)
 

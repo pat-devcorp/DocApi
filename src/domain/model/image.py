@@ -2,27 +2,17 @@ from collections import namedtuple
 
 from ...utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..DomainError import DomainError
-from ..enum.ticket_status import TicketState
 from ..identifier_handler import Identifier, IdentifierHandler, IdentityAlgorithm
 
-Ticket = namedtuple(
-    "Ticket",
-    [
-        "ticketId",
-        "where",
-        "requirement",
-        "because",
-        "state",
-    ],
-)
-PartialTicket = namedtuple(
-    "PartialTicket", Ticket._fields, defaults=[None] * (len(Ticket._fields) - 1)
+Image = namedtuple(
+    "Image",
+    ["imageId", "url"],
 )
 
 
-class TicketDomain:
+class ImageDomain:
     _idAlgorithm = IdentityAlgorithm.UUID_V4
-    _pk = "ticketId"
+    _pk = "ImageId"
 
     @classmethod
     def get_identifier(cls) -> Identifier:
@@ -41,38 +31,28 @@ class TicketDomain:
         return Identifier(identifier, cls._idAlgorithm, cls._pk)
 
     @staticmethod
-    def as_dict(data: Ticket | PartialTicket) -> dict:
-        return {k: v for k, v in data._asdict().items() if k is not None}
+    def as_dict(Image: Image) -> dict:
+        return {k: v for k, v in Image._asdict().items() if k is not None}
 
     @classmethod
-    def from_dict(
-        cls, identifier: Identifier, data: list
-    ) -> Ticket | PartialTicket | DomainError:
-        item = {k: v for k, v in data.items() if k in Ticket._fields}
+    def from_dict(cls, identifier: Identifier, data: list) -> Image | DomainError:
+        item = {k: v for k, v in data.items() if k in Image._fields}
         item[cls._pk] = identifier.value
 
         is_ok, err = cls.is_valid(item)
         if not is_ok:
             raise DomainError(SCHEMA_NOT_MATCH, err)
 
-        if Ticket._fields != set(item.keys()):
-            return PartialTicket(**item)
-        return Ticket(**item)
+        return Image(**item)
 
     @classmethod
-    def from_repo(cls, data: list) -> Ticket | PartialTicket:
-        item = {k: v for k, v in data.items() if k in Ticket._fields}
-
-        if Ticket._fields != set(item.keys()):
-            return PartialTicket(**item)
-        return Ticket(**item)
+    def from_repo(cls, data: list) -> Image:
+        item = {k: v for k, v in data.items() if k in Image._fields}
+        return Image(**item)
 
     @classmethod
     def is_valid(cls, data: dict, is_partial=True) -> tuple[bool, str]:
-        validate_func = {
-            "ticketId": [cls.is_valid_identifier],
-            "state": [TicketState.has_value],
-        }
+        validate_func = {"ImageId": [cls.is_valid_identifier]}
 
         errors = list()
         for k, v in data.items():
@@ -92,16 +72,8 @@ class TicketDomain:
     def new(
         cls,
         identifier: Identifier,
-        where,
-        requirement: str,
-        because: str,
-    ) -> Ticket | DomainError:
-        item = {
-            "ticketId": identifier.value,
-            "where": where.value,
-            "requirement": requirement,
-            "because": because,
-            "state": TicketState.CREATED.value,
-        }
+        name,
+    ) -> Image | DomainError:
+        item = {"ImageId": identifier.value, "name": name}
 
-        return Ticket(**item)
+        return Image(**item)

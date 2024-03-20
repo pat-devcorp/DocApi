@@ -4,4 +4,4 @@ from src.infrastructure.config import Config
 
 def test_rabbitmq():
     my_config = Config()
-    rabbitmq_interface_test(my_config)
+    rabbitmq_interface_test(my_config.RABBITMQ_SERVER)

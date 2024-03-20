@@ -1,7 +1,7 @@
 from enum import Enum
 
 from ...domain.identifier_handler import Identifier
-from ...domain.model.ticket import PartialTicket, Ticket, TicketDomain, TicketIdentifier
+from ...domain.model.ticket import PartialTicket, Ticket, TicketDomain
 from ...utils.response_code import DB_ID_NOT_FOUND
 from ..ApplicationError import ApplicationError
 from ..audit_handler import AuditHandler
@@ -42,10 +42,10 @@ class TicketUseCase:
 
         return self._r.fetch(self._f, matching)
 
-    def get_by_id(self, obj_id: TicketIdentifier) -> dict:
+    def get_by_id(self, obj_id: Identifier) -> dict:
         return self._r.get_by_id(obj_id.value, self._f)
 
-    def delete(self, obj_id: TicketIdentifier) -> None | ApplicationError:
+    def delete(self, obj_id: Identifier) -> None | ApplicationError:
         if not self._r.entity_exists(obj_id):
             raise ApplicationError(DB_ID_NOT_FOUND, "Entity ticket not exists")
 

@@ -1,18 +1,10 @@
 from typing import Dict, List, Protocol
 
 from pydantic import BaseModel
-from pymongo import MongoClient
+from pymongo import MongoClient as MongoProvider
 
 from ...utils.response_code import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
 from ..InfrastructureError import InfrastructureError
-
-
-class MongoConfig(Protocol):
-    MONGO_HOST: str
-    MONGO_PORT: int
-    MONGO_USER: str
-    MONGO_PASS: str
-    MONGO_DB: str
 
 
 class MongoServer(BaseModel):
@@ -21,15 +13,13 @@ class MongoServer(BaseModel):
     username: str
     password: str
     collection: str
-    tablename: str
-    pk: str
 
 
 class CriteriaProtocol(Protocol):
     clauses: list
 
 
-class Mongo:
+class MongoClient:
     def __init__(self, ref_mongo_server: MongoServer, tablename: str, pk: str):
         self.server = ref_mongo_server
         self.tablename = tablename
@@ -42,11 +32,11 @@ class Mongo:
         return f"mongodb://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
 
     def decoder_criteria(matching) -> None:
-        pass
+        print(matching)
 
     def _connect(self):
         if self.client is None:
-            self.client = MongoClient(self.dsn)
+            self.client = MongoProvider(self.dsn)
             self.collection = self.client[self.server.collection][
                 self.tablename
             ]  # Access collection directly
@@ -64,17 +54,6 @@ class Mongo:
         if self.client:
             self.client.close()
             self.client = None
-
-    @classmethod
-    def set_default(cls, my_config: MongoConfig, tablename: str, pk: str):
-        con = MongoServer(
-            hostname=my_config.MONGO_HOST,
-            port=my_config.MONGO_PORT,
-            username=my_config.MONGO_USER,
-            password=my_config.MONGO_PASS,
-            collection=my_config.MONGO_DB,
-        )
-        return cls(con, tablename, pk)
 
     def fetch(
         self, attrs: List[str], matching: CriteriaProtocol
@@ -115,15 +94,8 @@ class Mongo:
 
 
 # Test
-def mongo_interface_test(my_config):
-    server = MongoServer(
-        hostname=my_config.MONGO_HOST,
-        port=my_config.MONGO_PORT,
-        username=my_config.MONGO_USER,
-        password=my_config.MONGO_PASS,
-        collection=my_config.MONGO_DB,
-    )
-    mongo_repository = Mongo(server, "test", "identifier")
+def mongo_interface_test(ref_mongo_server):
+    mongo_repository = MongoClient(ref_mongo_server, "test", "identifier")
     print(f"CONNECTION: {mongo_repository.dsn}")
 
     current_id = "87378a1e-894c-11ee-b9d1-0242ac120002"
