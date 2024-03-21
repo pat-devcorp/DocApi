@@ -1,5 +1,5 @@
-from ...application.use_case.Person import PersonUseCase
-from ...domain.model.Person import PersonDomain
+from ...application.use_case.person import PersonUseCase
+from ...domain.model.person import PersonDomain
 from ...infrastructure.mongo.repositories.person_mongo import PersonMongo
 
 
@@ -19,23 +19,23 @@ class PersonController:
         return self._uc.fetch(0)
 
     def get_by_id(self, obj_id):
-        PersonId = PersonDomain.set_identifier(obj_id)
+        personId = PersonDomain.set_identifier(obj_id)
 
-        return self._uc.get_by_id(PersonId)
+        return self._uc.get_by_id(personId)
 
     def delete(self, obj_id):
-        PersonId = PersonDomain.set_identifier(obj_id)
+        personId = PersonDomain.set_identifier(obj_id)
 
-        return self._uc.delete(PersonId)
+        return self._uc.delete(personId)
 
     def update(self, obj_id, params: dict):
-        PersonId = PersonDomain.set_identifier(obj_id)
-        obj = PersonDomain.from_dict(PersonId, params)
+        personId = PersonDomain.set_identifier(obj_id)
+        obj = PersonDomain.from_dict(personId, params)
 
         return self._uc.update(obj)
 
-    def create(self, obj_id, channelId, requirement, because):
-        PersonId = PersonDomain.set_identifier(obj_id)
-        obj = PersonDomain.new(PersonId, channelId, requirement, because)
+    def create(self, obj_id, name, lastName):
+        personId = PersonDomain.set_identifier(obj_id)
+        obj = PersonDomain.new(personId, name, lastName)
 
         return self._uc.create(obj)

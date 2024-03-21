@@ -1,29 +1,27 @@
-from collections import namedtuple
 from enum import Enum
 from uuid import UUID, uuid4
 
-from ..infrastructure.services.User import UserService
+from ..utils.response_code import ID_NOT_VALID
+from .DomainError import DomainError
 
-Identifier = namedtuple("Identifier", "value", "algorithm", "key")
 
-
-class IdentityAlgorithm(Enum):
+class IdentifierAlgorithm(Enum):
     DEFAULT = 0
     UUID_V4 = 1
     USER_ID = 2
 
 
 class IdentifierHandler:
-    def __init__(self, algorithm: IdentityAlgorithm):
+    def __init__(self, pk: str, algorithm: IdentifierAlgorithm) -> None:
+        self.pk = pk
         self.algorithm = algorithm
 
-    @classmethod
-    def get_default(cls, algorithm: IdentityAlgorithm):
+    def get_default_identifier(self):
         default = [
-            cls.get_string,
-            cls.get_uuid_v4,
+            self.get_string,
+            self.get_uuid_v4,
         ]
-        return default[algorithm.value]()
+        return default[self.algorithm.value]()
 
     @staticmethod
     def get_string():
@@ -33,14 +31,11 @@ class IdentifierHandler:
     def get_uuid_v4():
         return str(uuid4())
 
-    @classmethod
-    def is_valid(cls, identifier, algorithm: IdentityAlgorithm) -> tuple[bool, str]:
-        validator = [
-            cls.is_valid_default,
-            cls.is_valid_uuid_v4,
-            cls.is_valid_user_id,
-        ]
-        return validator[algorithm.value](identifier)
+    def is_valid(self, identifier) -> None | DomainError:
+        validator = [self.is_valid_default, self.is_valid_uuid_v4]
+        is_ok, err = validator[self.algorithm.value](identifier)
+        if not is_ok:
+            raise DomainError(ID_NOT_VALID, err)
 
     @staticmethod
     def is_valid_default(identifier):
@@ -56,9 +51,3 @@ class IdentifierHandler:
             return True, ""
         except ValueError:
             return False, "Algorithm does not match"
-
-    @staticmethod
-    def is_valid_user_id(identifier) -> tuple[bool, str]:
-        if not UserService.is_valid_user_id(identifier):
-            return False, "User does not exists"
-        return True, ""

@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from ...utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..DomainError import DomainError
-from ..identifier_handler import Identifier, IdentifierHandler, IdentityAlgorithm
+from ..identifier_handler import Identifier, IdentifierAlgorithm, IdentifierHandler
 
 Image = namedtuple(
     "Image",
@@ -11,7 +11,7 @@ Image = namedtuple(
 
 
 class ImageDomain:
-    _idAlgorithm = IdentityAlgorithm.UUID_V4
+    _idAlgorithm = IdentifierAlgorithm.UUID_V4
     _pk = "ImageId"
 
     @classmethod

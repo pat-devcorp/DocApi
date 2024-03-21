@@ -1,15 +1,13 @@
 import pytest
 
-from src.domain.DomainError import DomainError
-from src.domain.model.person import Person, PersonDomain
+from src.domain.model.person import PersonDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.person import PersonController
-from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 class MockRepositoryClient:
-    object = [] 
+    object = []
 
     def dsn(self):
         return "mock-repos"
@@ -31,18 +29,23 @@ class MockRepositoryClient:
 
 
 def get_mock_controller():
-    u = UserService.get_mock()
+    u = UserService.get_default_identifier()
     r = MockRepositoryClient()
     b = MockBrokerClient()
-    return TicketController(u, r, b)
+    return PersonController(u, r, b)
 
 
-def get_obj():
-    obj_id = PersonDomain.get_identifier()
-    print(f"ID:{obj_id}")
-    obj = PersonDomain.new(obj_id, "ready")
-    print(f"OBJECT:{obj}")
-    return obj
+def test_domain():
+    person_id = PersonDomain.get_default_identifier()
+    print(f"ID:{PersonDomain.as_dict(person_id)}")
+    person_1 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", None)
+    data_1 = PersonDomain.as_dict(person_1)
+    print(f"OBJECT:{data_1}")
+    attrs = 
+    person_2 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", None)
+    obj_from_dict = PersonDomain.from_dict(data_1)
+    print(f"OBJECT:{PersonDomain.as_dict(obj_from_dict)}")
+    # return obj_id, new_obj
 
 
 # def get_invalid_obj():

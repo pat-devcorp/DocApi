@@ -3,7 +3,7 @@ from collections import namedtuple
 from ...utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..DomainError import DomainError
 from ..enum.ticket_status import TicketState
-from ..identifier_handler import Identifier, IdentifierHandler, IdentityAlgorithm
+from ..identifier_handler import Identifier, IdentifierAlgorithm, IdentifierHandler
 
 Ticket = namedtuple(
     "Ticket",
@@ -21,7 +21,7 @@ PartialTicket = namedtuple(
 
 
 class TicketDomain:
-    _idAlgorithm = IdentityAlgorithm.UUID_V4
+    _idAlgorithm = IdentifierAlgorithm.UUID_V4
     pk = "ticketId"
 
     @classmethod

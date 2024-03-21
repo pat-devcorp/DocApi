@@ -1,4 +1,4 @@
-from ..domain.identifier_handler import IdentifierHandler, IdentityAlgorithm
+from ..domain.identifier_handler import IdentifierAlgorithm, IdentifierHandler
 from ..infrastructure.services.User import UserService
 from ..utils.custom_date import CustomDatetime
 from ..utils.HandlerError import HandlerError
@@ -46,7 +46,7 @@ class AuditHandler:
     def get_identifier(cls, user_id) -> IdentifierHandler | HandlerError:
         if not UserService.is_valid_user_id(user_id):
             raise HandlerError(ID_NOT_FOUND)
-        return IdentifierHandler(IdentityAlgorithm.DEFAULT, user_id)
+        return IdentifierHandler(IdentifierAlgorithm.DEFAULT, user_id)
 
     @classmethod
     def from_dict(cls, params: dict) -> dict | HandlerError:
