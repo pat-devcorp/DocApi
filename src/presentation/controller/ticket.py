@@ -11,7 +11,7 @@ class TicketController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = ref_repository
+        _r = TicketMongo(ref_repository, TicketDomain.pk)
         _b = ref_broker
         self._uc = TicketUseCase(_w, _r, _b)
 
@@ -34,8 +34,8 @@ class TicketController:
 
         return self._uc.update(obj)
 
-    def create(self, obj_id, where, requirement, because):
+    def create(self, obj_id, channelId, requirement, because):
         ticketId = TicketDomain.set_identifier(obj_id)
-        obj = TicketDomain.new(ticketId, where, requirement, because)
+        obj = TicketDomain.new(ticketId, channelId, requirement, because)
 
         return self._uc.create(obj)

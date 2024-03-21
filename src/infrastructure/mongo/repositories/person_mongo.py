@@ -2,8 +2,8 @@ from ...InfrastructureError import InfrastructureError
 from ..mongo import MongoClient, MongoServer
 
 
-class TicketMongo:
-    tablename = "ticket"
+class PersonMongo:
+    tablename = "person"
 
     def __init__(self, ref_server: MongoServer, pk) -> None | InfrastructureError:
         self._m = MongoClient.set_default(ref_server, self.tablename, pk)

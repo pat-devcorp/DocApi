@@ -9,7 +9,7 @@ Ticket = namedtuple(
     "Ticket",
     [
         "ticketId",
-        "where",
+        "channelId",
         "requirement",
         "because",
         "state",
@@ -22,12 +22,12 @@ PartialTicket = namedtuple(
 
 class TicketDomain:
     _idAlgorithm = IdentityAlgorithm.UUID_V4
-    _pk = "ticketId"
+    pk = "ticketId"
 
     @classmethod
     def get_identifier(cls) -> Identifier:
         identifier = IdentifierHandler.get_default(cls._idAlgorithm)
-        return Identifier(identifier, cls._idAlgorithm, cls._pk)
+        return Identifier(identifier, cls._idAlgorithm, cls.pk)
 
     @classmethod
     def is_valid_identifier(cls, identifier) -> None | DomainError:
@@ -38,7 +38,7 @@ class TicketDomain:
     @classmethod
     def set_identifier(cls, identifier) -> Identifier | DomainError:
         cls.is_valid_identifier(identifier)
-        return Identifier(identifier, cls._idAlgorithm, cls._pk)
+        return Identifier(identifier, cls._idAlgorithm, cls.pk)
 
     @staticmethod
     def as_dict(data: Ticket | PartialTicket) -> dict:
@@ -49,7 +49,7 @@ class TicketDomain:
         cls, identifier: Identifier, data: list
     ) -> Ticket | PartialTicket | DomainError:
         item = {k: v for k, v in data.items() if k in Ticket._fields}
-        item[cls._pk] = identifier.value
+        item[cls.pk] = identifier.value
 
         is_ok, err = cls.is_valid(item)
         if not is_ok:
@@ -92,13 +92,13 @@ class TicketDomain:
     def new(
         cls,
         identifier: Identifier,
-        where,
+        channelId: Identifier,
         requirement: str,
         because: str,
     ) -> Ticket | DomainError:
         item = {
             "ticketId": identifier.value,
-            "where": where.value,
+            "channelId": channelId.value,
             "requirement": requirement,
             "because": because,
             "state": TicketState.CREATED.value,

@@ -1,16 +1,15 @@
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.ticket import Ticket, TicketDomain
+from src.domain.model.person import Person, PersonDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
-from src.presentation.controller.ticket import TicketController
+from src.presentation.controller.person import PersonController
 from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 class MockRepositoryClient:
-    def __init__(self, data) -> None:
-        self.object = data
+    object = [] 
 
     def dsn(self):
         return "mock-repos"
@@ -38,12 +37,12 @@ def get_mock_controller():
     return TicketController(u, r, b)
 
 
-# def get_obj():
-#     obj_id = TicketDomain.get_identifier()
-#     print(f"ID:{obj_id}")
-#     obj = TicketDomain.new(obj_id, "ready")
-#     print(f"OBJECT:{obj}")
-#     return obj
+def get_obj():
+    obj_id = PersonDomain.get_identifier()
+    print(f"ID:{obj_id}")
+    obj = PersonDomain.new(obj_id, "ready")
+    print(f"OBJECT:{obj}")
+    return obj
 
 
 # def get_invalid_obj():
