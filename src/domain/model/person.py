@@ -9,18 +9,35 @@ from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
 PersonId = namedtuple("PersonId", ["value"])
 Person = namedtuple(
     "Person",
-    ["personId", "name", "lastName", "mailAddress", "attrs"],
+    ["personId", "name", "lastName", "mailAddress", "birthDate", "documentNumber", "address"],
 )
-AttrsPerson = namedtuple(
-    "AttrsPerson",
-    ["birthDate", "documentNumber", "address"],
-)
+
+
+def is_empty_string(value: str) -> bool:
+    if value is None or not isinstance(value, str) or value == "":
+        return True
+    return False
+
+def has_special_char(value: str) -> bool:
+    non_alphanumeric_chars = ''
+    for char in value:
+        if not char.isalnum():
+            non_alphanumeric_chars += char
+    if non_alphanumeric_chars:
+        return True, non_alphanumeric_chars
+    return False, ""
+
+def validate_email_syntax(email):
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    if re.match(pattern, email) is None:
+        return False, "Invalid email format""
+    return True, ""
 
 
 class PersonDomain:
     algorithm = IdentifierAlgorithm.UUID_V4
     pk = "personId"
-    fields = Person._fields + AttrsPerson._fields
+    fields = Person._fields
 
     @classmethod
     def get_default_identifier(cls):
@@ -34,24 +51,42 @@ class PersonDomain:
         return PersonId(identifier)
 
     @staticmethod
-    def as_dict(obj) -> dict:
-        return {k: v for k, v in obj._asdict().items() if v is not None}
+    def as_dict(namedtuple_instance) -> dict:
+        return dict(namedtuple_instance._asdict())
+
+    @classmethod
+    def is_valid(cls, data: dict) -> tuple[bool, str]:
+        error = list()
+
+        if data.get("personId") is not None:
+            try:
+                cls.set_identifier(data["personId"])
+            except DomainError as e:
+                error.append(e.message)
+
+        if data.get("mailAddress") is not None:
+            is_ok, err = cls.validate_email_syntax(data["mailAddress"])
+            if not is_ok:
+                error.append(err)
+        
+        if data.get("birthDate") is not None:
+            is_ok, err = CustomDate.check_format(data["birthDate"])
+            if not is_ok:
+                error.append(err)
+        
+        if len(errors) > 0:
+            raise DomainError(INVALID_FORMAT, "\n".join(errors))
+
 
     @classmethod
     def from_dict(cls, data: list) -> Person | DomainError:
         if data.get(cls.pk, None) is None:
             raise DomainError(ID_NOT_FOUND, "id must be provided")
 
-        attr = AttrsPersonDomain.new(data)
         person = {k: v for k, v in data.items() if k in Person._fields}
-        person.update({"attrs": attr})
-
+        cls.is_valid(person)
         return Person(**person)
 
-    @classmethod
-    def from_repo(cls, data: list) -> Person:
-        item = {k: v for k, v in data.items() if k in Person._fields}
-        return Person(**item)
 
     @classmethod
     def new(
@@ -60,13 +95,19 @@ class PersonDomain:
         name: str,
         lastName: str,
         mailAddress: str,
-        attrs: AttrsPerson | None,
+        **kwargs
     ) -> Person | DomainError:
+        if identifier is None or is_empty_string(name) or is_empty_string(lastName) or is_empty_string(mailAddress):
+            raise DomainError(FIELD_REQUIRED, "fields must be provided")
+        if has_special_char(name) or has_special_char(lastName) or has_special_char(mailAddress):
+            raise DomainError(FIELD_REQUIRED, "fields must be provided")
+
         item = {
             "personId": identifier.value,
             "name": name,
             "lastName": lastName,
             "mailAddress": mailAddress,
-            "attrs": attrs.as_dict() if attrs else None,
         }
-        return Person(**item)
+        if kwargs:
+            item.update(kwargs)
+        return cls.from_dict(item)

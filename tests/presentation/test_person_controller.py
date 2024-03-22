@@ -38,11 +38,11 @@ def get_mock_controller():
 def test_domain():
     person_id = PersonDomain.get_default_identifier()
     print(f"ID:{PersonDomain.as_dict(person_id)}")
-    person_1 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", None)
+    person_1 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com")
     data_1 = PersonDomain.as_dict(person_1)
     print(f"OBJECT:{data_1}")
-    attrs = 
-    person_2 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", None)
+    attrs = {"birthDate": "1995/07/18", "documentNumber": "72539751", "address": "Cultura chimu 413"}
+    person_2 = PersonDomain.new(person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", attrs)
     obj_from_dict = PersonDomain.from_dict(data_1)
     print(f"OBJECT:{PersonDomain.as_dict(obj_from_dict)}")
     # return obj_id, new_obj

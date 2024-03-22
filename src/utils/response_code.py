@@ -1,4 +1,5 @@
 LOGIC_CRASH = ("1000", "Logic Crush")
+FIELD_REQUIRED = ("1001", "Field Required")
 ID_NOT_FOUND = ("1000", "ID must be provided")
 ID_NOT_VALID = ("1000", "ID not valid")
 WRITER_NOT_FOUND = ("1000", "Writer must be provided")

@@ -4,9 +4,9 @@ from datetime import datetime
 def has_valid_format(obj_date, format) -> bool:
     try:
         datetime.strptime(obj_date, format)
-        return True
+        return True, ""
     except ValueError:
-        return False
+        return False, f"{format} is not a valid for a date {obj_date}"
 
 
 class BaseDatetime(datetime):
