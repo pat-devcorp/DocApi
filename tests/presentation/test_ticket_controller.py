@@ -41,7 +41,7 @@ def test_domain():
     ticket_id = TicketDomain.get_default_identifier()
     print(f"ID:{TicketDomain.as_dict(ticket_id)}")
     ticket_1 = TicketDomain.new(
-        ticket_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com"
+        ticket_id, 
     )
     data_1 = TicketDomain.as_dict(ticket_1)
     print(f"OBJECT:{data_1}")
@@ -51,7 +51,7 @@ def test_domain():
         "address": "Cultura chimu 413",
     }
     ticket_2 = TicketDomain.new(
-        ticket_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", **attrs
+        ticket_id, 
     )
     print(f"OBJECT:{TicketDomain.as_dict(ticket_2)}")
     ticket = {
