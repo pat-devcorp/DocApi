@@ -1,6 +1,5 @@
 import json
 import os
-from typing import Protocol
 
 import pika
 from pydantic import BaseModel

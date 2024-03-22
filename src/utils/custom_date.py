@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from ..infrastructure.bootstrap import constant as const
+
 
 def has_valid_format(obj_date, format) -> bool:
     try:
@@ -38,8 +40,8 @@ class BaseDatetime(datetime):
 
 
 class CustomDate(BaseDatetime):
-    str_format = "%Y-%m-%d"
+    str_format = const.DATE_FORMAT
 
 
 class CustomDatetime(BaseDatetime):
-    str_format = "%Y-%m-%d %H:%M:%S"
+    str_format = const.DATETIME_FORMAT

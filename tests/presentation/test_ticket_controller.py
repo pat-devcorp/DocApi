@@ -1,7 +1,7 @@
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.ticket import Ticket, TicketDomain
+from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.ticket import TicketController
@@ -9,8 +9,7 @@ from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 class MockRepositoryClient:
-    def __init__(self, data) -> None:
-        self.object = data
+    object = {}
 
     def dsn(self):
         return "mock-repos"
@@ -32,18 +31,38 @@ class MockRepositoryClient:
 
 
 def get_mock_controller():
-    u = UserService.get_mock()
+    u = UserService.get_default_identifier()
     r = MockRepositoryClient()
     b = MockBrokerClient()
     return TicketController(u, r, b)
 
 
-# def get_obj():
-#     obj_id = TicketDomain.get_identifier()
-#     print(f"ID:{obj_id}")
-#     obj = TicketDomain.new(obj_id, "ready")
-#     print(f"OBJECT:{obj}")
-#     return obj
+def test_domain():
+    ticket_id = TicketDomain.get_default_identifier()
+    print(f"ID:{TicketDomain.as_dict(ticket_id)}")
+    ticket_1 = TicketDomain.new(
+        ticket_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com"
+    )
+    data_1 = TicketDomain.as_dict(ticket_1)
+    print(f"OBJECT:{data_1}")
+    attrs = {
+        "birthDate": "1995/07/18",
+        "documentNumber": "72539751",
+        "address": "Cultura chimu 413",
+    }
+    ticket_2 = TicketDomain.new(
+        ticket_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", **attrs
+    )
+    print(f"OBJECT:{TicketDomain.as_dict(ticket_2)}")
+    ticket = {
+        "ticketId": ticket_id.value,
+        "name": "Patrick Alonso",
+        "lastname": "Fuentes Carpio",
+        "mailAddress": "patrick18483@gmail.com",
+        "address": "Cultura chimu 413",
+    }
+    ticket_3 = TicketDomain.from_dict(ticket)
+    print(f"OBJECT:{TicketDomain.as_dict(ticket_3)}")
 
 
 # def get_invalid_obj():

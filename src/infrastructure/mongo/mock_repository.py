@@ -16,6 +16,3 @@ class MockRepositoryClient:
 
     def update(self, identifier, kwargs) -> None:
         return None
-
-    def delete(self, kwargs) -> None:
-        return None

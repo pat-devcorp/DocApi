@@ -1,53 +1,38 @@
 from collections import namedtuple
-from typing import Protocol
 
 from ...utils.custom_date import CustomDate
-from ...utils.response_code import ID_NOT_FOUND, INVALID_FORMAT, SCHEMA_NOT_MATCH
+from ...utils.response_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..DomainError import DomainError
 from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
+from ..str_funcs import StrValidator
 
 PersonId = namedtuple("PersonId", ["value"])
 Person = namedtuple(
     "Person",
-    ["personId", "name", "lastName", "mailAddress", "birthDate", "documentNumber", "address"],
+    [
+        "personId",
+        "name",
+        "lastName",
+        "mailAddress",
+        "birthDate",
+        "documentNumber",
+        "address",
+    ],
+    defaults=[None] * 7,
 )
-
-
-def is_empty_string(value: str) -> bool:
-    if value is None or not isinstance(value, str) or value == "":
-        return True
-    return False
-
-def has_special_char(value: str) -> bool:
-    non_alphanumeric_chars = ''
-    for char in value:
-        if not char.isalnum():
-            non_alphanumeric_chars += char
-    if non_alphanumeric_chars:
-        return True, non_alphanumeric_chars
-    return False, ""
-
-def validate_email_syntax(email):
-    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-    if re.match(pattern, email) is None:
-        return False, "Invalid email format""
-    return True, ""
 
 
 class PersonDomain:
     algorithm = IdentifierAlgorithm.UUID_V4
     pk = "personId"
-    fields = Person._fields
 
     @classmethod
     def get_default_identifier(cls):
-        identifier = IdentifierHandler(cls.pk, cls.algorithm)
-        return PersonId(identifier.get_default_identifier())
+        return PersonId(IdentifierHandler.get_default_identifier(cls.algorithm))
 
     @classmethod
     def set_identifier(cls, identifier):
-        identifier = IdentifierHandler(cls.pk, cls.algorithm)
-        identifier.is_valid(identifier)
+        IdentifierHandler.is_valid(cls.algorithm, identifier)
         return PersonId(identifier)
 
     @staticmethod
@@ -55,59 +40,74 @@ class PersonDomain:
         return dict(namedtuple_instance._asdict())
 
     @classmethod
-    def is_valid(cls, data: dict) -> tuple[bool, str]:
-        error = list()
-
-        if data.get("personId") is not None:
-            try:
-                cls.set_identifier(data["personId"])
-            except DomainError as e:
-                error.append(e.message)
-
-        if data.get("mailAddress") is not None:
-            is_ok, err = cls.validate_email_syntax(data["mailAddress"])
-            if not is_ok:
-                error.append(err)
-        
-        if data.get("birthDate") is not None:
-            is_ok, err = CustomDate.check_format(data["birthDate"])
-            if not is_ok:
-                error.append(err)
-        
-        if len(errors) > 0:
-            raise DomainError(INVALID_FORMAT, "\n".join(errors))
-
-
-    @classmethod
     def from_dict(cls, data: list) -> Person | DomainError:
-        if data.get(cls.pk, None) is None:
+        if data.get(cls.pk) is None:
             raise DomainError(ID_NOT_FOUND, "id must be provided")
 
         person = {k: v for k, v in data.items() if k in Person._fields}
         cls.is_valid(person)
         return Person(**person)
 
+    @classmethod
+    def is_valid(cls, item: dict) -> None | DomainError:
+        data = {k: v for k, v in item.items() if k in Person._fields}
+        errors = list()
+
+        if data.get("personId") is not None:
+            try:
+                cls.set_identifier(data["personId"])
+            except DomainError as e:
+                errors.append(str(e))
+
+        if data.get("name") is not None:
+            if any(character.isdigit() for character in data["name"]):
+                errors.append("name contain numbers")
+
+        if data.get("lastName") is not None:
+            if any(character.isdigit() for character in data["lastName"]):
+                errors.append("lastName contain numbers")
+
+        if data.get("mailAddress") is not None:
+            if not StrValidator.validate_email_syntax(data["mailAddress"]):
+                errors.append("Invalid email address")
+
+        if data.get("birthDate") is not None:
+            is_ok, err = CustomDate.check_format(data["birthDate"])
+            if not is_ok:
+                errors.append(err)
+
+        if len(errors) > 0:
+            raise DomainError(INVALID_FORMAT, "\n".join(errors))
 
     @classmethod
     def new(
         cls,
-        identifier: PersonId,
+        personId: PersonId,
         name: str,
         lastName: str,
         mailAddress: str,
-        **kwargs
+        birthDate=None,
+        documentNumber=None,
+        address=None,
     ) -> Person | DomainError:
-        if identifier is None or is_empty_string(name) or is_empty_string(lastName) or is_empty_string(mailAddress):
-            raise DomainError(FIELD_REQUIRED, "fields must be provided")
-        if has_special_char(name) or has_special_char(lastName) or has_special_char(mailAddress):
+        if (
+            personId is None
+            or StrValidator.is_empty_string(name)
+            or StrValidator.is_empty_string(lastName)
+            or StrValidator.is_empty_string(mailAddress)
+        ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
 
         item = {
-            "personId": identifier.value,
+            "personId": personId.value,
             "name": name,
             "lastName": lastName,
             "mailAddress": mailAddress,
         }
-        if kwargs:
-            item.update(kwargs)
+        if birthDate is not None:
+            item.update({"birthDate": birthDate})
+        if documentNumber is not None:
+            item.update({"documentNumber": documentNumber})
+        if address is not None:
+            item.update({"address": address})
         return cls.from_dict(item)

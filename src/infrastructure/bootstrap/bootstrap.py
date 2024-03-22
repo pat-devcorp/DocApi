@@ -1,34 +1,42 @@
 import os
 
-from ..infrastructure.broker.rabbitmq import RabbitmqServer
-from ..infrastructure.mongo.mongo import MongoServer
+import constant as const
+
+from ..broker.rabbitmq import RabbitmqServer
+from ..mongo.mongo import MongoServer
 
 
-class Config:
+class Bootstrap:
     def __init__(self):
+        self.get_constants()
+        self.get_paths()
+        self.get_from_environment()
+
+    def get_constants(self):
+        self.API_VERSION = const.API_VERSION
+        self.NAME = const.NAME
+        self.SYSTEM_UID = const.SYSTEM_UID
+        self.VIRUS_ANALYZER_API = const.VIRUS_ANALYZER_API
+        self.ALLOWED_EXTENSIONS = const.ALLOWED_EXTENSIONS
+        self.MAX_FILE_WEIGHT = const.MAX_FILE_WEIGHT
+        self.DATE_FORMAT = const.DATE_FORMAT
+        self.TIME_FORMAT = const.TIME_FORMAT
+        self.DATETIME_FORMAT = const.DATETIME_FORMAT
+
+    def get_paths(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
         self.ROUTE_PATH = os.path.join("src", "rest", "route")
         self.LOG_PATH = os.path.join("src", "log", "api", "api.log")
+        self.BROKER_PATH = os.path.join("src", "log", "broker")
+        self.IMAGE_FOLDER = os.path.join("src", "media", "img")
         self.LOG_CONFIG = os.path.join(
             self.PROJECT_PATH, "infrastructure", "logger", "config.json"
         )
-        self.BROKER_PATH = os.path.join("src", "log", "broker")
-        self.IMAGE_FOLDER = os.path.join("src", "media", "img")
 
+    def get_from_environment(self):
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
-        self.API_VERSION = os.getenv("API_VERSION", "1.0.0.0")
-        self.NAME = "task_" + self.API_VERSION
         self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
-        self.SYSTEM_UID = os.getenv("SYSTEM_UID", "IamBatman")
-
-        self.VIRUS_ANALYZER_API = os.getenv("ALLOWED_EXTENSIONS", None)
-        allowed_extensions = os.getenv("ALLOWED_EXTENSIONS", "pdf")
-        self.ALLOWED_EXTENSIONS = allowed_extensions.split(",")
-        self.MAX_FILE_WEIGHT = os.getenv("MAX_FILE_WEIGHT", 16000)
-        self.DATE_FORMAT = os.getenv("DATE_FORMAT", "%Y-%m-%d")
-        self.TIME_FORMAT = os.getenv("TIME_FORMAT", "%H:%M:%S")
-        self.DATETIME_FORMAT = os.getenv("DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S")
 
         self.BROKER = os.getenv("BROKER", False)
         self.BROKER_LOST_MESSAGE_PATH = os.getenv(

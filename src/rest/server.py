@@ -6,7 +6,7 @@ from flask import Flask
 from prometheus_client import make_wsgi_app
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
-from ..infrastructure.config import Config
+from ..infrastructure.bootstrap.bootstrap import Bootstrap
 from ..infrastructure.logger.logger import setup_logging
 
 
@@ -33,7 +33,7 @@ def get_blueprints(path_ref: Path, predicate: str = "") -> list:
 def create_server():
     app = Flask(__name__)
 
-    my_config = Config()
+    my_config = Bootstrap()
     app.config.from_object(my_config)
     print("---CONFIG")
     print(vars(my_config))

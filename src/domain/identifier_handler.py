@@ -12,16 +12,13 @@ class IdentifierAlgorithm(Enum):
 
 
 class IdentifierHandler:
-    def __init__(self, pk: str, algorithm: IdentifierAlgorithm) -> None:
-        self.pk = pk
-        self.algorithm = algorithm
-
-    def get_default_identifier(self):
+    @classmethod
+    def get_default_identifier(cls, algorithm: IdentifierAlgorithm):
         default = [
-            self.get_string,
-            self.get_uuid_v4,
+            cls.get_string,
+            cls.get_uuid_v4,
         ]
-        return default[self.algorithm.value]()
+        return default[algorithm.value]()
 
     @staticmethod
     def get_string():
@@ -31,9 +28,10 @@ class IdentifierHandler:
     def get_uuid_v4():
         return str(uuid4())
 
-    def is_valid(self, identifier) -> None | DomainError:
-        validator = [self.is_valid_default, self.is_valid_uuid_v4]
-        is_ok, err = validator[self.algorithm.value](identifier)
+    @classmethod
+    def is_valid(cls, algorithm: IdentifierAlgorithm, identifier) -> None | DomainError:
+        validator = [cls.is_valid_default, cls.is_valid_uuid_v4]
+        is_ok, err = validator[algorithm.value](identifier)
         if not is_ok:
             raise DomainError(ID_NOT_VALID, err)
 

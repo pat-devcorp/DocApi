@@ -2,8 +2,6 @@ from enum import Enum
 
 from ...domain.identifier_handler import Identifier
 from ...domain.model.image import Image
-from ...utils.response_code import DB_ID_NOT_FOUND
-from ..ApplicationError import ApplicationError
 from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol
 from ..criteria import Criteria

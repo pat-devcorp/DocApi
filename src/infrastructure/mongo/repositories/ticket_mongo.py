@@ -6,7 +6,7 @@ class TicketMongo:
     tablename = "ticket"
 
     def __init__(self, ref_server: MongoServer, pk) -> None | InfrastructureError:
-        self._m = MongoClient.set_default(ref_server, self.tablename, pk)
+        self._m = MongoClient(ref_server, self.tablename, pk)
 
     def entity_exists(self, identifier) -> bool:
         if self._m.get_by_id(identifier, [self._pk]) is None:
