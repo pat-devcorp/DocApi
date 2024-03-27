@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from ...utils.response_code import FIELD_REQUIRED, ID_NOT_FOUND
+from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND
 from ..DomainError import DomainError
 from ..enum.ticket_status import TicketState
 from ..identifier_handler import Identifier, IdentifierAlgorithm, IdentifierHandler

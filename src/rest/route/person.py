@@ -2,7 +2,7 @@ from flask import Blueprint, request
 
 from ...presentation.controller.person import PersonController
 from ..ExceptionHandler import exception_handler
-from ..http_code import REQUIRED_FIELD, WRITER_NOT_PROVIDED
+from ..status_code import REQUIRED_FIELD, WRITER_NOT_PROVIDED
 
 person = Blueprint("person", __name__, url_prefix="/person")
 

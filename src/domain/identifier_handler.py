@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID, uuid4
 
-from ..utils.response_code import ID_NOT_VALID
+from ..utils.status_code import ID_NOT_VALID
 from .DomainError import DomainError
 
 

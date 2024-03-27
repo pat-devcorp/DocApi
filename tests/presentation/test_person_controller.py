@@ -5,7 +5,7 @@ from src.domain.model.person import PersonDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.person import PersonController
-from src.utils.response_code import ID_NOT_VALID, INVALID_FORMAT
+from utils.status_code import ID_NOT_VALID, INVALID_FORMAT
 
 
 class MockRepositoryClient:

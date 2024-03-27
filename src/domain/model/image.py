@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from ...utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
+from ...utils.status_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 from ..DomainError import DomainError
 from ..identifier_handler import Identifier, IdentifierAlgorithm, IdentifierHandler
 

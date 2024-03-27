@@ -2,7 +2,7 @@ from enum import Enum
 
 from ...domain.identifier_handler import Identifier
 from ...domain.model.ticket import PartialTicket, Ticket, TicketDomain
-from ...utils.response_code import DB_ID_NOT_FOUND
+from ...utils.status_code import DB_ID_NOT_FOUND
 from ..ApplicationError import ApplicationError
 from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol

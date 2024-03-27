@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from ...utils.custom_date import CustomDate
-from ...utils.response_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..DomainError import DomainError
 from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
 from ..str_funcs import StrValidator

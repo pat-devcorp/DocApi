@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 
 from ...domain.identifier_handler import IdentifierHandler
 from ...utils.file_handler import FileHandler
-from ..http_code import CODE_CREATED, FILE_NOT_PROVIDED
+from ..status_code import CODE_CREATED, FILE_NOT_PROVIDED
 
 file_route = Blueprint("file", __name__)
 

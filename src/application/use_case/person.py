@@ -24,3 +24,6 @@ class PersonUseCase:
 
     def add_audit_fields(self) -> None:
         self._f += AuditHandler._fields
+
+    def get_by_id(self, person_id) -> dict:
+        return self._r.get_by_id(person_id.value, self._f)

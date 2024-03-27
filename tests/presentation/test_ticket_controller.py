@@ -5,7 +5,7 @@ from src.domain.model.ticket import TicketDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.ticket import TicketController
-from src.utils.response_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
+from utils.status_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 class MockRepositoryClient:
@@ -41,7 +41,7 @@ def test_domain():
     ticket_id = TicketDomain.get_default_identifier()
     print(f"ID:{TicketDomain.as_dict(ticket_id)}")
     ticket_1 = TicketDomain.new(
-        ticket_id, 
+        ticket_id,
     )
     data_1 = TicketDomain.as_dict(ticket_1)
     print(f"OBJECT:{data_1}")
@@ -51,7 +51,7 @@ def test_domain():
         "address": "Cultura chimu 413",
     }
     ticket_2 = TicketDomain.new(
-        ticket_id, 
+        ticket_id,
     )
     print(f"OBJECT:{TicketDomain.as_dict(ticket_2)}")
     ticket = {

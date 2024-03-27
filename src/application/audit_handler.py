@@ -2,7 +2,7 @@ from ..domain.identifier_handler import IdentifierAlgorithm, IdentifierHandler
 from ..infrastructure.services.User import UserService
 from ..utils.custom_date import CustomDatetime
 from ..utils.HandlerError import HandlerError
-from ..utils.response_code import ID_NOT_FOUND, SCHEMA_NOT_MATCH, WRITER_NOT_FOUND
+from ..utils.status_code import ID_NOT_FOUND, SCHEMA_NOT_MATCH, WRITER_NOT_FOUND
 
 
 class AuditHandler:
