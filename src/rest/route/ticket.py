@@ -12,16 +12,16 @@ ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
 def create_ticket():
     params = request.args.to_dict()
 
-    if (writeUId := params.get("writeUId")) is None:
+    if (write_uid := params.get("write_uid")) is None:
         code, message = WRITER_NOT_PROVIDED
         return (code, message)
 
     lc = TicketController(
-        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
     )
     item = lc.create(
-        params.get("ticketId"),
-        params.get("channelId"),
+        params.get("ticket_id"),
+        params.get("channel_id"),
         params.get("requirement"),
         params.get("because"),
     )
@@ -35,12 +35,12 @@ def create_ticket():
 def fetch_tickets(id=None):
     params = request.args.to_dict()
 
-    if (writeUId := params.get("writeUId")) is None:
+    if (write_uid := params.get("write_uid")) is None:
         code, message = WRITER_NOT_PROVIDED
         return code, message
 
     lc = TicketController(
-        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
     )
     data = lc.get_by_id(id) if id is not None else lc.fetch()
 
@@ -52,17 +52,17 @@ def fetch_tickets(id=None):
 def update_ticket(id):
     params = request.args.to_dict()
 
-    if (writeUId := params.get("writeUId")) is None:
+    if (write_uid := params.get("write_uid")) is None:
         code, message = WRITER_NOT_PROVIDED
         return (code, message)
-    if (ticketId := id) is None:
+    if (ticket_id := id) is None:
         code, message = REQUIRED_FIELD
         return (code, message)
 
     lc = TicketController(
-        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
     )
-    item = lc.update(ticketId, params)
+    item = lc.update(ticket_id, params)
 
     return (200, item)
 
@@ -72,16 +72,16 @@ def update_ticket(id):
 def delete_ticket(id):
     params = request.args.to_dict()
 
-    if (writeUId := params.get("writeUId")) is None:
+    if (write_uid := params.get("write_uid")) is None:
         code, message = WRITER_NOT_PROVIDED
         return (code, message)
-    if (ticketId := id) is None:
+    if (ticket_id := id) is None:
         code, message = REQUIRED_FIELD
         return (code, message)
 
     lc = TicketController(
-        writeUId, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
     )
-    item = lc.delete(ticketId)
+    item = lc.delete(ticket_id)
 
     return (200, item)

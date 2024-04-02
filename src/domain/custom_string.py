@@ -1,7 +1,11 @@
 import re
 
 
-class StrValidator:
+class CustomString:
+    @staticmethod
+    def not_available():
+        return "N/A"
+
     @staticmethod
     def is_empty_string(value: str) -> bool:
         if value is None or not isinstance(value, str) or value == "":
@@ -14,3 +18,11 @@ class StrValidator:
         if re.match(pattern, email) is None:
             return False
         return True
+
+    @staticmethod
+    def validate_url_syntax(url):
+        regex = r"^(https?|ftp)://[^\s/$.?#].[^\s]*$"
+        if re.match(regex, url):
+            return True
+        else:
+            return False

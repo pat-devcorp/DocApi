@@ -1,7 +1,9 @@
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.ticket import TicketDomain
+from src.domain.enum.ticket_status import TicketState, TicketStatus
+from src.domain.identifier_handler import IdentifierHandler
+from src.domain.model.ticket import Ticket, TicketDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.ticket import TicketController
@@ -9,16 +11,22 @@ from utils.status_code import ID_NOT_VALID, SCHEMA_NOT_MATCH
 
 
 class MockRepositoryClient:
-    object = {}
+    obj = {
+        "ticket_id": IdentifierHandler.get_uuid_v4(),
+        "channel_id": IdentifierHandler.get_uuid_v4(),
+        "requirement": "test",
+        "because": "help with development",
+        "state": TicketStatus.END.value,
+    }
 
     def dsn(self):
         return "mock-repos"
 
     def fetch(self, attrs, matching):
-        return [self.object]
+        return [self.obj]
 
     def get_by_id(self, identifier, attrs):
-        return self.object
+        return self.obj
 
     def delete(self, identifier) -> None:
         return None
@@ -26,7 +34,10 @@ class MockRepositoryClient:
     def update(self, identifier, kwargs) -> None:
         return None
 
-    def delete(self, kwargs) -> None:
+    def create(self, kwargs) -> None:
+        return None
+
+    def insert_many(self, data) -> None:
         return None
 
 
@@ -38,77 +49,22 @@ def get_mock_controller():
 
 
 def test_domain():
-    ticket_id = TicketDomain.get_default_identifier()
-    print(f"ID:{TicketDomain.as_dict(ticket_id)}")
-    ticket_1 = TicketDomain.new(
-        ticket_id,
-    )
-    data_1 = TicketDomain.as_dict(ticket_1)
-    print(f"OBJECT:{data_1}")
-    attrs = {
-        "birthDate": "1995/07/18",
-        "documentNumber": "72539751",
-        "address": "Cultura chimu 413",
+    identifier = TicketDomain.get_default_identifier()
+    channel_id = ChannelDomain.get_default_identifier()
+    assert hasattr(identifier, "value")
+    valid_obj = {
+        "requirement": "create a ticket",
+        "because": "test the requirement",
     }
-    ticket_2 = TicketDomain.new(
-        ticket_id,
-    )
-    print(f"OBJECT:{TicketDomain.as_dict(ticket_2)}")
-    ticket = {
-        "ticketId": ticket_id.value,
-        "name": "Patrick Alonso",
-        "lastname": "Fuentes Carpio",
-        "mailAddress": "patrick18483@gmail.com",
-        "address": "Cultura chimu 413",
+    defaults = {
+        "state": TicketState.END.value,
     }
-    ticket_3 = TicketDomain.from_dict(ticket)
-    print(f"OBJECT:{TicketDomain.as_dict(ticket_3)}")
-
-
-# def get_invalid_obj():
-#     return Ticket(
-#         "a",
-#         "a" * 201,
-#         100,
-#         100,
-#         100,
-#         100,
-#         "20/20/20",
-#     )
-
-
-# def test_interface_with_out_parameters():
-#     tc = get_mock_controller()
-
-#     with pytest.raises(TypeError) as error:
-#         tc.create()
-#     with pytest.raises(TypeError) as error:
-#         tc.update()
-#     with pytest.raises(TypeError) as error:
-#         tc.delete()
-
-
-# def test_interface_invalid_params():
-#     tc = get_mock_controller()
-#     obj = get_obj()
-#     invalid_obj = get_invalid_obj()
-
-#     with pytest.raises(DomainError) as error:
-#         tc.create(invalid_obj.ticketId, invalid_obj.requirement)
-#     assert str(error.value) == ID_NOT_VALID[1]
-
-#     with pytest.raises(DomainError) as error:
-#         tc.get_by_id(invalid_obj.ticketId)
-#     assert str(error.value) == ID_NOT_VALID[1]
-
-#     with pytest.raises(DomainError) as error:
-#         tc.delete(invalid_obj.ticketId)
-#     assert str(error.value) == ID_NOT_VALID[1]
-
-#     with pytest.raises(DomainError) as error:
-#         tc.create(obj.ticketId, invalid_obj.requirement)
-#     assert str(error.value) == SCHEMA_NOT_MATCH[1]
-
-#     with pytest.raises(DomainError) as error:
-#         tc.update(obj.ticketId, invalid_obj._asdict())
-#     assert str(error.value) == SCHEMA_NOT_MATCH[1]
+    obj_1 = TicketDomain.new(identifier, channel_id, **valid_obj)
+    assert isinstance(obj_1, Ticket)
+    assert isinstance(TicketDomain.as_dict(obj_1), dict)
+    obj_2 = TicketDomain.new(identifier, channel_id, **valid_obj, **defaults)
+    assert isinstance(obj_2, Ticket)
+    dct = dict(valid_obj)
+    dct.update({"ticket_id": identifier.value})
+    obj_3 = TicketDomain.from_dict(dct)
+    assert isinstance(obj_3, Ticket)

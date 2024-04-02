@@ -2,7 +2,7 @@ from typing import Protocol
 
 
 class ControllerProtocol(Protocol):
-    def __init__(self, writeUId) -> None:
+    def __init__(self, write_uid) -> None:
         pass
 
     def create(self):

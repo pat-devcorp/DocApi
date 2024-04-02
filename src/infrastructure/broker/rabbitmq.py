@@ -18,8 +18,6 @@ class RabbitmqServer(BaseModel):
     port: int
     username: str
     password: str
-    queue_name: str
-    lost_message_path: str
 
 
 class RabbitmqClient:
@@ -92,7 +90,7 @@ class RabbitmqClient:
 
             # Dump the JSON data
             json.dump(
-                {"type": message_type, "data": message, "writeAt": now},
+                {"type": message_type, "data": message, "write_at": now},
                 f,
                 ensure_ascii=False,
                 indent=4,

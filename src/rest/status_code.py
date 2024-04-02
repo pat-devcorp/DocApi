@@ -1,8 +1,9 @@
-REQUIRED_FIELD = ("Required param was not send", "417")
-OPERATION_FAIL = ("Operation fail", "417")
-WRITER_NOT_PROVIDED = ("Writer is not present in the requests", "417")
-FILE_NOT_PROVIDED = ("File not provided", "417")
-CODE_CREATED = ("Code created", "201")
+REQUIRED_FIELD = (417, "Required param was not send")
+OPERATION_FAIL = (417, "Operation fail")
+WRITER_NOT_PROVIDED = (417, "Writer is not present in the requests")
+FILE_NOT_PROVIDED = (417, "File not provided")
+CODE_CREATED = (201, "Code created")
+CODE_OK = (200, "Code created")
 
 # # CODE STATUS
 # CODE_CONTINUE = 100

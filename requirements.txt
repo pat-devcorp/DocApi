@@ -8,3 +8,5 @@ kafka-python
 prometheus_client
 pymongo
 python-magic
+sonyflake-py
+pandas

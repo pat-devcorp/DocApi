@@ -18,35 +18,44 @@ class PersonController:
     def fetch(self) -> list:
         return self._uc.fetch(0)
 
-    def get_by_id(self, personId):
-        personId = PersonDomain.set_identifier(personId)
+    def get_by_id(self, person_id):
+        person_id = PersonDomain.set_identifier(person_id)
 
-        return self._uc.get_by_id(personId)
+        return self._uc.get_by_id(person_id)
 
-    def delete(self, personId):
-        personId = PersonDomain.set_identifier(personId)
+    def delete(self, person_id):
+        person_id = PersonDomain.set_identifier(person_id)
 
-        return self._uc.delete(personId)
+        return self._uc.delete(person_id)
 
-    def update(self, personId, params: dict):
-        params.update({"personId": personId})
+    def update(self, person_id, params: dict):
+        params.update({"person_id": person_id})
         obj = PersonDomain.from_dict(params)
 
         return self._uc.update(obj)
 
     def create(
         self,
-        personId,
+        person_id,
         name,
-        lastName,
-        mailAddress,
-        birthDate=None,
-        documentNumber=None,
+        last_name,
+        mail_address,
+        birthdate=None,
+        document_number=None,
         address=None,
     ):
-        personId = PersonDomain.set_identifier(personId)
+        person_id = PersonDomain.set_identifier(person_id)
         obj = PersonDomain.new(
-            personId, name, lastName, mailAddress, birthDate, documentNumber, address
+            person_id,
+            name,
+            last_name,
+            mail_address,
+            birthdate,
+            document_number,
+            address,
         )
 
         return self._uc.create(obj)
+
+    def insert_many(self, data: list):
+        return self._uc.insert_many(data)

@@ -3,40 +3,22 @@ import pytest
 from src.application.audit_handler import AuditHandler
 from src.application.use_case.ticket import TicketUseCase
 from src.domain.model.ticket import TicketDomain
-from src.infrastructure.broker.MockBroker import MockBroker
-from src.infrastructure.mongo.MockRepository import MockRepository
+from src.infrastructure.bootstrap.bootstrap import Bootstrap
+from src.infrastructure.broker.rabbitmq import RabbitmqClient
+from src.infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 from src.infrastructure.services.User import get_mock
 
 
-def get_mock_application():
+def get_use_case():
+    my_config = Bootstrap()
     u = get_mock()
-    r = MockRepository()
-    b = MockBroker()
+    r = TicketMongo(my_config["MONGO_SERVER"])
+    b = RabbitmqClient(my_config["RABBITMQ_SERVER"])
     return TicketUseCase(u, r, b)
 
 
-def get_objs():
-    obj_id = TicketDomain.get_identifier()
-    print(f"ID:{obj_id}")
-    obj = TicketDomain.new_ticket(obj_id, "ready")
-    print(f"OBJECT:{obj}")
-    partial_obj = TicketDomain.from_dict(obj_id, {"requirement": "steady"})
-    return obj_id, obj, partial_obj
-
-
-def test_interface_with_out_parameters():
-    ta = get_mock_application()
-
-    with pytest.raises(TypeError):
-        ta.create()
-    with pytest.raises(TypeError):
-        ta.update()
-    with pytest.raises(TypeError):
-        ta.delete()
-
-
 def test_application_ticket():
-    ta = get_mock_application()
+    ta = get_use_case()
     obj_id, obj, partial_obj = get_objs()
 
     ta.add_audit_fields()

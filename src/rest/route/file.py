@@ -12,19 +12,16 @@ file_route = Blueprint("file", __name__)
 def upload_file():
     # check if the post request has the file part
     if "file" not in request.files:
-        code, message = FILE_NOT_PROVIDED
-        return (code, message)
+        return FILE_NOT_PROVIDED
     file = request.files["file"]
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
     if file.filename == "":
-        code, message = FILE_NOT_PROVIDED
-        return (code, message)
+        return FILE_NOT_PROVIDED
     code = IdentifierHandler.get_uuid_v4()
     filename = secure_filename(code)
     FileHandler(file_route.config["IMAGE_FOLDER"], filename)
-    code, _ = CODE_CREATED
-    return (code, filename)
+    return (CODE_CREATED[0], filename)
 
 
 @file_route.get("/uploads/<name>")

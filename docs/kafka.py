@@ -69,7 +69,7 @@ class KafkaBroker:
 #     current_id = "3ca3d2c3-01bb-443e-afb8-7aac10d40f9c"
 
 #     dto = {
-#         "writeUId": "8888",
+#         "write_uid": "8888",
 #         "_id": current_id,
 #         "description": "This is a ticket modified",
 #     }

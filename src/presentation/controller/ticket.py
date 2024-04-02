@@ -1,4 +1,5 @@
 from ...application.use_case.ticket import TicketUseCase
+from ...domain.enum.ticket_status import TicketState
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 
@@ -18,24 +19,26 @@ class TicketController:
     def fetch(self) -> list:
         return self._uc.fetch(0)
 
-    def get_by_id(self, obj_id):
-        ticketId = TicketDomain.set_identifier(obj_id)
+    def get_by_id(self, ticket_id):
+        ticket_id = TicketDomain.set_identifier(ticket_id)
 
-        return self._uc.get_by_id(ticketId)
+        return self._uc.get_by_id(ticket_id)
 
-    def delete(self, obj_id):
-        ticketId = TicketDomain.set_identifier(obj_id)
+    def delete(self, ticket_id):
+        ticket_id = TicketDomain.set_identifier(ticket_id)
 
-        return self._uc.delete(ticketId)
+        return self._uc.delete(ticket_id)
 
-    def update(self, obj_id, params: dict):
-        ticketId = TicketDomain.set_identifier(obj_id)
-        obj = TicketDomain.from_dict(ticketId, params)
+    def update(self, ticket_id, params: dict):
+        ticket_id = TicketDomain.set_identifier(ticket_id)
+        obj = TicketDomain.from_dict(ticket_id, params)
 
         return self._uc.update(obj)
 
-    def create(self, obj_id, channelId, requirement, because):
-        ticketId = TicketDomain.set_identifier(obj_id)
-        obj = TicketDomain.new(ticketId, channelId, requirement, because)
+    def create(self, ticket_id, channel_id, requirement, because, state=None):
+        ticket_id = TicketDomain.set_identifier(ticket_id)
+        if state is not None:
+            state = TicketState(state)
+        obj = TicketDomain.new(ticket_id, channel_id, requirement, because, state)
 
         return self._uc.create(obj)

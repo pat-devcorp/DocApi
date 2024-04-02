@@ -1,17 +1,16 @@
 from collections import namedtuple
 
-from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND
+from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from ..custom_string import CustomString
 from ..DomainError import DomainError
 from ..enum.ticket_status import TicketState
-from ..identifier_handler import Identifier, IdentifierAlgorithm, IdentifierHandler
-from ..str_funcs import StrValidator
+from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
 
-TicketId = namedtuple("TicketId", ["value"])
 Ticket = namedtuple(
     "Ticket",
     [
-        "ticketId",
-        "channelId",
+        "ticket_id",
+        "channel_id",
         "requirement",
         "because",
         "state",
@@ -21,16 +20,15 @@ Ticket = namedtuple(
 
 class TicketDomain:
     _idAlgorithm = IdentifierAlgorithm.UUID_V4
-    pk = "ticketId"
+    pk = "ticket_id"
 
     @classmethod
     def get_default_identifier(cls):
-        return TicketId(IdentifierHandler.get_default_identifier(cls.algorithm))
+        return IdentifierHandler.get_default_identifier(cls.algorithm)
 
     @classmethod
     def set_identifier(cls, identifier):
-        IdentifierHandler.is_valid(cls.algorithm, identifier)
-        return TicketId(identifier)
+        return IdentifierHandler.is_valid(cls.algorithm, identifier)
 
     @staticmethod
     def as_dict(namedtuple_instance) -> dict:
@@ -41,53 +39,67 @@ class TicketDomain:
         if data.get(cls.pk) is None:
             raise DomainError(ID_NOT_FOUND, "id must be provided")
 
-        ticket = {k: v for k, v in data.items() if k in Ticket._fields}
-        cls.is_valid(ticket)
-        return Ticket(**ticket)
+        item = dict()
+        for k in Ticket._fields:
+            item[k] = data.get(k, None)
+
+        return cls.is_valid(item)
 
     @classmethod
-    def is_valid(cls, data: dict, is_partial=True) -> tuple[bool, str]:
-        validate_func = {
-            "ticketId": [cls.is_valid_identifier],
-            "state": [TicketState.has_value],
-        }
-
+    def is_valid(
+        cls,
+        ticket_id,
+        channel_id,
+        requirement,
+        because,
+        state,
+    ) -> Ticket | DomainError:
         errors = list()
-        for k, v in data.items():
-            if is_partial and v is None:
-                continue
-            if (functions := validate_func.get(k)) is not None:
-                for function in functions:
-                    is_ok, err = function(v)
-                    if not is_ok:
-                        errors.append(err)
+
+        if ticket_id is not None:
+            try:
+                cls.set_identifier(ticket_id)
+            except DomainError as e:
+                errors.append(str(e))
+
+        if state is not None:
+            is_ok, err = TicketState.has_value(state)
+            if not is_ok:
+                errors.append(err)
 
         if len(errors) > 0:
-            return False, "\n".join(errors)
-        return True, ""
+            raise DomainError(INVALID_FORMAT, "\n".join(errors))
+
+        return Ticket(
+            ticket_id,
+            channel_id,
+            requirement,
+            because,
+            state,
+        )
 
     @classmethod
     def new(
         cls,
-        ticketId: TicketId,
-        channelId: Identifier,
+        ticket_id: IdentifierHandler,
+        channel_id: IdentifierHandler,
         requirement: str,
         because: str,
+        state: TicketState = None,
     ) -> Ticket | DomainError:
         if (
-            ticketId is None
-            or channelId is None
-            or StrValidator.is_empty_string(requirement)
-            or StrValidator.is_empty_string(because)
+            ticket_id is None
+            or channel_id is None
+            or CustomString.is_empty_string(requirement)
+            or CustomString.is_empty_string(because)
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
+        state = TicketState.CREATED.value if state is None else state.value
 
-        item = {
-            "ticketId": ticketId.value,
-            "channelId": channelId.value,
-            "requirement": requirement,
-            "because": because,
-            "state": TicketState.CREATED.value,
-        }
-
-        return cls.from_dict(item)
+        return cls.is_valid(
+            ticket_id,
+            channel_id,
+            requirement,
+            because,
+            state,
+        )

@@ -1,4 +1,4 @@
-from infrastructure.bootstrap.bootstrap import Bootstrap
+from src.infrastructure.bootstrap.bootstrap import Bootstrap
 from src.infrastructure.mongo.mongo import mongo_interface_test
 
 

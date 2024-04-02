@@ -14,10 +14,9 @@ def exception_handler(func):
         status_code = 403
 
         try:
-            response = timeout_function(
+            status_code, response = timeout_function(
                 func(*args, **kwargs) or "OK", seconds=const.TIME_OUT
             )
-            status_code = 200
         except PresentationError as p_err:
             response = str(p_err)
             status_code = 422

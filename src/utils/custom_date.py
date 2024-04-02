@@ -3,35 +3,43 @@ from datetime import datetime
 from ..infrastructure.bootstrap import constant as const
 
 
-def has_valid_format(obj_date, format) -> bool:
-    try:
-        datetime.strptime(obj_date, format)
-        return True, ""
-    except ValueError:
-        return False, f"{format} is not a valid for a date {obj_date}"
-
-
 class BaseDatetime(datetime):
     value: str
 
     @classmethod
-    def check_format(cls, value):
-        return has_valid_format(value, cls.str_format)
+    def not_available(cls):
+        date_obj = datetime(1900, 1, 1)
+        return date_obj.strftime(cls.str_format)
+
+    @classmethod
+    def check_format(cls, value: str | datetime):
+        try:
+            if isinstance(value, str):
+                datetime.strptime(value, cls.str_format)
+            elif isinstance(value, datetime):
+                formatted_value = value.strftime(cls.str_format)
+                if formatted_value != value:
+                    raise ValueError("Invalid format")
+            else:
+                raise ValueError("Invalid type")
+            return True, ""
+        except ValueError:
+            return False, f"{cls.str_format} is not a valid for a date {value}"
 
     @classmethod
     def now(cls):
-        dt_obj = datetime.now()
-        return cls(dt_obj.year, dt_obj.month, dt_obj.day)
+        date_obj = datetime.now()
+        return cls(date_obj.year, date_obj.month, date_obj.day)
 
     @classmethod
     def str_now(cls):
-        dt_obj = datetime.now()
-        return dt_obj.strftime(cls.str_format)
+        date_obj = datetime.now()
+        return date_obj.strftime(cls.str_format)
 
     @classmethod
     def from_string(cls, date_str):
-        dt_obj = datetime.strptime(date_str, cls.str_format)
-        return cls(dt_obj.year, dt_obj.month, dt_obj.day)
+        date_obj = datetime.strptime(date_str, cls.str_format)
+        return cls(date_obj.year, date_obj.month, date_obj.day)
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls, *args, **kwargs)
@@ -44,4 +52,4 @@ class CustomDate(BaseDatetime):
 
 
 class CustomDatetime(BaseDatetime):
-    str_format = const.DATETIME_FORMAT
+    str_format = const.DATE_FORMAT + " " + const.TIME_FORMAT

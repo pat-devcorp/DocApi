@@ -1,21 +1,23 @@
+import pandas as pd
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.model.person import PersonDomain
+from src.domain.identifier_handler import IdentifierHandler
+from src.domain.model.person import Person, PersonDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.person import PersonController
-from utils.status_code import ID_NOT_VALID, INVALID_FORMAT
+from src.utils.status_code import ID_NOT_VALID, INVALID_FORMAT
 
 
 class MockRepositoryClient:
-    object = {
-        "personId": "194336c0-7c27-414c-a936-a14962618bec",
+    obj = {
+        "person_id": IdentifierHandler.get_uuid_v4(),
         "name": "Patrick Alonso",
-        "lastName": "Fuentes Carpio",
-        "mailAddress": "patrick18483@gmail.com",
-        "birthDate": None,
-        "documentNumber": None,
+        "last_name": "Fuentes Carpio",
+        "mail_address": "patrick18483@gmail.com",
+        "birthdate": None,
+        "document_number": None,
         "address": None,
     }
 
@@ -23,10 +25,10 @@ class MockRepositoryClient:
         return "mock-repos"
 
     def fetch(self, attrs, matching):
-        return [self.object]
+        return [self.obj]
 
     def get_by_id(self, identifier, attrs):
-        return self.object
+        return self.obj
 
     def delete(self, identifier) -> None:
         return None
@@ -34,7 +36,10 @@ class MockRepositoryClient:
     def update(self, identifier, kwargs) -> None:
         return None
 
-    def delete(self, kwargs) -> None:
+    def create(self, kwargs) -> None:
+        return None
+
+    def insert_many(self, data) -> None:
         return None
 
 
@@ -46,48 +51,47 @@ def get_mock_controller():
 
 
 def test_domain():
-    person_id = PersonDomain.get_default_identifier()
-    print(f"ID:{PersonDomain.as_dict(person_id)}")
-    person_1 = PersonDomain.new(
-        person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com"
-    )
-    data_1 = PersonDomain.as_dict(person_1)
-    print(f"OBJECT:{data_1}")
-    attrs = {
-        "birthDate": "1995/07/18",
-        "documentNumber": "72539751",
-        "address": "Cultura chimu 413",
-    }
-    person_2 = PersonDomain.new(
-        person_id, "Patrick Alonso", "Fuentes Carpio", "patrick18483@gmail.com", **attrs
-    )
-    print(f"OBJECT:{PersonDomain.as_dict(person_2)}")
-    person = {
-        "personId": person_id.value,
+    identifier = PersonDomain.get_default_identifier()
+    assert hasattr(identifier, "value")
+    valid_obj = {
         "name": "Patrick Alonso",
-        "lastname": "Fuentes Carpio",
-        "mailAddress": "patrick18483@gmail.com",
-        "address": "Cultura chimu 413",
+        "last_name": "Fuentes Carpio",
+        "mail_address": "patrick18483@gmail.com",
     }
-    person_3 = PersonDomain.from_dict(person)
-    print(f"OBJECT:{PersonDomain.as_dict(person_3)}")
+    defaults = {
+        "birthdate": "1995/07/18",
+        "document_number": "72539751",
+    }
+    attrs = {
+        "address": "Cultura chimu 413",
+        "zip_code": "04002",
+    }
+    obj_1 = PersonDomain.new(identifier, **valid_obj)
+    assert isinstance(obj_1, Person)
+    assert isinstance(PersonDomain.as_dict(obj_1), dict)
+    obj_2 = PersonDomain.new(identifier, **valid_obj, **defaults, attrs=attrs)
+    assert isinstance(obj_2, Person)
+    dct = dict(valid_obj)
+    dct.update({"person_id": identifier.value})
+    obj_3 = PersonDomain.from_dict(dct)
+    assert isinstance(obj_3, Person)
 
 
 def test_interface_invalid_params():
     tc = get_mock_controller()
     person_id = PersonDomain.get_default_identifier()
     valid_obj = {
-        "personId": person_id.value,
+        "person_id": person_id.value,
         "name": "Patrick Alonso",
         "lastname": "Fuentes Carpio",
-        "mailAddress": "patrick18483@gmail.com",
+        "mail_address": "patrick18483@gmail.com",
         "address": "Cultura chimu 413",
     }
     invalid_obj = {
-        "personId": "0000",
+        "person_id": "0000",
         "name": "Patrick Al0ns0",
-        "lastName": "Fuentes Carpi0",
-        "mailAddress": "patrick",
+        "last_name": "Fuentes Carpi0",
+        "mail_address": "patrick",
     }
 
     with pytest.raises(DomainError) as error:
@@ -95,18 +99,18 @@ def test_interface_invalid_params():
         assert error.code == ID_NOT_VALID[0]
 
     with pytest.raises(DomainError) as error:
-        tc.get_by_id(invalid_obj["personId"])
+        tc.get_by_id(invalid_obj["person_id"])
         assert str(error.code) == ID_NOT_VALID[0]
 
     with pytest.raises(DomainError) as error:
-        tc.delete(invalid_obj["personId"])
+        tc.delete(invalid_obj["person_id"])
         assert str(error.code) == ID_NOT_VALID[0]
 
     with pytest.raises(DomainError) as error:
         tc.create(
-            valid_obj["personId"],
+            person_id.value,
             invalid_obj["name"],
-            invalid_obj["lastName"],
-            invalid_obj["mailAddress"],
+            invalid_obj["last_name"],
+            invalid_obj["mail_address"],
         )
         assert str(error.value) == INVALID_FORMAT[0]
