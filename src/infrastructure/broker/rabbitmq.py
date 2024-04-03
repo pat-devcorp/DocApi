@@ -24,14 +24,15 @@ class RabbitmqClient:
     def __init__(
         self,
         rabbitmq_server: RabbitmqServer,
-        queue: str,
         in_lost_save_local: bool = True,
     ) -> None:
         self.server = rabbitmq_server
-        self.queue = queue
         self.client = None
         self.channel = None
         self.in_lost_save_local = in_lost_save_local
+
+    def set_queue(self, queue):
+        self.queue = queue
 
     @property
     def dsn(self):
@@ -102,5 +103,6 @@ class RabbitmqClient:
 
 # Test
 def rabbitmq_interface_test(ref_rabbitmq_server):
-    rabbitmq_broker = RabbitmqClient(ref_rabbitmq_server, "test")
+    rabbitmq_broker = RabbitmqClient(ref_rabbitmq_server)
+    rabbitmq_broker.set_queue("test")
     rabbitmq_broker.publish("testing...")

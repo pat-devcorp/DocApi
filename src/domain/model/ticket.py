@@ -3,23 +3,26 @@ from collections import namedtuple
 from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..custom_string import CustomString
 from ..DomainError import DomainError
+from ..enum.identifier_algorithm import IdentifierAlgorithm
 from ..enum.ticket_status import TicketState
-from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
+from ..enum.type_channel import TypeChannel
+from ..identifier_handler import IdentifierHandler
 
 Ticket = namedtuple(
     "Ticket",
     [
         "ticket_id",
-        "channel_id",
+        "type_channel",
         "requirement",
         "because",
         "state",
+        "attrs",
     ],
 )
 
 
 class TicketDomain:
-    _idAlgorithm = IdentifierAlgorithm.UUID_V4
+    algorithm = IdentifierAlgorithm.SONY_FLAKE
     pk = "ticket_id"
 
     @classmethod
@@ -39,20 +42,22 @@ class TicketDomain:
         if data.get(cls.pk) is None:
             raise DomainError(ID_NOT_FOUND, "id must be provided")
 
-        item = dict()
-        for k in Ticket._fields:
-            item[k] = data.get(k, None)
+        item = {k: data.get(k, None) for k in Ticket._fields}
+        attrs = {k: v for k, v in data.items() if k not in Ticket._fields}
+        item["attrs"] = attrs
 
-        return cls.is_valid(item)
+        cls.is_valid(**item)
+        return Ticket(**item)
 
     @classmethod
     def is_valid(
         cls,
         ticket_id,
-        channel_id,
+        type_channel,
         requirement,
         because,
         state,
+        attrs,
     ) -> Ticket | DomainError:
         errors = list()
 
@@ -62,44 +67,64 @@ class TicketDomain:
             except DomainError as e:
                 errors.append(str(e))
 
+        if requirement is not None:
+            if CustomString.is_empty_string(requirement):
+                errors.append("invalid requirement")
+
+        if because is not None:
+            if CustomString.is_empty_string(because):
+                errors.append("invalid because")
+
         if state is not None:
             is_ok, err = TicketState.has_value(state)
+            if not is_ok:
+                errors.append(err)
+
+        if type_channel is not None:
+            is_ok, err = TypeChannel.has_value(type_channel)
             if not is_ok:
                 errors.append(err)
 
         if len(errors) > 0:
             raise DomainError(INVALID_FORMAT, "\n".join(errors))
 
-        return Ticket(
-            ticket_id,
-            channel_id,
-            requirement,
-            because,
-            state,
-        )
-
     @classmethod
     def new(
         cls,
         ticket_id: IdentifierHandler,
-        channel_id: IdentifierHandler,
+        type_channel: TypeChannel,
         requirement: str,
         because: str,
         state: TicketState = None,
+        attrs: dict = None,
     ) -> Ticket | DomainError:
-        if (
-            ticket_id is None
-            or channel_id is None
-            or CustomString.is_empty_string(requirement)
-            or CustomString.is_empty_string(because)
+        if not isinstance(ticket_id, IdentifierHandler) or not isinstance(
+            type_channel, TypeChannel
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
-        state = TicketState.CREATED.value if state is None else state.value
+        type_channel_value = type_channel.value
+        state_value = (
+            TicketState.CREATED.value
+            if not isinstance(state, TicketState)
+            else state.value
+        )
+        if attrs is None:
+            attrs = dict()
 
-        return cls.is_valid(
-            ticket_id,
-            channel_id,
+        cls.is_valid(
+            ticket_id.value,
+            type_channel_value,
             requirement,
             because,
-            state,
+            state_value,
+            attrs,
+        )
+
+        return Ticket(
+            ticket_id.value,
+            type_channel_value,
+            requirement,
+            because,
+            state_value,
+            attrs,
         )

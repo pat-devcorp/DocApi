@@ -1,12 +1,14 @@
 pydantic
+mypy
 pytest
 pre-commit
 gunicorn
 flask
 flask_cors
-kafka-python
 prometheus_client
 pymongo
 python-magic
 sonyflake-py
+nanoid
 pandas
+pika

@@ -22,7 +22,7 @@ def create_person():
         return WRITER_NOT_PROVIDED
 
     lc = PersonController(
-        write_uid, person.config["MONGO_SERVER"], person.config["RABBITMQ_SERVER"]
+        write_uid, person.config["REPOSITORY_MONGO"], person.config["BROKER_RABBITMQ"]
     )
 
     request_data = request.get_json()

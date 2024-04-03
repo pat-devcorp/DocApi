@@ -1,20 +1,13 @@
 from datetime import datetime
-from enum import Enum
 from uuid import UUID, uuid4
 
 from bson import ObjectId
+from nanoid import generate
 from sonyflake import SonyFlake
 
 from ..utils.status_code import ID_NOT_VALID
 from .DomainError import DomainError
-
-
-class IdentifierAlgorithm(Enum):
-    DEFAULT = 0
-    UUID_V4 = 1
-    USER_ID = 2
-    SONYFLAKE = 3
-    OBJECT_ID = 4
+from .enum.identifier_algorithm import IdentifierAlgorithm
 
 
 class IdentifierHandler:
@@ -25,16 +18,17 @@ class IdentifierHandler:
     @classmethod
     def get_default_identifier(cls, algorithm: IdentifierAlgorithm):
         functions = [
-            cls.get_string,
+            cls.get_default,
             cls.get_uuid_v4,
-            cls.get_sonyflake,
+            cls.get_sony_flake,
             cls.get_object_id,
+            cls.get_nanoid,
         ]
         default = functions[algorithm.value]()
         return cls(algorithm, default)
 
     @staticmethod
-    def get_sonyflake():
+    def get_sony_flake():
         sf = SonyFlake()
         return str(sf.next_id())
 
@@ -44,8 +38,12 @@ class IdentifierHandler:
         return str(ObjectId.from_datetime(now))
 
     @staticmethod
-    def get_string():
-        return "DEFAULT"
+    def get_nanoid():
+        return generate()
+
+    @staticmethod
+    def get_default():
+        return "N/A"
 
     @staticmethod
     def get_uuid_v4():
@@ -61,6 +59,7 @@ class IdentifierHandler:
             cls.is_valid_uuid_v4,
             cls.is_valid_snowflake,
             cls.is_valid_object_id,
+            cls.is_valid_nano_id,
         ]
         if not validator[algorithm.value](identifier):
             raise DomainError(ID_NOT_VALID, "Algorithm does not match")
@@ -68,16 +67,15 @@ class IdentifierHandler:
 
     @staticmethod
     def is_valid_default(identifier):
-        return True, ""
+        return True
 
     @staticmethod
-    def is_valid_snowflake(identifier):
-        try:
-            sf = SonyFlake()
-            sf.parse_id(identifier)
-            return True
-        except ValueError:
+    def is_valid_snowflake(identifier: str):
+        if not isinstance(identifier, str):
             return False
+        if len(identifier) != 18:
+            return False
+        return True
 
     @staticmethod
     def is_valid_object_id(identifier):
@@ -88,7 +86,17 @@ class IdentifierHandler:
             return False
 
     @staticmethod
+    def is_valid_nano_id(identifier: str):
+        if not isinstance(identifier, str):
+            return False
+        if len(identifier) != 21:
+            return False
+        return True
+
+    @staticmethod
     def is_valid_uuid_v4(identifier):
+        if not isinstance(identifier, str):
+            return False
         try:
             UUID(identifier, version=4)
             return True

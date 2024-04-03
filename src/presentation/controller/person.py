@@ -11,7 +11,7 @@ class PersonController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = PersonMongo(ref_repository, PersonDomain.pk)
+        _r = PersonMongo(ref_repository)
         _b = ref_broker
         self._uc = PersonUseCase(_w, _r, _b)
 

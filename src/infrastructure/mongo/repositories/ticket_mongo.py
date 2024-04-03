@@ -1,12 +1,13 @@
 from ...InfrastructureError import InfrastructureError
-from ..mongo import MongoClient, MongoServer
+from ..mongo import MongoClient
 
 
 class TicketMongo:
     tablename = "ticket"
 
-    def __init__(self, ref_server: MongoServer, pk=None) -> None | InfrastructureError:
-        self._m = MongoClient(ref_server, self.tablename)
+    def __init__(self, ref_client: MongoClient, pk=None) -> None | InfrastructureError:
+        self._m = ref_client
+        self._m.set_tablename(self.tablename)
         self.pk = pk if pk is not None else "_id"
 
     def entity_exists(self, identifier) -> bool:
@@ -45,5 +46,5 @@ class TicketMongo:
         dataset = list(data)
         for item in dataset:
             item["_id"] = item.pop(self.pk)
-        self._m.create(dataset)
+        self._m.insert_many(dataset)
         return None

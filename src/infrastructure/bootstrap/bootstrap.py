@@ -1,7 +1,7 @@
 import os
 
-from ..broker.rabbitmq import RabbitmqServer
-from ..mongo.mongo import MongoServer
+from ..broker.rabbitmq import RabbitmqClient, RabbitmqServer
+from ..mongo.mongo import MongoClient, MongoServer
 
 
 class Bootstrap:
@@ -35,6 +35,7 @@ class Bootstrap:
                 username=os.environ["RABBITMQ_USER"],
                 password=os.environ["RABBITMQ_PASS"],
             )
+            self.BROKER_RABBITMQ = RabbitmqClient(self.RABBITMQ_SERVER)
         if self.BROKER == "KAFKA":
             self.KAFKA_HOST = os.environ["KAFKA_HOST"]
             self.KAFKA_PORT = os.environ["KAFKA_PORT"]
@@ -48,3 +49,4 @@ class Bootstrap:
                 password=os.environ["MONGO_PASS"],
                 collection=os.environ["MONGO_DB"],
             )
+            self.REPOSITORY_MONGO = MongoClient(self.MONGO_SERVER)

@@ -1,5 +1,6 @@
 from ...application.use_case.ticket import TicketUseCase
 from ...domain.enum.ticket_status import TicketState
+from ...domain.enum.type_channel import TypeChannel
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 
@@ -12,7 +13,7 @@ class TicketController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = TicketMongo(ref_repository, TicketDomain.pk)
+        _r = TicketMongo(ref_repository)
         _b = ref_broker
         self._uc = TicketUseCase(_w, _r, _b)
 
@@ -35,10 +36,14 @@ class TicketController:
 
         return self._uc.update(obj)
 
-    def create(self, ticket_id, channel_id, requirement, because, state=None):
+    def create(self, ticket_id, type_channel, requirement, because, state=None):
         ticket_id = TicketDomain.set_identifier(ticket_id)
+        enum_channel = TypeChannel(type_channel)
+        enum_state = None
         if state is not None:
-            state = TicketState(state)
-        obj = TicketDomain.new(ticket_id, channel_id, requirement, because, state)
+            enum_state = TicketState(state)
+        obj = TicketDomain.new(
+            ticket_id, enum_channel, requirement, because, enum_state
+        )
 
         return self._uc.create(obj)

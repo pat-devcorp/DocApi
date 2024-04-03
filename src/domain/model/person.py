@@ -4,7 +4,8 @@ from ...utils.custom_date import CustomDate
 from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..custom_string import CustomString
 from ..DomainError import DomainError
-from ..identifier_handler import IdentifierAlgorithm, IdentifierHandler
+from ..enum.identifier_algorithm import IdentifierAlgorithm
+from ..identifier_handler import IdentifierHandler
 
 Person = namedtuple(
     "Person",
@@ -21,7 +22,7 @@ Person = namedtuple(
 
 
 class PersonDomain:
-    algorithm = IdentifierAlgorithm.UUID_V4
+    algorithm = IdentifierAlgorithm.NANO_ID
     pk = "person_id"
 
     @classmethod
@@ -88,7 +89,7 @@ class PersonDomain:
 
         if (
             document_number is not None
-            and isinstance(document_number, str)
+            and not isinstance(document_number, str)
             and not (document_number == CustomString.not_available())
         ):
             if not document_number.isalnum():
@@ -109,7 +110,7 @@ class PersonDomain:
         attrs: dict = None,
     ) -> Person | DomainError:
         if (
-            person_id is None
+            not isinstance(person_id, IdentifierHandler)
             or CustomString.is_empty_string(name)
             or CustomString.is_empty_string(last_name)
             or CustomString.is_empty_string(mail_address)
@@ -132,7 +133,7 @@ class PersonDomain:
             attrs,
         )
         return Person(
-            person_id,
+            person_id.value,
             name,
             last_name,
             mail_address,

@@ -22,11 +22,13 @@ class CriteriaProtocol(Protocol):
 
 
 class MongoClient:
-    def __init__(self, ref_mongo_server: MongoServer, tablename: str):
+    def __init__(self, ref_mongo_server: MongoServer):
         self.server = ref_mongo_server
-        self.tablename = tablename
         self.client = None
         self.collection = None
+
+    def set_tablename(self, tablename):
+        self.tablename = tablename
 
     @property
     def dsn(self):
@@ -110,7 +112,8 @@ class MongoClient:
 
 # Test
 def mongo_interface_test(ref_mongo_server):
-    mongo_repository = MongoClient(ref_mongo_server, "test")
+    mongo_repository = MongoClient(ref_mongo_server)
+    mongo_repository.set_tablename("test")
     assert hasattr(mongo_repository, "dsn")
 
     current_id = MongoClient.get_object_id()

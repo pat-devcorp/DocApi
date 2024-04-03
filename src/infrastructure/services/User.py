@@ -1,7 +1,8 @@
 import requests
 from pydantic import BaseModel
 
-from ...domain.identifier_handler import IdentifierAlgorithm, IdentifierHandler
+from ...domain.enum.identifier_algorithm import IdentifierAlgorithm
+from ...domain.identifier_handler import IdentifierHandler
 
 
 class UserServer(BaseModel):

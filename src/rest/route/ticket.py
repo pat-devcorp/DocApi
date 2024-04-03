@@ -17,7 +17,7 @@ def create_ticket():
         return (code, message)
 
     lc = TicketController(
-        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid, ticket.config["REPOSITORY_MONGO"], ticket.config["BROKER_RABBITMQ"]
     )
     item = lc.create(
         params.get("ticket_id"),
