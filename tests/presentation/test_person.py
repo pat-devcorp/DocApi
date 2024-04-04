@@ -63,19 +63,14 @@ def test_interface_invalid_params():
         tc.create(invalid_person_id, **invalid_person)
         assert error.code == ID_NOT_VALID[0]
 
-    # with pytest.raises(DomainError) as error:
-    #     tc.get_by_id(invalid_obj["person_id"])
-    #     assert str(error.code) == ID_NOT_VALID[0]
+    with pytest.raises(DomainError) as error:
+        tc.get_by_id(invalid_person_id)
+        assert str(error.code) == ID_NOT_VALID[0]
 
-    # with pytest.raises(DomainError) as error:
-    #     tc.delete(invalid_obj["person_id"])
-    #     assert str(error.code) == ID_NOT_VALID[0]
+    with pytest.raises(DomainError) as error:
+        tc.delete(invalid_person_id)
+        assert str(error.code) == ID_NOT_VALID[0]
 
-    # with pytest.raises(DomainError) as error:
-    #     tc.create(
-    #         person_id.value,
-    #         invalid_obj["name"],
-    #         invalid_obj["last_name"],
-    #         invalid_obj["mail_address"],
-    #     )
-    #     assert str(error.value) == INVALID_FORMAT[0]
+    with pytest.raises(DomainError) as error:
+        tc.create(person_id.value, **invalid_person)
+        assert str(error.value) == INVALID_FORMAT[0]

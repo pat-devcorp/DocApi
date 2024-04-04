@@ -32,33 +32,28 @@ def is_safe(file, virus_api=VIRUS_ANALYZER_API) -> str:
             raise HandlerError(WARNING_FILE)
 
 
-class FileHandler:
-    file_id = None
+def upload_file(media_path, uploaded_file, name=None):
+    if not os.path.exists(media_path):
+        raise HandlerError(NOT_FOUND, f"Path does not exists {media_path}")
+    if not os.path.isdir(media_path):
+        raise HandlerError(NOT_FOUND, f"Path is not a directory {media_path}")
 
-    def __init__(self, media_path) -> None:
-        self.current_path = media_path
+    file_name = uploaded_file.filename
+    if name is not None:
+        _, old_ext = os.path.splitext(file_name)
+        file_name = name + old_ext
 
-    def upload_file(self, uploaded_file, name=None, directory: str = None) -> bool:
-        is_valid_type(uploaded_file.stream)
-        is_safe(uploaded_file)
+    # If the old name had no extension, simply return the new name
+    file_path = os.path.join(media_path, file_name)
 
-        file_name = name or uploaded_file.filename
-        if directory is not None and directory != "":
-            self.current_path = os.path.join(self.current_path, directory)
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.read())
 
-        file_path = os.path.join(self.current_path, file_name)
-        uploaded_file.save(file_path)
+    return file_name
 
-        self.file_id = file_path
-        return True
 
-    def file_exists(self, file_name: str, directory: str = None) -> bool:
-        if directory is not None and directory != "":
-            self.current_path = os.path.join(self.current_path, directory)
-
-        file_path = os.path.join(self.current_path, file_name)
-        if not os.path.exists(file_path):
-            raise HandlerError(NOT_FOUND)
-
-        self.file_id = file_path
-        return True
+def file_exists(media_path, file_name: str) -> bool:
+    file_path = os.path.join(media_path, file_name)
+    if not os.path.isfile(file_path):
+        return False
+    return True

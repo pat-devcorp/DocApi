@@ -1,11 +1,12 @@
 from collections import namedtuple
 
 from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError
+from ..enum.channel_type import ChannelType
 from ..enum.identifier_algorithm import IdentifierAlgorithm
 from ..enum.ticket_status import TicketState
-from ..enum.type_channel import TypeChannel
 from ..identifier_handler import IdentifierHandler
 
 Ticket = namedtuple(
@@ -81,9 +82,13 @@ class TicketDomain:
                 errors.append(err)
 
         if type_channel is not None:
-            is_ok, err = TypeChannel.has_value(type_channel)
+            is_ok, err = ChannelType.has_value(type_channel)
             if not is_ok:
                 errors.append(err)
+
+        if attrs is not None:
+            if not CustomDict.has_only_primitive_types(attrs):
+                errors.append("the dictionary must have only primitive types")
 
         if len(errors) > 0:
             raise DomainError(INVALID_FORMAT, "\n".join(errors))
@@ -92,14 +97,14 @@ class TicketDomain:
     def new(
         cls,
         ticket_id: IdentifierHandler,
-        type_channel: TypeChannel,
+        type_channel: ChannelType,
         requirement: str,
         because: str,
         state: TicketState = None,
         attrs: dict = None,
     ) -> Ticket | DomainError:
         if not isinstance(ticket_id, IdentifierHandler) or not isinstance(
-            type_channel, TypeChannel
+            type_channel, ChannelType
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
         type_channel_value = type_channel.value

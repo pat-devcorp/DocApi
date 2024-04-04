@@ -1,7 +1,7 @@
 from ..custom_enum import CustomEnum
 
 
-class TypeCommit(CustomEnum):
+class CommitType(CustomEnum):
     UNDEFINED = 0
     FEAT = 1
     FIX = 2

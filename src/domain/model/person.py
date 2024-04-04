@@ -1,7 +1,9 @@
 from collections import namedtuple
 
+from ...infrastructure.bootstrap import constant
 from ...utils.custom_date import CustomDate
 from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError
 from ..enum.identifier_algorithm import IdentifierAlgorithm
@@ -90,10 +92,14 @@ class PersonDomain:
         if (
             document_number is not None
             and not isinstance(document_number, str)
-            and not (document_number == CustomString.not_available())
+            and not (document_number == constant.NOT_AVAILABLE)
         ):
             if not document_number.isalnum():
                 errors.append("Invalid document number")
+
+        if attrs is not None:
+            if not CustomDict.has_only_primitive_types(attrs):
+                errors.append("the dictionary must have only primitive types")
 
         if len(errors) > 0:
             raise DomainError(INVALID_FORMAT, "\n".join(errors))
@@ -119,7 +125,7 @@ class PersonDomain:
         if birthdate is None:
             birthdate = CustomDate.not_available()
         if document_number is None:
-            document_number = CustomString.not_available()
+            document_number = constant.NOT_AVAILABLE
         if attrs is None:
             attrs = dict()
 

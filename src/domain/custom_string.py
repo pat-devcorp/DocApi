@@ -3,10 +3,6 @@ import re
 
 class CustomString:
     @staticmethod
-    def not_available():
-        return "N/A"
-
-    @staticmethod
     def is_empty_string(value: str) -> bool:
         if value is None or not isinstance(value, str) or value == "":
             return True

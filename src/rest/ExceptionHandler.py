@@ -2,7 +2,7 @@ import json
 import traceback
 
 from ..domain.DomainError import DomainError
-from ..infrastructure.bootstrap import constant as const
+from ..infrastructure.bootstrap import constant
 from ..infrastructure.InfrastructureError import InfrastructureError
 from ..presentation.PresentationError import PresentationError
 from ..utils.timeout import timeout_function
@@ -15,7 +15,7 @@ def exception_handler(func):
 
         try:
             status_code, response = timeout_function(
-                func(*args, **kwargs) or "OK", seconds=const.TIME_OUT
+                func(*args, **kwargs) or "OK", seconds=constant.TIME_OUT
             )
         except PresentationError as p_err:
             response = str(p_err)

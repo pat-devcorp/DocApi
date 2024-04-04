@@ -1,10 +1,9 @@
 from enum import Enum
 
 from ...domain.identifier_handler import IdentifierHandler
-from ...domain.model.reference import Reference
+from ...domain.model.image import Image, ImageDomain
 from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol
-from ..criteria import Criteria
 from ..RepositoryProtocol import RepositoryProtocol
 
 
@@ -13,7 +12,6 @@ class ImageEvent(Enum):
     PNG = 1
 
 
-# TODO: Rule to manager can not have in progress more than 4 Images
 class ImageUseCase:
     def __init__(
         self,
@@ -24,16 +22,15 @@ class ImageUseCase:
         self._w = ref_write_uid
         self._r = ref_repository
         self._b = ref_broker
-        self._f = list(Reference._fields)
+        self._f = list(Image._fields)
 
     def add_audit_fields(self) -> None:
         self._f += AuditHandler._fields
 
-    def fetch(self, limit: int) -> list[dict]:
-        matching = Criteria(self._f)
-        matching._limit(limit)
+    def create(self, obj: Image) -> None:
+        item = ImageDomain.as_dict(obj)
+        item.update(AuditHandler.get_create_fields(self._w))
 
-        return self._r.fetch(self._f, matching)
+        self._r.create(item)
 
-    def get_by_id(self, obj_id: IdentifierHandler) -> dict:
-        return self._r.get_by_id(obj_id.value, self._f)
+        ImageDomain.save(obj)

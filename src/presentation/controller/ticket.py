@@ -1,6 +1,6 @@
 from ...application.use_case.ticket import TicketUseCase
+from ...domain.enum.channel_type import ChannelType
 from ...domain.enum.ticket_status import TicketState
-from ...domain.enum.type_channel import TypeChannel
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 
@@ -38,7 +38,7 @@ class TicketController:
 
     def create(self, ticket_id, type_channel, requirement, because, state=None):
         ticket_id = TicketDomain.set_identifier(ticket_id)
-        enum_channel = TypeChannel(type_channel)
+        enum_channel = ChannelType(type_channel)
         enum_state = None
         if state is not None:
             enum_state = TicketState(state)

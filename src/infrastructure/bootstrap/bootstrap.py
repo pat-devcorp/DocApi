@@ -11,13 +11,16 @@ class Bootstrap:
 
     def get_paths(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, ".."))
-        self.ROUTE_PATH = os.path.join("src", "rest", "route")
-        self.LOG_PATH = os.path.join("src", "log", "api", "api.log")
-        self.BROKER_PATH = os.path.join("src", "log", "broker")
-        self.IMAGE_FOLDER = os.path.join("src", "media", "img")
+        self.PROJECT_PATH = os.path.abspath(os.path.join(current_directory, "..", ".."))
+        self.ROUTE_PATH = os.path.join(self.PROJECT_PATH, "rest", "route")
+        self.LOG_PATH = os.path.join(self.PROJECT_PATH, "log", "api", "api.log")
+        self.BROKER_PATH = os.path.join(self.PROJECT_PATH, "log", "broker")
+        self.IMAGE_PATH = os.path.join(self.PROJECT_PATH, "media", "img")
         self.LOG_CONFIG = os.path.join(
             self.PROJECT_PATH, "infrastructure", "logger", "config.json"
+        )
+        self.BROKER_LOST_MESSAGE_PATH = os.path.join(
+            self.PROJECT_PATH, "log", "broker", "lost"
         )
 
     def get_from_environment(self):
@@ -25,9 +28,6 @@ class Bootstrap:
         self.IS_IN_PRODUCTION = os.getenv("IS_IN_PRODUCTION", 0)
 
         self.BROKER = os.getenv("BROKER", False)
-        self.BROKER_LOST_MESSAGE_PATH = os.getenv(
-            "BROKER_LOST_MESSAGE_PATH", os.path.join("src", "log", "broker", "lost")
-        )
         if self.BROKER == "RABBITMQ":
             self.RABBITMQ_SERVER = RabbitmqServer(
                 hostname=os.environ["RABBITMQ_HOST"],

@@ -8,3 +8,4 @@ DATE_FORMAT = "%Y/%m/%d"
 TIME_FORMAT = "%H:%M:%S"
 DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 TIME_OUT = 600
+NOT_AVAILABLE = "N/A"

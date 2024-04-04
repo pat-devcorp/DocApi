@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ..infrastructure.bootstrap import constant as const
+from ..infrastructure.bootstrap import constant
 
 
 class BaseDatetime(datetime):
@@ -48,8 +48,8 @@ class BaseDatetime(datetime):
 
 
 class CustomDate(BaseDatetime):
-    str_format = const.DATE_FORMAT
+    str_format = constant.DATE_FORMAT
 
 
 class CustomDatetime(BaseDatetime):
-    str_format = const.DATE_FORMAT + " " + const.TIME_FORMAT
+    str_format = constant.DATE_FORMAT + " " + constant.TIME_FORMAT

@@ -1,5 +1,5 @@
 from ..custom_enum import CustomEnum
 
 
-class TypeChannel(CustomEnum):
+class ChannelType(CustomEnum):
     MAIL = 0
