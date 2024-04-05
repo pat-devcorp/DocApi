@@ -1,6 +1,6 @@
 from ...application.use_case.ticket import TicketUseCase
 from ...domain.enum.channel_type import ChannelType
-from ...domain.enum.ticket_status import TicketState
+from ...domain.enum.ticket_state import TicketState
 from ...domain.model.ticket import TicketDomain
 from ...infrastructure.mongo.repositories.ticket_mongo import TicketMongo
 
@@ -36,14 +36,24 @@ class TicketController:
 
         return self._uc.update(obj)
 
-    def create(self, ticket_id, type_channel, requirement, because, state=None):
+    def create(
+        self,
+        ticket_id,
+        channel_type,
+        requirement,
+        because,
+        state=None,
+        attrs: dict = None,
+    ):
         ticket_id = TicketDomain.set_identifier(ticket_id)
-        enum_channel = ChannelType(type_channel)
+        enum_channel = ChannelType(channel_type)
         enum_state = None
-        if state is not None:
-            enum_state = TicketState(state)
+        if state is None:
+            enum_state = TicketState.CREATED
+        if attrs is None:
+            attrs = {}
         obj = TicketDomain.new(
-            ticket_id, enum_channel, requirement, because, enum_state
+            ticket_id, enum_channel, requirement, because, enum_state, attrs
         )
 
         return self._uc.create(obj)

@@ -1,5 +1,3 @@
-from enum import Enum
-
 from ...domain.identifier_handler import IdentifierHandler
 from ...domain.model.ticket import Ticket, TicketDomain
 from ...utils.status_code import DB_ID_NOT_FOUND
@@ -10,14 +8,6 @@ from ..criteria import Criteria
 from ..RepositoryProtocol import RepositoryProtocol
 
 
-class TicketEvent(Enum):
-    CREATED = 0
-    UPDATED = 1
-    DELETED = 2
-    ADD_MEMBER = 3
-
-
-# TODO: Rule to manager can not have in progress more than 4 tickets
 class TicketUseCase:
     def __init__(
         self,

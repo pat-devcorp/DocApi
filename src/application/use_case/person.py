@@ -1,5 +1,3 @@
-from enum import Enum
-
 from ...domain.identifier_handler import IdentifierHandler
 from ...domain.model.person import Person, PersonDomain
 from ...utils.status_code import DB_ID_NOT_FOUND, INVALID_FORMAT
@@ -8,10 +6,6 @@ from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol
 from ..criteria import Criteria
 from ..RepositoryProtocol import RepositoryProtocol
-
-
-class PersonEvent(Enum):
-    CREATED = 0
 
 
 class PersonUseCase:

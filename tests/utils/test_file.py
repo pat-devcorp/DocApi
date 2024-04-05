@@ -8,7 +8,7 @@ from src.utils.file_handler import upload_file
 class TestUploadFile(unittest.TestCase):
     def setUp(self):
         # Set up a temporary directory for testing
-        self.media_path = "temp_media"
+        self.media_path = "tmp"
         os.makedirs(self.media_path, exist_ok=True)
 
     def tearDown(self):

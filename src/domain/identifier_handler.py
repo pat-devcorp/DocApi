@@ -15,6 +15,9 @@ class IdentifierHandler:
         self.algorithm = algorithm
         self.value = value
 
+    def set_value(self, value):
+        self.value = value
+
     @classmethod
     def get_default_identifier(cls, algorithm: IdentifierAlgorithm):
         functions = [

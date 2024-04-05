@@ -6,6 +6,7 @@ from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError
+from ..enum.contact_type import ContactType
 from ..enum.identifier_algorithm import IdentifierAlgorithm
 from ..identifier_handler import IdentifierHandler
 
@@ -15,7 +16,7 @@ Person = namedtuple(
         "person_id",
         "name",
         "last_name",
-        "mail_address",
+        "contact_type",
         "birthdate",
         "document_number",
         "attrs",
@@ -26,6 +27,35 @@ Person = namedtuple(
 class PersonDomain:
     algorithm = IdentifierAlgorithm.NANO_ID
     pk = "person_id"
+
+    @staticmethod
+    def get_invalid_person():
+        return Person(
+            person_id=0,
+            name="Patrick Al0ns0",
+            last_name="Fuent3s Carp1o",
+            contact_type="A",
+            birthdate="1995/07/18",
+            document_number="@253",
+            attrs=list(),
+        )
+
+    @classmethod
+    def get_valid_person(cls):
+        identifier = cls.get_default_identifier()
+        return Person(
+            person_id=identifier.value,
+            name="Patrick Alonso",
+            last_name="Fuentes Carpio",
+            contact_type=ContactType.UNDEFINED.value,
+            birthdate=CustomDate.not_available(),
+            document_number=constant.NOT_AVAILABLE,
+            attrs={
+                "mail_address": "patrick18483@gmail.com",
+                "address": "Cultura chimu 413",
+                "zip_code": "04002",
+            },
+        )
 
     @classmethod
     def get_default_identifier(cls) -> IdentifierHandler:
@@ -57,7 +87,7 @@ class PersonDomain:
         person_id,
         name,
         last_name,
-        mail_address,
+        contact_type,
         birthdate,
         document_number,
         attrs,
@@ -80,9 +110,9 @@ class PersonDomain:
             if any(character.isdigit() for character in last_name):
                 errors.append("last_name contain numbers")
 
-        if mail_address is not None:
-            if not CustomString.validate_email_syntax(mail_address):
-                errors.append("Invalid email address")
+        if contact_type is not None:
+            if not ContactType.has_value(contact_type):
+                errors.append("Invalid contact type")
 
         if birthdate is not None and not (birthdate == CustomDate.not_available()):
             is_ok, err = CustomDate.check_format(birthdate)
@@ -110,7 +140,7 @@ class PersonDomain:
         person_id: IdentifierHandler,
         name: str,
         last_name: str,
-        mail_address: str,
+        contact_type: ContactType | int,
         birthdate=None,
         document_number=None,
         attrs: dict = None,
@@ -119,9 +149,14 @@ class PersonDomain:
             not isinstance(person_id, IdentifierHandler)
             or CustomString.is_empty_string(name)
             or CustomString.is_empty_string(last_name)
-            or CustomString.is_empty_string(mail_address)
+            or not isinstance(contact_type, (ContactType, int))
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
+        contact_value = (
+            contact_type.value
+            if isinstance(contact_type, ContactType)
+            else contact_type
+        )
         if birthdate is None:
             birthdate = CustomDate.not_available()
         if document_number is None:
@@ -133,7 +168,7 @@ class PersonDomain:
             person_id.value,
             name,
             last_name,
-            mail_address,
+            contact_value,
             birthdate,
             document_number,
             attrs,
@@ -142,7 +177,7 @@ class PersonDomain:
             person_id.value,
             name,
             last_name,
-            mail_address,
+            contact_value,
             birthdate,
             document_number,
             attrs,

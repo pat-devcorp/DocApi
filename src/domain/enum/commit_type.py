@@ -9,7 +9,7 @@ class CommitType(CustomEnum):
     CI = 4
     DOCS = 5
     CHORE = 6
-    PERFORMANCE = 6
-    REFACTOR = 7
-    LINTER = 8
-    TEST = 9
+    PERFORMANCE = 7
+    REFACTOR = 8
+    STYLE = 9
+    TEST = 10

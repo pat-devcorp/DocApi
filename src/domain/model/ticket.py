@@ -5,15 +5,16 @@ from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError
 from ..enum.channel_type import ChannelType
+from ..enum.commit_type import CommitType
 from ..enum.identifier_algorithm import IdentifierAlgorithm
-from ..enum.ticket_status import TicketState
+from ..enum.ticket_state import TicketState
 from ..identifier_handler import IdentifierHandler
 
 Ticket = namedtuple(
     "Ticket",
     [
         "ticket_id",
-        "type_channel",
+        "channel_type",
         "requirement",
         "because",
         "state",
@@ -25,6 +26,29 @@ Ticket = namedtuple(
 class TicketDomain:
     algorithm = IdentifierAlgorithm.SONY_FLAKE
     pk = "ticket_id"
+
+    @staticmethod
+    def get_invalid_ticket():
+        return Ticket(
+            ticket_id=0,
+            channel_type="A",
+            requirement="asdasdasd",
+            because="asdasdas",
+            state="A",
+            attrs=list(),
+        )
+
+    @classmethod
+    def get_valid_ticket(cls):
+        identifier = cls.get_default_identifier()
+        return Ticket(
+            ticket_id=identifier.value,
+            channel_type=ChannelType.MAIL.value,
+            requirement="test",
+            because="help with development",
+            state=TicketState.CREATED.value,
+            attrs={"type_commit": CommitType.FIX.value},
+        )
 
     @classmethod
     def get_default_identifier(cls):
@@ -54,7 +78,7 @@ class TicketDomain:
     def is_valid(
         cls,
         ticket_id,
-        type_channel,
+        channel_type,
         requirement,
         because,
         state,
@@ -81,8 +105,8 @@ class TicketDomain:
             if not is_ok:
                 errors.append(err)
 
-        if type_channel is not None:
-            is_ok, err = ChannelType.has_value(type_channel)
+        if channel_type is not None:
+            is_ok, err = ChannelType.has_value(channel_type)
             if not is_ok:
                 errors.append(err)
 
@@ -97,28 +121,30 @@ class TicketDomain:
     def new(
         cls,
         ticket_id: IdentifierHandler,
-        type_channel: ChannelType,
+        channel_type: ChannelType | int,
         requirement: str,
         because: str,
-        state: TicketState = None,
+        state: TicketState | int,
         attrs: dict = None,
     ) -> Ticket | DomainError:
-        if not isinstance(ticket_id, IdentifierHandler) or not isinstance(
-            type_channel, ChannelType
+        if (
+            not isinstance(ticket_id, IdentifierHandler)
+            or not isinstance(channel_type, (ChannelType, int))
+            or not isinstance(state, (TicketState, int))
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
-        type_channel_value = type_channel.value
-        state_value = (
-            TicketState.CREATED.value
-            if not isinstance(state, TicketState)
-            else state.value
+        channel_type_value = (
+            channel_type.value
+            if isinstance(channel_type, ChannelType)
+            else channel_type
         )
+        state_value = state.value if isinstance(state, TicketState) else state
         if attrs is None:
             attrs = dict()
 
         cls.is_valid(
             ticket_id.value,
-            type_channel_value,
+            channel_type_value,
             requirement,
             because,
             state_value,
@@ -127,7 +153,7 @@ class TicketDomain:
 
         return Ticket(
             ticket_id.value,
-            type_channel_value,
+            channel_type_value,
             requirement,
             because,
             state_value,

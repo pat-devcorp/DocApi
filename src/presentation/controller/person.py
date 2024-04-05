@@ -1,4 +1,5 @@
 from ...application.use_case.person import PersonUseCase
+from ...domain.enum.contact_type import ContactType
 from ...domain.model.person import PersonDomain
 from ...infrastructure.mongo.repositories.person_mongo import PersonMongo
 
@@ -39,17 +40,18 @@ class PersonController:
         person_id,
         name,
         last_name,
-        mail_address,
+        contact_type,
         birthdate=None,
         document_number=None,
         address=None,
     ):
         person_id = PersonDomain.set_identifier(person_id)
+        contact = ContactType(contact_type)
         obj = PersonDomain.new(
             person_id,
             name,
             last_name,
-            mail_address,
+            contact,
             birthdate,
             document_number,
             address,

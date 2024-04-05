@@ -18,9 +18,28 @@ class ImageDomain:
     algorithm = IdentifierAlgorithm.NANO_ID
     pk = "image_id"
 
+    @staticmethod
+    def get_invalid_image():
+        return Image(
+            image_id=0,
+            path="/asdasd",
+            attrs=list(),
+        )
+
     @classmethod
-    def get_default_identifier(cls) -> IdentifierHandler:
-        return IdentifierHandler.get_default_identifier(cls.algorithm)
+    def get_valid_image(cls, valid_path, extension_file: str):
+        identifier = cls.get_default_identifier(extension_file)
+        return Image(
+            image_id=identifier.value + extension_file,
+            path=valid_path,
+            attrs={"mac_address": "60-A5-E2-92-31-73"},
+        )
+
+    @classmethod
+    def get_default_identifier(cls, extension_file: str) -> IdentifierHandler:
+        identifier = IdentifierHandler.get_default_identifier(cls.algorithm)
+        identifier.set_value(identifier.value + extension_file)
+        return identifier
 
     @classmethod
     def set_identifier(cls, identifier) -> IdentifierHandler:
@@ -76,23 +95,25 @@ class ImageDomain:
         path: str,
         attrs: dict = None,
     ) -> Image | DomainError:
-        if not isinstance(image_id, IdentifierHandler) or CustomString.is_empty_string(
-            path
+        if (
+            image_file is None
+            or not isinstance(image_id, IdentifierHandler)
+            or CustomString.is_empty_string(path)
         ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
         if attrs is None:
             attrs = dict()
 
-        identifier = upload_file(path, image_file, image_id.value)
+        upload_file(path, image_file, image_id.value)
 
         cls.is_valid(
-            identifier,
+            image_id.value,
             path,
             attrs,
         )
 
         return Image(
-            identifier,
+            image_id.value,
             path,
             attrs,
         )

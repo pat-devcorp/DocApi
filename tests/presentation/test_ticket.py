@@ -1,45 +1,79 @@
+import unittest
+
 import pytest
 
-from src.domain.enum.channel_type import ChannelType
-from src.domain.enum.ticket_status import TicketState
+from src.domain.DomainError import DomainError
 from src.domain.model.ticket import Ticket, TicketDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.ticket import TicketController
-
-ticket_id = TicketDomain.get_default_identifier()
-type_channel = ChannelType.MAIL
-state = TicketState.END
-ticket = {
-    "requirement": "test",
-    "because": "help with development",
-}
+from src.utils.status_code import FIELD_REQUIRED, ID_NOT_VALID, INVALID_FORMAT
 
 
-def get_mock_controller():
-    u = UserService.get_default_identifier()
-    r = MockRepositoryClient(ticket)
-    b = MockBrokerClient()
-    return TicketController(u, r, b)
+class TestTicketController(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.ticket = TicketDomain.get_valid_ticket()
+        cls.ticket_id = TicketDomain.set_identifier(cls.ticket.ticket_id)
+        cls.invalid_ticket = TicketDomain.get_invalid_ticket()
+        u = UserService.get_default_identifier()
+        r = MockRepositoryClient(TicketDomain.as_dict(cls.ticket))
+        b = MockBrokerClient()
+        cls.controller = TicketController(u, r, b)
+
+    def test_attrs(self):
+        assert hasattr(self.ticket_id, "value")
+        assert isinstance(TicketDomain.as_dict(self.ticket), dict)
+
+    def test_new_ticket(self):
+        obj = TicketDomain.new(
+            self.ticket_id,
+            self.ticket.channel_type,
+            self.ticket.requirement,
+            self.ticket.because,
+            self.ticket.state,
+        )
+        assert isinstance(obj, Ticket)
+
+    def test_new_ticket_adding_attrs(self):
+        obj = TicketDomain.new(
+            self.ticket_id,
+            self.ticket.channel_type,
+            self.ticket.requirement,
+            self.ticket.because,
+            self.ticket.state,
+            self.ticket.attrs,
+        )
+        assert isinstance(obj, Ticket)
+
+    def test_update_ticket(self):
+        obj = TicketDomain.from_dict(TicketDomain.as_dict(self.ticket))
+        assert isinstance(obj, Ticket)
+
+    def test_interface_invalid_params(self):
+        with pytest.raises(DomainError) as error:
+            self.controller.create(
+                None,
+                self.invalid_ticket.channel_type,
+                self.invalid_ticket.requirement,
+                self.invalid_ticket.because,
+                self.invalid_ticket.state,
+                self.invalid_ticket.attrs,
+            )
+            assert error.code == FIELD_REQUIRED[0]
+
+        with pytest.raises(DomainError) as error:
+            self.controller.create(
+                self.invalid_ticket.ticket_id,
+                self.invalid_ticket.channel_type,
+                self.invalid_ticket.requirement,
+                self.invalid_ticket.because,
+                self.invalid_ticket.state,
+                self.invalid_ticket.attrs,
+            )
+            assert error.code == INVALID_FORMAT[0]
 
 
-def test_new_ticket():
-    assert hasattr(ticket_id, "value")
-    obj = TicketDomain.new(ticket_id, type_channel, **ticket)
-    assert isinstance(obj, Ticket)
-    assert isinstance(TicketDomain.as_dict(obj), dict)
-
-
-def test_new_ticket_adding_state():
-    dct = dict(ticket)
-    dct.update({"state": state.value})
-    obj = TicketDomain.new(ticket_id, type_channel, **ticket)
-    assert isinstance(obj, Ticket)
-
-
-def test_update_ticket():
-    dct = dict(ticket)
-    dct.update({"ticket_id": ticket_id.value})
-    obj = TicketDomain.from_dict(dct)
-    assert isinstance(obj, Ticket)
+if __name__ == "__main__":
+    unittest.main()

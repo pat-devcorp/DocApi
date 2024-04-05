@@ -1,15 +1,8 @@
-from enum import Enum
-
 from ...domain.identifier_handler import IdentifierHandler
 from ...domain.model.image import Image, ImageDomain
 from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol
 from ..RepositoryProtocol import RepositoryProtocol
-
-
-class ImageEvent(Enum):
-    JPG = 0
-    PNG = 1
 
 
 class ImageUseCase:
