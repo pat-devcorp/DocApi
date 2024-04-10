@@ -10,10 +10,10 @@ from ..status_code import (
     WRITER_NOT_PROVIDED,
 )
 
-person = Blueprint("person", __name__, url_prefix="/person")
+person_route = Blueprint("person_route", __name__, url_prefix="/person")
 
 
-@person.post("/")
+@person_route.post("/")
 @exception_handler
 def create_person():
     params = request.args.to_dict()
@@ -22,7 +22,9 @@ def create_person():
         return WRITER_NOT_PROVIDED
 
     lc = PersonController(
-        write_uid, person.config["REPOSITORY_MONGO"], person.config["BROKER_RABBITMQ"]
+        write_uid,
+        person_route.config["REPOSITORY_MONGO"],
+        person_route.config["BROKER_RABBITMQ"],
     )
 
     request_data = request.get_json()
@@ -39,7 +41,7 @@ def create_person():
     return CODE_OK
 
 
-@person.post("/csv")
+@person_route.post("/csv")
 @exception_handler
 def create_persons_from_csv():
     params = request.args.to_dict()
@@ -48,7 +50,9 @@ def create_persons_from_csv():
         return WRITER_NOT_PROVIDED
 
     lc = PersonController(
-        write_uid, person.config["MONGO_SERVER"], person.config["RABBITMQ_SERVER"]
+        write_uid,
+        person_route.config["MONGO_SERVER"],
+        person_route.config["RABBITMQ_SERVER"],
     )
 
     if "file" not in request.files:
@@ -65,8 +69,8 @@ def create_persons_from_csv():
     return CODE_OK
 
 
-@person.get("/", defaults={"id": None})
-@person.get("/<id>")
+@person_route.get("/", defaults={"id": None})
+@person_route.get("/<id>")
 @exception_handler
 def fetch_persons(id=None):
     params = request.args.to_dict()
@@ -75,14 +79,16 @@ def fetch_persons(id=None):
         return WRITER_NOT_PROVIDED
 
     lc = PersonController(
-        write_uid, person.config["MONGO_SERVER"], person.config["RABBITMQ_SERVER"]
+        write_uid,
+        person_route.config["MONGO_SERVER"],
+        person_route.config["RABBITMQ_SERVER"],
     )
     data = lc.get_by_id(id) if id is not None else lc.fetch()
 
     return (CODE_OK[0], data)
 
 
-@person.put("/<id>")
+@person_route.put("/<id>")
 @exception_handler
 def update_person(id):
     params = request.args.to_dict()
@@ -96,14 +102,16 @@ def update_person(id):
     request_data.update(params["write_uid"])
 
     lc = PersonController(
-        write_uid, person.config["MONGO_SERVER"], person.config["RABBITMQ_SERVER"]
+        write_uid,
+        person_route.config["MONGO_SERVER"],
+        person_route.config["RABBITMQ_SERVER"],
     )
     lc.update(person_id, request_data)
 
     return CODE_OK
 
 
-@person.delete("/<id>")
+@person_route.delete("/<id>")
 @exception_handler
 def delete_person(id):
     params = request.args.to_dict()
@@ -114,7 +122,9 @@ def delete_person(id):
         return REQUIRED_FIELD
 
     lc = PersonController(
-        write_uid, person.config["MONGO_SERVER"], person.config["RABBITMQ_SERVER"]
+        write_uid,
+        person_route.config["MONGO_SERVER"],
+        person_route.config["RABBITMQ_SERVER"],
     )
     lc.delete(person_id)
 

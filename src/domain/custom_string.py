@@ -22,3 +22,41 @@ class CustomString:
             return True
         else:
             return False
+
+    @staticmethod
+    def sanitize_string(text):
+        """
+        Sanitizes a string by removing potentially harmful characters.
+
+        Args:
+            text: The string to sanitize.
+
+        Returns:
+            The sanitized string.
+        """
+        # Common SQL injection keywords (case-insensitive)
+        injection_pattern = (
+            r"(union|select|insert|update|delete|drop|or|and|\*|\')|\b(exec|execute)\b"
+        )
+
+        # Sanitize using regular expressions
+        return re.sub(injection_pattern, "", text, flags=re.IGNORECASE)
+
+    @staticmethod
+    def check_suspicious_keywords(text):
+        """
+        Performs basic checks for common NoSQL injection keywords.
+
+        **Note:** This is not a robust method and should be used with caution.
+
+        Args:
+            text: The string to check.
+
+        Returns:
+            True if suspicious patterns are found, False otherwise.
+        """
+        injection_keywords = ["$", "or", "and", "--", ";"]
+        for keyword in injection_keywords:
+            if keyword.lower() in text.lower():
+                return True
+        return False

@@ -141,8 +141,8 @@ class PersonDomain:
         name: str,
         last_name: str,
         contact_type: ContactType | int,
-        birthdate=None,
-        document_number=None,
+        birthdate: str = None,
+        document_number: str = None,
         attrs: dict = None,
     ) -> Person | DomainError:
         if (

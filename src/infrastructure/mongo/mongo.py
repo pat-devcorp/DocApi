@@ -34,6 +34,7 @@ class MongoClient:
     def dsn(self):
         return f"mongodb://{self.server.username}:{self.server.password}@{self.server.hostname}:{self.server.port}"
 
+    @staticmethod
     def decoder_criteria(matching) -> None:
         print(matching)
 
@@ -62,7 +63,7 @@ class MongoClient:
         self, attrs: List[str] = None, matching: CriteriaProtocol = None
     ) -> List[Dict] | InfrastructureError:
         if matching is not None:
-            self.decoder_criteria(matching.clauses)
+            self.decoder_criteria(matching)
         attributes = dict
         if attrs is not None:
             attributes = {attr: 1 for attr in attrs}

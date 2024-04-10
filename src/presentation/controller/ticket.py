@@ -13,24 +13,24 @@ class TicketController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = TicketMongo(ref_repository)
+        _r = TicketMongo(ref_repository, TicketDomain.pk)
         _b = ref_broker
         self._uc = TicketUseCase(_w, _r, _b)
 
     def fetch(self) -> list:
         return self._uc.fetch(0)
 
-    def get_by_id(self, ticket_id):
+    def get_by_id(self, ticket_id: str):
         ticket_id = TicketDomain.set_identifier(ticket_id)
 
         return self._uc.get_by_id(ticket_id)
 
-    def delete(self, ticket_id):
+    def delete(self, ticket_id: str):
         ticket_id = TicketDomain.set_identifier(ticket_id)
 
         return self._uc.delete(ticket_id)
 
-    def update(self, ticket_id, params: dict):
+    def update(self, ticket_id: str, params: dict):
         ticket_id = TicketDomain.set_identifier(ticket_id)
         obj = TicketDomain.from_dict(ticket_id, params)
 
@@ -38,16 +38,20 @@ class TicketController:
 
     def create(
         self,
-        ticket_id,
-        channel_type,
-        requirement,
-        because,
-        state=None,
+        ticket_id: str,
+        channel_type: int | ChannelType,
+        requirement: str,
+        because: str,
+        state: str | TicketState = None,
         attrs: dict = None,
     ):
         ticket_id = TicketDomain.set_identifier(ticket_id)
-        enum_channel = ChannelType(channel_type)
-        enum_state = None
+        enum_channel = channel_type
+        if isinstance(channel_type, int):
+            enum_channel = ChannelType(channel_type)
+        enum_state = state
+        if isinstance(state, int):
+            enum_state = TicketState(state)
         if state is None:
             enum_state = TicketState.CREATED
         if attrs is None:

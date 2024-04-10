@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 
 from src.domain.DomainError import DomainError
-from src.domain.enum.contact_type import ContactType
 from src.domain.model.person import Person, PersonDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.mongo.mock_repository import MockRepositoryClient

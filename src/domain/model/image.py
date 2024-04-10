@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import TextIO
 
 from ...utils.file_handler import file_exists, upload_file
 from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
@@ -90,7 +91,7 @@ class ImageDomain:
     @classmethod
     def new(
         cls,
-        image_file,
+        image_file: TextIO,
         image_id: IdentifierHandler,
         path: str,
         attrs: dict = None,

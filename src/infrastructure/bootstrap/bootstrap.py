@@ -19,9 +19,6 @@ class Bootstrap:
         self.LOG_CONFIG = os.path.join(
             self.PROJECT_PATH, "infrastructure", "logger", "config.json"
         )
-        self.BROKER_LOST_MESSAGE_PATH = os.path.join(
-            self.PROJECT_PATH, "log", "broker", "lost"
-        )
 
     def get_from_environment(self):
         self.SECRET_KEY = os.getenv("SECRET_KEY", "BatmanIsBruceWayne")
@@ -34,6 +31,7 @@ class Bootstrap:
                 port=int(os.environ["RABBITMQ_PORT"]),
                 username=os.environ["RABBITMQ_USER"],
                 password=os.environ["RABBITMQ_PASS"],
+                lost_message_path=self.BROKER_PATH,
             )
             self.BROKER_RABBITMQ = RabbitmqClient(self.RABBITMQ_SERVER)
         if self.BROKER == "KAFKA":

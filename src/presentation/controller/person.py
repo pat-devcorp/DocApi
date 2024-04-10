@@ -12,24 +12,24 @@ class PersonController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = PersonMongo(ref_repository)
+        _r = PersonMongo(ref_repository, PersonDomain.pk)
         _b = ref_broker
         self._uc = PersonUseCase(_w, _r, _b)
 
     def fetch(self) -> list:
         return self._uc.fetch(0)
 
-    def get_by_id(self, person_id):
+    def get_by_id(self, person_id: str):
         person_id = PersonDomain.set_identifier(person_id)
 
         return self._uc.get_by_id(person_id)
 
-    def delete(self, person_id):
+    def delete(self, person_id: str):
         person_id = PersonDomain.set_identifier(person_id)
 
         return self._uc.delete(person_id)
 
-    def update(self, person_id, params: dict):
+    def update(self, person_id: str, params: dict):
         params.update({"person_id": person_id})
         obj = PersonDomain.from_dict(params)
 
@@ -37,21 +37,23 @@ class PersonController:
 
     def create(
         self,
-        person_id,
-        name,
-        last_name,
-        contact_type,
-        birthdate=None,
-        document_number=None,
-        address=None,
+        person_id: str,
+        name: str,
+        last_name: str,
+        contact_type: int | ContactType,
+        birthdate: str = None,
+        document_number: str = None,
+        address: str = None,
     ):
         person_id = PersonDomain.set_identifier(person_id)
-        contact = ContactType(contact_type)
+        enum_contact = contact_type
+        if isinstance(contact_type, int):
+            enum_contact = ContactType(contact_type)
         obj = PersonDomain.new(
             person_id,
             name,
             last_name,
-            contact,
+            enum_contact,
             birthdate,
             document_number,
             address,

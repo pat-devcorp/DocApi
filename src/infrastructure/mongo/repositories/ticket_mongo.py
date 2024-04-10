@@ -5,13 +5,13 @@ from ..mongo import MongoClient
 class TicketMongo:
     tablename = "ticket"
 
-    def __init__(self, ref_client: MongoClient, pk=None) -> None | InfrastructureError:
+    def __init__(self, ref_client: MongoClient, pk) -> None | InfrastructureError:
         self._m = ref_client
         self._m.set_tablename(self.tablename)
-        self.pk = pk if pk is not None else "_id"
+        self.pk = pk
 
     def entity_exists(self, identifier) -> bool:
-        if self._m.get_by_id(identifier, [self._pk]) is None:
+        if self._m.get_by_id(identifier, [self.pk]) is None:
             return False
         return True
 

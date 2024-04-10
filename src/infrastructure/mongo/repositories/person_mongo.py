@@ -11,7 +11,7 @@ class PersonMongo:
         self.pk = pk if pk is not None else "_id"
 
     def entity_exists(self, identifier) -> bool:
-        if self._m.get_by_id(identifier, [self._pk]) is None:
+        if self._m.get_by_id(identifier, [self.pk]) is None:
             return False
         return True
 

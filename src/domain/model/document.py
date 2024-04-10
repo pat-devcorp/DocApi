@@ -90,6 +90,6 @@ class DocumentDomain:
         )
         return Document(
             document_id.value,
-            body,
+            CustomString.sanitize_string(body),
             attrs,
         )

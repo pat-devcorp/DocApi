@@ -1,3 +1,5 @@
+from typing import TextIO
+
 from ...application.use_case.image import ImageUseCase
 from ...domain.model.image import ImageDomain
 from ...infrastructure.mongo.repositories.image_mongo import ImageMongo
@@ -12,15 +14,15 @@ class ImageController:
         ref_broker,
     ) -> None:
         _w = ref_write_uid
-        _r = ImageMongo(ref_repository)
+        _r = ImageMongo(ref_repository, ImageDomain.pk)
         _b = ref_broker
         self._uc = ImageUseCase(_w, _r, _b)
         self._p = image_path
 
     def create(
         self,
-        image_file,
-        image_id,
+        image_file: TextIO,
+        image_id: str,
         attrs: dict = None,
     ):
         image_id = ImageDomain.set_identifier(image_id)

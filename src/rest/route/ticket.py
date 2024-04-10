@@ -4,10 +4,10 @@ from ...presentation.controller.ticket import TicketController
 from ..ExceptionHandler import exception_handler
 from ..status_code import REQUIRED_FIELD, WRITER_NOT_PROVIDED
 
-ticket = Blueprint("ticket", __name__, url_prefix="/ticket")
+ticket_route = Blueprint("ticket_route", __name__, url_prefix="/ticket")
 
 
-@ticket.post("/")
+@ticket_route.post("/")
 @exception_handler
 def create_ticket():
     params = request.args.to_dict()
@@ -17,7 +17,9 @@ def create_ticket():
         return (code, message)
 
     lc = TicketController(
-        write_uid, ticket.config["REPOSITORY_MONGO"], ticket.config["BROKER_RABBITMQ"]
+        write_uid,
+        ticket_route.config["REPOSITORY_MONGO"],
+        ticket_route.config["BROKER_RABBITMQ"],
     )
     item = lc.create(
         params.get("ticket_id"),
@@ -29,8 +31,8 @@ def create_ticket():
     return (200, item)
 
 
-@ticket.get("/", defaults={"id": None})
-@ticket.get("/<id>")
+@ticket_route.get("/", defaults={"id": None})
+@ticket_route.get("/<id>")
 @exception_handler
 def fetch_tickets(id=None):
     params = request.args.to_dict()
@@ -40,14 +42,16 @@ def fetch_tickets(id=None):
         return code, message
 
     lc = TicketController(
-        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid,
+        ticket_route.config["MONGO_SERVER"],
+        ticket_route.config["RABBITMQ_SERVER"],
     )
     data = lc.get_by_id(id) if id is not None else lc.fetch()
 
     return (200, data)
 
 
-@ticket.put("/<id>")
+@ticket_route.put("/<id>")
 @exception_handler
 def update_ticket(id):
     params = request.args.to_dict()
@@ -60,14 +64,16 @@ def update_ticket(id):
         return (code, message)
 
     lc = TicketController(
-        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid,
+        ticket_route.config["MONGO_SERVER"],
+        ticket_route.config["RABBITMQ_SERVER"],
     )
     item = lc.update(ticket_id, params)
 
     return (200, item)
 
 
-@ticket.delete("/<id>")
+@ticket_route.delete("/<id>")
 @exception_handler
 def delete_ticket(id):
     params = request.args.to_dict()
@@ -80,7 +86,9 @@ def delete_ticket(id):
         return (code, message)
 
     lc = TicketController(
-        write_uid, ticket.config["MONGO_SERVER"], ticket.config["RABBITMQ_SERVER"]
+        write_uid,
+        ticket_route.config["MONGO_SERVER"],
+        ticket_route.config["RABBITMQ_SERVER"],
     )
     item = lc.delete(ticket_id)
 

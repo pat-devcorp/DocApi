@@ -18,6 +18,7 @@ class RabbitmqServer(BaseModel):
     port: int
     username: str
     password: str
+    lost_message_path: str
 
 
 class RabbitmqClient:
