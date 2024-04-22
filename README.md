@@ -1,5 +1,7 @@
 [style_conventions]
 
+https://nimblehq.co/compass/production/postmortem/
+
 - Repository data attributes: Camel Case
 - objects class: first letter only
 - Util Class: Upper Case

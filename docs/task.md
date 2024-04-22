@@ -47,3 +47,48 @@
 **VOTES YES:** 
 - Patrick Alonso Fuentes Carpio
 **VOTES NO:**
+
+## Feature Design
+
+(Optional) Add design screenshots or Figma links for UI/UX-related stories.
+
+## Bug Environment
+
+- Platform: Web/Android/iOS
+- Device: e.g., iPhone 10
+- OS: e.g., iOS 13
+- Version: e.g., 0.12.0 (519)
+- Environment: staging/production
+
+## Prerequisites
+
+Specify if there are specific conditions that must be met to recreate the issue. For example:
+
+Use an account with no chat history / The app must be freshly launched / Launch the app from the already signed-in state with an account registered with mobile no.
+
+## Steps to Reproduce
+
+1. X
+2. X
+3. X
+
+## Expected Behavior
+
+Describe the expected outcome. Add screenshots if possible.
+
+## Actual Behavior
+
+Describe the actual behavior. Add screenshots and screencasts.
+
+
+## Refactor Why
+
+Describe the purpose of the chore.
+
+## Acceptance Criteria
+
+List down what is being accomplished in the chore and what the QA should test to consider the chore as completed.
+
+## Resources
+
+List any resources needed in accomplishing the chore.

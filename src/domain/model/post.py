@@ -7,19 +7,19 @@ from ..DomainError import DomainError
 from ..enum.identifier_algorithm import IdentifierAlgorithm
 from ..identifier_handler import IdentifierHandler
 
-Document = namedtuple(
-    "Document",
+Post = namedtuple(
+    "Post",
     [
-        "document_id",
+        "post_id",
         "body",
         "attrs",
     ],
 )
 
 
-class DocumentDomain:
+class PostDomain:
     algorithm = IdentifierAlgorithm.NANO_ID
-    pk = "document_id"
+    pk = "post_id"
 
     @classmethod
     def get_default_identifier(cls) -> IdentifierHandler:
@@ -34,31 +34,31 @@ class DocumentDomain:
         return dict(namedtuple_instance._asdict())
 
     @classmethod
-    def from_dict(cls, data: list) -> Document | DomainError:
+    def from_dict(cls, data: list) -> Post | DomainError:
         if data.get(cls.pk) is None:
             raise DomainError(ID_NOT_FOUND, "id must be provided")
 
-        item = {k: data.get(k, None) for k in Document._fields}
-        attrs = {k: v for k, v in data.items() if k not in Document._fields}
+        item = {k: data.get(k, None) for k in Post._fields}
+        attrs = {k: v for k, v in data.items() if k not in Post._fields}
         item["attrs"] = attrs
 
         cls.is_valid(**item)
-        return Document(**item)
+        return Post(**item)
 
     @classmethod
     def is_valid(
         cls,
-        document_id,
+        post_id,
         body,
         attrs,
-    ) -> Document | DomainError:
+    ) -> Post | DomainError:
         errors = list()
 
-        if document_id is None:
+        if post_id is None:
             errors.append("Id must be provided")
         else:
             try:
-                cls.set_identifier(document_id)
+                cls.set_identifier(post_id)
             except DomainError as e:
                 errors.append(str(e))
 
@@ -72,24 +72,24 @@ class DocumentDomain:
     @classmethod
     def new(
         cls,
-        document_id: IdentifierHandler,
+        post_id: IdentifierHandler,
         body: str,
         attrs: dict = None,
-    ) -> Document | DomainError:
-        if not isinstance(
-            document_id, IdentifierHandler
-        ) or CustomString.is_empty_string(body):
+    ) -> Post | DomainError:
+        if not isinstance(post_id, IdentifierHandler) or CustomString.is_empty_string(
+            body
+        ):
             raise DomainError(FIELD_REQUIRED, "fields must be provided")
         if attrs is None:
             attrs = dict()
 
         cls.is_valid(
-            document_id.value,
+            post_id.value,
             body,
             attrs,
         )
-        return Document(
-            document_id.value,
+        return Post(
+            post_id.value,
             CustomString.sanitize_string(body),
             attrs,
         )
