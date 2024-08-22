@@ -1,28 +1,35 @@
+from utils.timeout import timeout_function
 from ...application.use_case.person import PersonUseCase
 from ...domain.enum.contact_type import ContactType
 from ...domain.model.person import PersonDomain
 from ...infrastructure.mongo.repositories.person_mongo import PersonMongo
 
-
+# Time out per use case
 class PersonController:
     def __init__(
         self,
         ref_write_uid,
-        ref_repository,
-        ref_broker,
+        ref_env,
+        ref_timeout,
     ) -> None:
         _w = ref_write_uid
-        _r = PersonMongo(ref_repository, PersonDomain.pk)
-        _b = ref_broker
+        _r = PersonMongo(ref_env["REPOSITORY_MONGO"])
+        _b = ref_env["BROKER_RABBITMQ"]
+        self._t = ref_timeout
         self._uc = PersonUseCase(_w, _r, _b)
 
     def fetch(self) -> list:
-        return self._uc.fetch(0)
+        return timeout_function(
+                self._uc.fetch(0), seconds=self._t
+            )
 
     def get_by_id(self, person_id: str):
         person_id = PersonDomain.set_identifier(person_id)
 
-        return self._uc.get_by_id(person_id)
+        return timeout_function(
+            self._uc.get_by_id(person_id), seconds=self._t
+        )
+
 
     def delete(self, person_id: str):
         person_id = PersonDomain.set_identifier(person_id)

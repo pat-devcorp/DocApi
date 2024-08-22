@@ -23,8 +23,8 @@ def create_person():
 
     lc = PersonController(
         write_uid,
-        person_route.config["REPOSITORY_MONGO"],
-        person_route.config["BROKER_RABBITMQ"],
+        person_route.config,
+        constant.TIME_OUT
     )
 
     request_data = request.get_json()

@@ -8,7 +8,7 @@ from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.ticket import TicketController
-from src.utils.status_code import FIELD_REQUIRED, ID_NOT_VALID, INVALID_FORMAT
+from src.domain.model.status_code import FIELD_REQUIRED, ID_NOT_VALID, INVALID_FORMAT
 
 
 class TestTicketController(unittest.TestCase):

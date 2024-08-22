@@ -1,6 +1,6 @@
 from ...domain.identifier_handler import IdentifierHandler
 from ...domain.model.ticket import Ticket, TicketDomain
-from ...utils.status_code import DB_ID_NOT_FOUND
+from ...domain.model.status_code import DB_ID_NOT_FOUND
 from ..ApplicationError import ApplicationError
 from ..audit_handler import AuditHandler
 from ..BrokerProtocol import BrokerProtocol

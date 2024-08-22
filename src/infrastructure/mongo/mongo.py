@@ -5,9 +5,11 @@ from bson import ObjectId
 from pydantic import BaseModel
 from pymongo import MongoClient as MongoProvider
 
-from ...utils.status_code import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
+from ...domain.model.error_message import DB_CREATE_FAIL, DB_DELETE_FAIL, DB_UPDATE_FAIL
 from ..InfrastructureError import InfrastructureError
 
+
+#TODO do not close the connection and give the responsability of manage function to repositories
 
 class MongoServer(BaseModel):
     hostname: str

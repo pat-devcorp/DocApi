@@ -2,7 +2,7 @@ from collections import namedtuple
 from typing import TextIO
 
 from ...utils.file_handler import file_exists, upload_file
-from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from .status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError

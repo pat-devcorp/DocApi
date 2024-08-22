@@ -1,7 +1,7 @@
 from ..domain.identifier_handler import IdentifierHandler
 from ..utils.custom_date import CustomDatetime
 from ..utils.HandlerError import HandlerError
-from ..utils.status_code import INVALID_FORMAT, WRITER_NOT_FOUND
+from ..domain.model.status_code import INVALID_FORMAT, WRITER_NOT_FOUND
 from .ApplicationError import ApplicationError
 
 

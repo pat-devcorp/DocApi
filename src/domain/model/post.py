@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from ...utils.status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
+from .status_code import FIELD_REQUIRED, ID_NOT_FOUND, INVALID_FORMAT
 from ..custom_dict import CustomDict
 from ..custom_string import CustomString
 from ..DomainError import DomainError

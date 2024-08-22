@@ -5,7 +5,7 @@ from bson import ObjectId
 from nanoid import generate
 from sonyflake import SonyFlake
 
-from ..utils.status_code import ID_NOT_VALID
+from .model.status_code import ID_NOT_VALID
 from .DomainError import DomainError
 from .enum.identifier_algorithm import IdentifierAlgorithm
 

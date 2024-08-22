@@ -9,7 +9,7 @@ from src.infrastructure.broker.mock_broker import MockBrokerClient
 from src.infrastructure.mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.person import PersonController
-from src.utils.status_code import FIELD_REQUIRED, INVALID_FORMAT
+from src.domain.model.status_code import FIELD_REQUIRED, INVALID_FORMAT
 
 
 class TestPersonController(unittest.TestCase):

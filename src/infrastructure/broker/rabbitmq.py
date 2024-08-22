@@ -5,7 +5,7 @@ import pika
 from pydantic import BaseModel
 
 from ...utils.custom_date import CustomDatetime
-from ...utils.status_code import (
+from ...domain.model.status_code import (
     BROKER_CHANNEL_ERROR,
     BROKER_CONNECTION_FAIL,
     BROKER_SEND_FAIL,
