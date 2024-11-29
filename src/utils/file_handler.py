@@ -5,10 +5,12 @@ import magic
 import requests
 
 from .HandlerError import HandlerError
-from ..domain.model.status_code import NOT_FOUND, UNSUPPORTED_MEDIA_TYPE, WARNING_FILE
 
 ALLOWED_EXTENSIONS = ["pdf"]
 VIRUS_ANALYZER_API = "https://www.virustotal.com/gui/home/upload"
+UNSUPPORTED_MEDIA_TYPE = "This type of file is not supported"
+WARNING_FILE = "File could have potential virus"
+NOT_FOUND = "Not found"
 
 
 def is_valid_type(file, allowed_extensions=ALLOWED_EXTENSIONS):

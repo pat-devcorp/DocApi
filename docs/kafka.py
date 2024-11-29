@@ -71,7 +71,7 @@ class KafkaBroker:
 #     dto = {
 #         "write_uid": "8888",
 #         "_id": current_id,
-#         "description": "This is a ticket modified",
+#         "description": "This is a task modified",
 #     }
 #     try:
 #         kafka_producer.send("create/task", str(dto))

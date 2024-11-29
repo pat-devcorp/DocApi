@@ -23,8 +23,8 @@
 
 ## Related Task
 
-1. Ticket Principal
-1.1 Current ticket
+1. Task Principal
+1.1 Current task
 
 ## Milestones
 

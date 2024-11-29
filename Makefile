@@ -1,5 +1,5 @@
 # Makefile for python code
-# 
+#
 # > make help
 #
 # The following commands can be used.
@@ -34,7 +34,7 @@ include $(ENVIRONMENT_VARIABLE_FILE)
 export-env: ## export environment variables
 export-env:
 	$(call export.functions)
-	
+
 init: ## sets up environment and installs requirements
 init:
 	pip install -r /requirements.txt
@@ -79,6 +79,14 @@ build:
 	@docker image rm -f $(DOCKER_NAME):$(API_VERSION) || true
 	docker build -t $(DOCKER_NAME):$(API_VERSION) --file ./Dockerfile .
 
+proto_build:
+proto_build:
+	poetry run python -m grpc_tools.protoc --proto_path=rpc/proto \
+		--python_out=rpc/build \
+		--pyi_out=rpc/build \
+		--grpc_python_out=rpc/build \
+		rpc/proto/*.proto
+
 run: ## Run docker container
 run:
 	@if [ -n "$$(docker ps -a -q -f name=$(DOCKER_NAME))" ]; then \
@@ -86,7 +94,7 @@ run:
     fi
 	docker run -p 5000:$(API_PORT) --name $(DOCKER_NAME) $(DOCKER_NAME):$(API_VERSION)
 
-dev: ##Run with docker-compose 
+dev: ##Run with docker-compose
 dev:
 	docker-compose up -d
 

@@ -1,11 +1,1 @@
-API_VERSION = "1.0.0.0"
-NAME = "task_api"
-SYSTEM_UID = "IamBatman"
-VIRUS_ANALYZER_API = "https://www.virustotal.com/gui/home/upload"
-ALLOWED_EXTENSIONS = "pdf,jpg,png"
-MAX_FILE_WEIGHT = 16000
-DATE_FORMAT = "%Y/%m/%d"
-TIME_FORMAT = "%H:%M:%S"
-DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
-TIME_OUT = 600
 NOT_AVAILABLE = "N/A"

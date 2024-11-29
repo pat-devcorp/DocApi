@@ -1,5 +1,4 @@
 import pytest
-
 from src.rest.server import create_server
 
 

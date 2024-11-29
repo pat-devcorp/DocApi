@@ -4,7 +4,7 @@ import pytest
 
 from domain.model.post import Post, PostDomain
 from src.infrastructure.broker.mock_broker import MockBrokerClient
-from src.infrastructure.mongo.mock_repository import MockRepositoryClient
+from src.infrastructure.my_mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import UserService
 
 # from src.presentation.controller.document import PostController

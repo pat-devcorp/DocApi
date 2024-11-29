@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from ..infrastructure.bootstrap import constant
+DATE_FORMAT = "%Y/%m/%d"
+TIME_FORMAT = "%H:%M:%S"
 
 
 class BaseDatetime(datetime):
@@ -48,8 +49,8 @@ class BaseDatetime(datetime):
 
 
 class CustomDate(BaseDatetime):
-    str_format = constant.DATE_FORMAT
+    str_format = DATE_FORMAT
 
 
 class CustomDatetime(BaseDatetime):
-    str_format = constant.DATE_FORMAT + " " + constant.TIME_FORMAT
+    str_format = DATE_FORMAT + " " + TIME_FORMAT

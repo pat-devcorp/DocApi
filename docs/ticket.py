@@ -18,6 +18,7 @@
 
     **NOTES:** The module should be developed following clean architecture principles.
 """
+
 {
     "authorId": {
         "representation": "I",

@@ -8,12 +8,12 @@ from PIL import Image as ImageHelper
 from src.domain.DomainError import DomainError
 from src.domain.identifier_handler import IdentifierHandler
 from src.domain.model.image import Image, ImageDomain
+from src.domain.model.status_code import FIELD_REQUIRED, INVALID_FORMAT
 from src.infrastructure.bootstrap.bootstrap import Bootstrap
 from src.infrastructure.broker.mock_broker import MockBrokerClient
-from src.infrastructure.mongo.mock_repository import MockRepositoryClient
+from src.infrastructure.my_mongo.mock_repository import MockRepositoryClient
 from src.infrastructure.services.User import UserService
 from src.presentation.controller.image import ImageController
-from src.domain.model.status_code import FIELD_REQUIRED, INVALID_FORMAT
 
 
 class TestImageController(unittest.TestCase):

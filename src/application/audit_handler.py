@@ -1,33 +1,34 @@
 from ..domain.identifier_handler import IdentifierHandler
+from ..domain.model.constant import INVALID_FORMAT, WRITER_NOT_FOUND
 from ..utils.custom_date import CustomDatetime
-from ..utils.HandlerError import HandlerError
-from ..domain.model.status_code import INVALID_FORMAT, WRITER_NOT_FOUND
-from .ApplicationError import ApplicationError
+from ..utils.handler_error import HandlerError
+from .application_error import ApplicationError
 
 
 class AuditHandler:
-    _fields = ["write_uid", "write_at", "create_uid", "create_at"]
+    _fields = ["writeUId", "writeAt", "createUId", "createAt", "isFromRepo"]
 
     @classmethod
     def is_valid(
         cls,
-        write_uid,
-        write_at,
-        create_uid,
-        create_at,
+        writeUId,
+        writeAt,
+        createUId,
+        createAt,
+        isFromRepo
     ) -> list:
         errors = list()
 
-        if write_uid is None:
+        if writeUId is None:
             errors.append("Write user is required")
 
-        if write_at is None:
-            is_ok, err = CustomDatetime.check_format(write_at)
+        if writeAt is None:
+            is_ok, err = CustomDatetime.check_format(writeAt)
             if not is_ok:
                 errors.append(err)
 
-        if create_at is not None:
-            is_ok, err = CustomDatetime.check_format(create_at)
+        if createAt is not None:
+            is_ok, err = CustomDatetime.check_format(createAt)
             if not is_ok:
                 errors.append(err)
 
@@ -35,16 +36,16 @@ class AuditHandler:
             raise ApplicationError(INVALID_FORMAT, "\n".join(errors))
 
         return {
-            "write_uid": write_uid,
-            "write_at": write_at,
-            "create_uid": create_uid,
-            "create_at": create_at,
+            "writeUId": writeUId,
+            "writeAt": writeAt,
+            "createUId": createUId,
+            "createAt": createAt,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> dict | HandlerError:
-        write_uid = data.get("write_uid")
-        if write_uid is None:
+        writeUId = data.get("writeUId")
+        if writeUId is None:
             raise HandlerError(WRITER_NOT_FOUND)
 
         item = dict()
@@ -54,17 +55,16 @@ class AuditHandler:
         return cls.is_valid(**item)
 
     @classmethod
-    def get_update_fields(cls, identifier: IdentifierHandler) -> dict | HandlerError:
-        current_uid = identifier.value
-        return {"write_uid": current_uid, "write_at": CustomDatetime.str_now()}
+    def get_update_fields(cls, currentUId: str) -> dict:
+        return {"writeUId": currentUId, "writeAt": CustomDatetime.str_now()}
 
     @classmethod
-    def get_create_fields(cls, identifier: IdentifierHandler) -> dict | HandlerError:
+    def get_create_fields(cls, currentUId: str) -> dict:
         now = CustomDatetime.str_now()
-        current_uid = identifier.value
         return cls.is_valid(
-            current_uid,
+            currentUId,
             now,
-            current_uid,
+            currentUId,
             now,
+            false
         )

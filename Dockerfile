@@ -36,13 +36,13 @@ FROM python:3.10.14-slim
 ENV APP_HOME=/home/app
 RUN mkdir -p $APP_HOME
 COPY ./entrypoint.sh / $APP_HOME
-COPY ./wsgi.py / $APP_HOME
+COPY ./cmd / $APP_HOME
 COPY ./pytest.ini $APP_HOME
 COPY ./src $APP_HOME/src
 RUN chmod -R 777 $APP_HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd 
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd
 COPY --from=builder /usr/wheels /wheels
 COPY --from=builder /usr/requirements.txt .
 RUN pip install --upgrade pip

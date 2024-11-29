@@ -1,5 +1,5 @@
 from src.infrastructure.bootstrap.bootstrap import Bootstrap
-from src.infrastructure.mongo.mongo import mongo_interface_test
+from src.infrastructure.my_mongo.mongo import mongo_interface_test
 
 
 def test_mongo():
